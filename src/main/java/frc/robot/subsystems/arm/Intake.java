@@ -11,6 +11,11 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.EncoderType;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,16 +44,16 @@ public class Intake extends SubsystemBase {
   private double maxCurrent = 0.0;
   private int maxCurrentCtr = 0;
 
-  private TalonSRX intake;
-  private GamePieceLEDs leds;
+  private CANSparkMax intake;
+
   /** Creates a new intake. */
-  public Intake(GamePieceLEDs leds) {
-    this.leds = leds;
+  public Intake() {
 
-    intake = new TalonSRX(CAN.INTAKE_TALON);
+    intake = new CANSparkMax(CAN.INTAKE_SPARKMAX, MotorType.kBrushless);
 
-    intake.configFactoryDefault();
+    intake.restoreFactoryDefaults();
 
+    /* 
     // intake.setSensorPhase(false);
     intake.setInverted(true);
    
@@ -64,46 +69,10 @@ public class Intake extends SubsystemBase {
     intake.config_kI(INTAKE_PID_SLOT, intake_NORMAL_I_VAL, Constants.CTRE.TIMEOUT_MS);
     intake.config_kD(INTAKE_PID_SLOT, intake_NORMAL_D_VAL, Constants.CTRE.TIMEOUT_MS);
     intake.config_kF(INTAKE_PID_SLOT, intake_NORMAL_F_VAL, Constants.CTRE.TIMEOUT_MS);
+    */
   }
 
-  public void setSpeed(IntakeSpeed intakeSpeed) {
-    if (leds.getGameState() == GamePiece.CONE) {
-      intake.set(ControlMode.PercentOutput, intakeSpeed.coneSpeed); 
-    } else if (leds.getGameState() == GamePiece.CUBE) {
-      intake.set(ControlMode.PercentOutput, intakeSpeed.cubeSpeed); 
-    } else {
-      intake.set(ControlMode.PercentOutput, 0.0);
-    }
-  }  
-
-  public enum IntakeSpeed {
-    STOP(0.0, 0.0),
-    INTAKE(1.0, -1.0),
-    EJECT(-1.0, 1.0);
-
-    public final double coneSpeed;
-    public final double cubeSpeed;
-
-    private IntakeSpeed(double coneSpeed, double cubeSpeed) {
-      this.coneSpeed = coneSpeed;
-      this.cubeSpeed = cubeSpeed;
-    }
-  }
-
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Intake current", intake.getSupplyCurrent());
-    if (DriverStation.isDisabled()) {
-      maxCurrent = 0.0;
-    } else {
-      double current = intake.getSupplyCurrent();
-      if(current > maxCurrent || maxCurrentCtr > 500) {
-        maxCurrent = current;
-        maxCurrentCtr = 0;
-      }
-    }
-    maxCurrentCtr++;
-    SmartDashboard.putNumber("Intake max current", maxCurrent);
-
+  public void setSpeed() {
+    intake.set(0.0); //change later
   }
 }

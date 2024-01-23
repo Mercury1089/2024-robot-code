@@ -36,8 +36,10 @@ public class MoveArm extends Command {
   public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
+  /*
   @Override
   public boolean isFinished() {
     return arm.getError() < MercMath.inchesToEncoderTicks(THRESHOLD_DEGREES);
   }
+  */
 }

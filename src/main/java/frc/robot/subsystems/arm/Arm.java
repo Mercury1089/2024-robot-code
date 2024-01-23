@@ -6,11 +6,18 @@ package frc.robot.subsystems.arm;
 
 import java.util.function.Supplier;
 
+import javax.management.relation.Relation;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,13 +47,17 @@ public class Arm extends SubsystemBase {
   public final double GEAR_RATIO = 1;
   public final double THRESHOLD_DEGREES = 2.0;
 
-  private TalonFX arm;
+  private CANSparkMax arm;
+  private AbsoluteEncoder arm_absolute_encoder;
+  private RelativeEncoder arm_relative_encoder;
 
   public Arm() {
-    arm = new TalonFX(CAN.ARM_TALON);
+    arm = new CANSparkMax(CAN.ARM_SPARKMAX, MotorType.kBrushless);
+    arm_absolute_encoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
 
-    arm.configFactoryDefault();
+    arm.restoreFactoryDefaults();
 
+    /* 
     // Account for motor orientation.
     arm.setSensorPhase(true);
     arm.setInverted(false);
@@ -81,28 +92,15 @@ public class Arm extends SubsystemBase {
     arm.config_kF(ARM_PID_SLOT, ARM_NORMAL_F_VAL, Constants.CTRE.TIMEOUT_MS);
 
     arm.selectProfileSlot(ARM_PID_SLOT, Constants.CTRE.PRIMARY_PID_LOOP);
+    */
   }
 
-  public void configPID(double P, double I, double D, double nomFwd, double nomRev) {
-    arm.config_kP(ARM_PID_SLOT, P, Constants.CTRE.TIMEOUT_MS);
-    arm.config_kI(ARM_PID_SLOT, I, Constants.CTRE.TIMEOUT_MS);
-    arm.config_kD(ARM_PID_SLOT, D, Constants.CTRE.TIMEOUT_MS);
-    
-    arm.configNominalOutputForward(nomFwd, Constants.CTRE.TIMEOUT_MS);
-    arm.configNominalOutputReverse(nomRev, Constants.CTRE.TIMEOUT_MS);
+  
+  public void resetEncoders() {
+    arm_relative_encoder.setPosition(0);
   }
 
-  /**  sets the position of the entire arm */
-  public void setPosition(ArmPosition armPos) {
-    arm.set(ControlMode.Position, armPos.degreePos);
-  }
-
-  public void setSpeed(Supplier<Double> speedSupplier) {
-    arm.set(ControlMode.PercentOutput, 
-      MathUtil.applyDeadband(speedSupplier.get(), SWERVE.JOYSTICK_DEADBAND)
-    );
-  }
-
+  /* 
   public double getError() {
     return arm.getClosedLoopError(ARM_PID_SLOT);
   }
@@ -137,23 +135,5 @@ public class Arm extends SubsystemBase {
     // );
 
   }
-
-  public enum ArmPosition {
-    INSIDE(0.0),
-    HOME(-5.0),
-    RAMP_PICKUP(46.0), // single substation
-    SHELF_PICKUP(100.0), // double substation
-    HIGH_SCORE(100.0),
-    MID_SCORE(75.0),
-    UP_CONE_BULLDOZER(28.0),
-    BULLDOZER(17.0),
-    FELL_OVER(0); // lol
-
-    public final double degreePos;
-
-        ArmPosition(double degreePos) {
-          this.degreePos = degreePos;
-        }
-  }
- 
+  */
 }

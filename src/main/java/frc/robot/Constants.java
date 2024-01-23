@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -96,14 +98,14 @@ public final class Constants {
     public static final int TURNING_BACK_LEFT = 2;
     public static final int DRIVING_BACK_RIGHT = 5;
     public static final int TURNING_BACK_RIGHT = 6;
-    public static final int ARM_TALON = 9;
-    public static final int PIGEON_DRIVETRAIN = 10;
-    public static final int WRIST_TALON = 11;
-    public static final int TELESCOPE_TALON = 12;
-    public static final int ARM_GYRO = 13;
-    public static final int CLAW_TALON = 16;
-    public static final int INTAKE_TALON = 14;
-
+    
+    public static final int PIGEON_DRIVETRAIN = 9;
+    public static final int WRIST_SPARKMAX = 10;
+    public static final int SHOOTER_SPARKMAX = 11;
+    public static final int ARM_SPARKMAX = 12;
+    public static final int FEEDER_SPARKMAX = 13;
+    public static final int INTAKE_SPARKMAX = 14;
+    
     
     private CAN() {}
   }

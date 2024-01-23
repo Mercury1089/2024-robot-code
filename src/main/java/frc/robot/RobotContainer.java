@@ -16,7 +16,9 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 
 import java.util.function.Supplier;
 
-
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -51,6 +53,7 @@ public class RobotContainer {
   private Arm arm;
   private Intake intake;
   private Drivetrain drivetrain;
+  private CANSparkMax neoMotor;
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -62,13 +65,9 @@ public class RobotContainer {
     gamepad = new CommandXboxController(DS_USB.GAMEPAD);
     configureBindings();
     
-    // subsystems & sensors
-    LEDs = new GamePieceLEDs();
-    
     arm = new Arm();
-    arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadRightY), arm));
     
-    intake = new Intake(LEDs);
+    intake = new Intake();
 
     drivetrain = new Drivetrain();
     drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
@@ -76,33 +75,14 @@ public class RobotContainer {
 
     // auton = new Autons(drivetrain, arm, telescope, wrist, intake, LEDs);
 
-    left1.whileTrue(
-      new RunCommand(() -> intake.setSpeed(Intake.IntakeSpeed.INTAKE), intake).handleInterrupt(() -> intake.setSpeed(Intake.IntakeSpeed.STOP))
-    );
-    
-    left3.onTrue(
-      new RunCommand(() -> LEDs.lightUp(LEDState.PURPLE), LEDs)
-    );
-    //-38 wrist ramp pickup
-    //25 claw ramp pickup
-
-    
-    left6.onTrue(new RunCommand(() -> LEDs.lightUp(LEDState.CELEBRATION), LEDs));
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
   
     // in honor of resetTurret
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
-
-    // right1.onTrue(new RunCommand(() -> claw.open(), claw));
-    right1.whileTrue(
-      new RunCommand(() -> intake.setSpeed(Intake.IntakeSpeed.EJECT), intake).handleInterrupt(() -> intake.setSpeed(Intake.IntakeSpeed.STOP))
-    );
-    
-    right3.onTrue(new RunCommand(() -> LEDs.lightUp(LEDState.YELLOW), LEDs));
     
     right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
-    
+  
   }
 
   /**
