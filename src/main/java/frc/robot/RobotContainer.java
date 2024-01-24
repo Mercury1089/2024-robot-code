@@ -12,6 +12,7 @@ import frc.robot.subsystems.GamePieceLEDs;
 import frc.robot.subsystems.GamePieceLEDs.LEDState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
+import frc.robot.subsystems.arm.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 import java.util.function.Supplier;
@@ -54,6 +55,7 @@ public class RobotContainer {
   private Intake intake;
   private Drivetrain drivetrain;
   private CANSparkMax neoMotor;
+  private Shooter shooter;
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -65,24 +67,31 @@ public class RobotContainer {
     gamepad = new CommandXboxController(DS_USB.GAMEPAD);
     configureBindings();
     
-    arm = new Arm();
+//    arm = new Arm();
     
-    intake = new Intake();
+//    intake = new Intake();
 
-    drivetrain = new Drivetrain();
-    drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
-    drivetrain.resetGyro();
+    shooter = new Shooter();
+    //shooter.setDefaultCommand(new RunCommand(() -> shooter.runShooter(gamepadLeftX), shooter));
+
+//    drivetrain = new Drivetrain();
+//    drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
+//    drivetrain.resetGyro();
 
     // auton = new Autons(drivetrain, arm, telescope, wrist, intake, LEDs);
 
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
   
     // in honor of resetTurret
-    left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
-    left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
+//    left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
+//    left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
     
-    right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
+//    right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   
+    gamepadX.onTrue(new RunCommand(() -> shooter.setVelocity(5600), shooter));
+    gamepadY.onTrue(new RunCommand(() -> shooter.setVelocity(4500), shooter));
+    gamepadA.onTrue(new RunCommand(() -> shooter.setVelocity(4000), shooter));
+    gamepadB.onTrue(new RunCommand(() -> shooter.stopShooter(), shooter));
   }
 
   /**
@@ -163,6 +172,6 @@ public class RobotContainer {
    */
   public Autons getAutonomous() {
     // An example command will be run in autonomous
-    return auton;
+    return new Autons();
   }
 }

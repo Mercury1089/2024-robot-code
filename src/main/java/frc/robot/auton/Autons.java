@@ -30,7 +30,6 @@ import frc.robot.subsystems.GamePieceLEDs;
 import frc.robot.subsystems.GamePieceLEDs.LEDState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
-import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 
@@ -62,29 +61,8 @@ public class Autons {
     /**
      * made by rohan no thanks to owen :(
      */
-    public Autons(Drivetrain drivetrain, Arm arm, Intake intake, GamePieceLEDs LEDs) {
+    public Autons() {
 
-        Optional<Alliance> allianceColor = DriverStation.getAlliance();
-        this.allianceColor = allianceColor.isPresent() ? allianceColor.get() : Alliance.Blue;
-
-        this.knownLocations = new KnownLocations();
-        this.currentSelectedAuton = KnownLocations.DO_NOTHING;
-        this.currentSelectedPose = knownLocations.START_TOPMOST;
-        this.currentSelectedAutonType = AutonTypes.LEAVE_COMMUNITY;
-
-        this.drivetrain = drivetrain;
-        this.arm = arm;
-        this.intake = intake;
-
-        this.pathConstraints = new PathConstraints(MAX_DIRECTIONAL_SPEED, MAX_ACCELERATION); 
-        turningPIDController = new PIDController(TURNING_P_VAL, 0, 0);
-        turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
-        xController = new PIDController(X_P_VAL, 0, 0);
-        yController = new PIDController(Y_P_VAL, 0, 0);
-        
-        setChoosers();
-
-        this.LEDs = LEDs;
     }
 
     public void setChoosers() {
@@ -158,6 +136,7 @@ public class Autons {
      * - Auton Type
      */
     public void updateDash() {
+        /*
         // runs constantly when disabled
         PathPoint currAuton = autonChooser.getSelected();
         PathPoint currPose = startingPoseChooser.getSelected();
@@ -189,6 +168,7 @@ public class Autons {
             this.currentSelectedAutonType = currAutonType;
             //this.autonCommand = buildAutonCommand();
         }
+        */
     }
     
     /**

@@ -101,10 +101,11 @@ public final class Constants {
     
     public static final int PIGEON_DRIVETRAIN = 9;
     public static final int WRIST_SPARKMAX = 10;
-    public static final int SHOOTER_SPARKMAX = 11;
-    public static final int ARM_SPARKMAX = 12;
-    public static final int FEEDER_SPARKMAX = 13;
-    public static final int INTAKE_SPARKMAX = 14;
+    public static final int SHOOTER_FRONT_SPARKMAX = 11;
+    public static final int SHOOTER_BACK_SPARKMAX = 12;
+    public static final int ARM_SPARKMAX = 13;
+    public static final int FEEDER_SPARKMAX = 14;
+    public static final int INTAKE_SPARKMAX = 15;
     
     
     private CAN() {}

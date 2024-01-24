@@ -6,25 +6,22 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.util.MercMath;
 
 public class MoveArm extends Command {
   /** Creates a new MoveArm. */
   Arm arm;
-  ArmPosition armPos;
   public final double THRESHOLD_DEGREES = 2.0;
-  public MoveArm(Arm arm, ArmPosition armPos) {
+  public MoveArm(Arm arm) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
-    this.armPos = armPos; 
     addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arm.setPosition(armPos);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
