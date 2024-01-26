@@ -3,7 +3,8 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
-      "/SmartDashboard/Set LEDs": "String Chooser"
+      "/SmartDashboard/Set LEDs": "String Chooser",
+      "/SmartDashboard/Swerve Odometry": "Field2d"
     }
   },
   "NetworkTables": {
@@ -18,5 +19,8 @@
         "open": true
       }
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   }
 }

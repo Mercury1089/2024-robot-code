@@ -71,12 +71,12 @@ public class RobotContainer {
     
 //    intake = new Intake();
 
-    shooter = new Shooter();
+    //shooter = new Shooter();
     //shooter.setDefaultCommand(new RunCommand(() -> shooter.runShooter(gamepadLeftX), shooter));
 
-//    drivetrain = new Drivetrain();
-//    drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
-//    drivetrain.resetGyro();
+    drivetrain = new Drivetrain();
+    drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
+    drivetrain.resetGyro();
 
     // auton = new Autons(drivetrain, arm, telescope, wrist, intake, LEDs);
 
@@ -88,10 +88,10 @@ public class RobotContainer {
     
 //    right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   
-    gamepadX.onTrue(new RunCommand(() -> shooter.setVelocity(5600), shooter));
-    gamepadY.onTrue(new RunCommand(() -> shooter.setVelocity(4500), shooter));
-    gamepadA.onTrue(new RunCommand(() -> shooter.setVelocity(4000), shooter));
-    gamepadB.onTrue(new RunCommand(() -> shooter.stopShooter(), shooter));
+    //gamepadX.onTrue(new RunCommand(() -> shooter.setVelocity(5600), shooter));
+    //gamepadY.onTrue(new RunCommand(() -> shooter.setVelocity(4500), shooter));
+    //gamepadA.onTrue(new RunCommand(() -> shooter.setVelocity(4000), shooter));
+    //gamepadB.onTrue(new RunCommand(() -> shooter.stopShooter(), shooter));
   }
 
   /**

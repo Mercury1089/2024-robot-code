@@ -38,14 +38,14 @@ public class AprilTagCamera extends PhotonCamera {
     public AprilTagCamera() {
         super(DEFAULT_CAM_NAME);
         try {
-            fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+            fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
         } catch (IOException e) {
             fieldLayout = null;
         }
         Transform3d robotToCam = new Transform3d(
             new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0, 0, 0)
         );
-        estimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_RIO, this, robotToCam);
+        estimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, this, robotToCam);
     }
 
     public double getDistanceToTarget() {
