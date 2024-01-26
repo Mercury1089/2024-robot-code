@@ -60,7 +60,7 @@ public class Shooter extends SubsystemBase {
 
     shooterFront.setIdleMode(IdleMode.kCoast);
     shooterBack.setIdleMode(IdleMode.kCoast);
-
+    // TODO: Double check these with final mechanism
     shooterFront.setInverted(true);
     shooterBack.follow(shooterFront, false); // Do not follow inverted
 
@@ -103,6 +103,9 @@ public class Shooter extends SubsystemBase {
    * @param distance distance to the target as provided by the limelight
    * @return calculated velocity based on distance
    */
+
+  //TODO: calculate velocity, angle
+
   private double getVelocityFromDistance(double distance) {
     // return 75.0 + (2932.0 * Math.exp(0.0246 * distance));
    // return 3410 - 70.2 * distance + 7.71 * Math.pow(distance, 2) + 0.0349 * Math.pow(distance, 3);
@@ -114,7 +117,7 @@ public class Shooter extends SubsystemBase {
    * @return velocity required or NULL_RPM if velocity is invalid
    */
   public double getVelocityToTarget() {
-    double distance = 0.0; // limelight.getDistanceToTarget();
+    double distance = 0.0; // TODO: get distance from AprilTagCamera
     return distance >= MIN_DISTANCE && distance <= MAX_DISTANCE ? getVelocityFromDistance(distance) : NULL_RPM;
   }
 

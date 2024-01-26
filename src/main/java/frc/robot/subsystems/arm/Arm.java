@@ -16,6 +16,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -47,16 +48,19 @@ public class Arm extends SubsystemBase {
   public final double GEAR_RATIO = 1;
   public final double THRESHOLD_DEGREES = 2.0;
 
+  
   private CANSparkMax arm;
-  private AbsoluteEncoder arm_absolute_encoder;
-  private RelativeEncoder arm_relative_encoder;
+  private SparkPIDController armPIDController;
+  private AbsoluteEncoder armAbsoluteEncoder;
+  private RelativeEncoder armRelativeEncoder;
 
   public Arm() {
     arm = new CANSparkMax(CAN.ARM_SPARKMAX, MotorType.kBrushless);
-    arm_absolute_encoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
-
     arm.restoreFactoryDefaults();
-
+    armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
+    armPIDController = arm.getPIDController();
+    //TODO: set encoder conversion
+    
     /* 
     // Account for motor orientation.
     arm.setSensorPhase(true);
@@ -97,9 +101,12 @@ public class Arm extends SubsystemBase {
 
   
   public void resetEncoders() {
-    arm_relative_encoder.setPosition(0);
+    armRelativeEncoder.setPosition(0);
   }
 
+  public void setPosition(ArmPosition pos) {
+    armPIDController.setReference(pos.degreePos, CANSparkMax.ControlType.kPosition);
+  }
   /* 
   public double getError() {
     return arm.getClosedLoopError(ARM_PID_SLOT);
@@ -136,4 +143,15 @@ public class Arm extends SubsystemBase {
 
   }
   */
+  public enum ArmPosition {
+    INSIDE(0.0),
+    HOME(-5.0);
+    
+    public final double degreePos;
+
+        ArmPosition(double degreePos) {
+          this.degreePos = degreePos;
+        }
+  }
+ 
 }
