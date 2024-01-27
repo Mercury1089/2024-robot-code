@@ -58,4 +58,5 @@ public class Wrist extends SubsystemBase {
         WristPosition(double degreePos) {
           this.degreePos = degreePos;
         }
+  }
 }
