@@ -78,7 +78,7 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
     drivetrain.resetGyro();
 
-    // auton = new Autons(drivetrain, arm, telescope, wrist, intake, LEDs);
+    auton = new Autons(drivetrain);
 
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
   
@@ -172,6 +172,6 @@ public class RobotContainer {
    */
   public Autons getAutonomous() {
     // An example command will be run in autonomous
-    return new Autons();
+    return auton;
   }
 }

@@ -14,6 +14,7 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -33,6 +35,7 @@ import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.AprilTagCamera;
+import frc.robot.util.SwerveUtils;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -48,8 +51,16 @@ public class Drivetrain extends SubsystemBase {
   private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
   public final double ROLL_WHEN_LEVEL = -1.75;
 
-  private Pose2d testInitialPose; 
+  // Slew rate filter variables for controlling lateral acceleration
+  private double currentAngularSpeed = 0.0;
+  private double currentTranslationDir = 0.0;
+  private double currentTranslationMag = 0.0;
 
+  private SlewRateLimiter magLimiter = new SlewRateLimiter(SWERVE.MAGNITUDE_SLEW_RATE);
+  private SlewRateLimiter angularSpeedLimiter = new SlewRateLimiter(SWERVE.ROTATIONAL_SLEW_RATE);
+  private double prevTime = WPIUtilJNI.now() * 1e-6;
+
+  private Pose2d testInitialPose; 
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -70,22 +81,22 @@ public class Drivetrain extends SubsystemBase {
     smartdashField = new Field2d();
     SmartDashboard.putData("Swerve Odometry", smartdashField);
 
-   // testInitialPose = new Pose2d(Units.inchesToMeters(54.93), Units.inchesToMeters(199.65), getPigeonRotation());
+    // testInitialPose = new Pose2d(Units.inchesToMeters(54.93), Units.inchesToMeters(199.65), getPigeonRotation());
     testInitialPose = new Pose2d(0, 0, getPigeonRotation()); //  will be reset by setManualPose()
 
     // wpilib convienence classes
     /*
-     * swerve modules relative to robot center --> kinematics object --> odometry object 
-     */
+    * swerve modules relative to robot center --> kinematics object --> odometry object 
+    */
 
     double widthFromCenter = Units.inchesToMeters(WHEEL_WIDTH) / 2;
     double lengthFromCenter = Units.inchesToMeters(WHEEL_LENGTH) / 2;
 
     swerveKinematics = new SwerveDriveKinematics(
-      new Translation2d(lengthFromCenter, widthFromCenter),
-      new Translation2d(lengthFromCenter, -widthFromCenter),
-      new Translation2d(-lengthFromCenter, widthFromCenter),
-      new Translation2d(-lengthFromCenter, -widthFromCenter)
+    new Translation2d(lengthFromCenter, widthFromCenter),
+    new Translation2d(lengthFromCenter, -widthFromCenter),
+    new Translation2d(-lengthFromCenter, widthFromCenter),
+    new Translation2d(-lengthFromCenter, -widthFromCenter)
     );
     odometry = new SwerveDrivePoseEstimator(
       swerveKinematics, 
@@ -96,7 +107,8 @@ public class Drivetrain extends SubsystemBase {
         backLeftModule.getPosition(),
         backRightModule.getPosition()
       },
-      getInitialPose());
+      getInitialPose()
+    );
 
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
@@ -165,29 +177,86 @@ public class Drivetrain extends SubsystemBase {
     pigeon.reset();
   }
 
-  public void joyDrive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative) {
-    xSpeed *= SWERVE.MAX_DIRECTION_SPEED;
-    ySpeed *= SWERVE.MAX_DIRECTION_SPEED;
-    angularSpeed *= SWERVE.MAX_ROTATIONAL_SPEED;
+  public void joyDrive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative, boolean rateLimit) {
+    double xSpeedCommanded;
+    double ySpeedCommanded;
+
+    if (rateLimit) {
+      // Convert XY to polar for rate limiting
+      double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
+      double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
+
+      // Calculate the direction slew rate based on an estimate of the lateral acceleration
+      double directionSlewRate;
+      if (currentTranslationMag != 0.0) {
+        directionSlewRate = Math.abs(SWERVE.DIRECTION_SLEW_RATE / currentTranslationMag);
+      } else {
+        directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
+      }
+
+      double currentTime = WPIUtilJNI.now() * 1e-6;
+      double elapsedTime = currentTime - prevTime;
+      double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, currentTranslationDir);
+      if (angleDif < 0.45*Math.PI) {
+        currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+        currentTranslationMag = magLimiter.calculate(inputTranslationMag);
+      }
+      else if (angleDif > 0.85*Math.PI) {
+        if (currentTranslationMag > 1e-4) { //some small number to avoid floating-point errors with equality checking
+          // keep currentTranslationDir unchanged
+          currentTranslationMag = magLimiter.calculate(0.0);
+        }
+        else {
+          currentTranslationDir = SwerveUtils.WrapAngle(currentTranslationDir + Math.PI);
+          currentTranslationMag = magLimiter.calculate(inputTranslationMag);
+        }
+      }
+      else {
+        currentTranslationDir = SwerveUtils.StepTowardsCircular(currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+        currentTranslationMag = magLimiter.calculate(0.0);
+      }
+      prevTime = currentTime;
+      
+      xSpeedCommanded = currentTranslationMag * Math.cos(currentTranslationDir);
+      ySpeedCommanded = currentTranslationMag * Math.sin(currentTranslationDir);
+      currentAngularSpeed = angularSpeedLimiter.calculate(angularSpeed);
+
+
+    } else {
+      xSpeedCommanded = xSpeed;
+      ySpeedCommanded = ySpeed;
+      currentAngularSpeed = angularSpeed;
+    }
+
+    double xSpeedDelivered = xSpeedCommanded * SWERVE.MAX_DIRECTION_SPEED;
+    double ySpeedDelivered = ySpeedCommanded * SWERVE.MAX_DIRECTION_SPEED;
+    double angularSpeedDelivered = currentAngularSpeed * SWERVE.MAX_ROTATIONAL_SPEED;
 
     ChassisSpeeds fieldRelativeSpeeds;
 
     if (fieldRelative) {
-      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, angularSpeed, getPigeonRotation());
+      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered, getPigeonRotation());
     } else {
-      fieldRelativeSpeeds = new ChassisSpeeds(xSpeed, ySpeed, angularSpeed);
+      fieldRelativeSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered);
     }
     
-    // general swerve speeds --> speed per module
-    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(fieldRelativeSpeeds);
+    driveFieldRelative(fieldRelativeSpeeds);
+  }
 
-    setModuleStates(moduleStates);
+  public void joyDrive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative) {
+    joyDrive(xSpeed, ySpeed, angularSpeed, fieldRelative, false);
   }
 
   public void joyDrive(double xSpeed, double ySpeed, double angularSpeed) {
     joyDrive(xSpeed, ySpeed, angularSpeed, true);
   }
 
+  public void driveFieldRelative(ChassisSpeeds fieldRelativeSpeeds) {
+    // general swerve speeds --> speed per module
+    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(fieldRelativeSpeeds);
+
+    setModuleStates(moduleStates);
+  }
 
   /** update smartdash with trajectory */
   public void setTrajectorySmartdash(Trajectory trajectory, String type) {
@@ -217,6 +286,14 @@ public class Drivetrain extends SubsystemBase {
     return swerveKinematics;
   }
 
+  public ChassisSpeeds getFieldRelativSpeeds() {
+    return swerveKinematics.toChassisSpeeds(new SwerveModuleState[] {
+        frontLeftModule.getState(),
+        frontRightModule.getState(),
+        backLeftModule.getState(),
+        backRightModule.getState()
+    });
+  }
 
   public Rotation2d getPigeonRotation() {
     /* return the pigeon's yaw as Rotation2d object */
@@ -243,12 +320,12 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     odometry.update(
-    getPigeonRotation(),
-    new SwerveModulePosition[] {
-      frontLeftModule.getPosition(),
-      frontRightModule.getPosition(),
-      backLeftModule.getPosition(),
-      backRightModule.getPosition()
+      getPigeonRotation(),
+      new SwerveModulePosition[] {
+        frontLeftModule.getPosition(),
+        frontRightModule.getPosition(),
+        backLeftModule.getPosition(),
+        backRightModule.getPosition()
     });
 
     if (fieldWidgetType.equals("Odometry")) {
