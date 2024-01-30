@@ -111,7 +111,23 @@ public class SwerveModule {
         desiredState.angle = new Rotation2d(turningEncoder.getPosition());
         drivingEncoder.setPosition(0);
     }
+  /**
+   * Returns the current state of the module.
+   *
+   * @return The current state of the module.
+   */
+  public SwerveModuleState getState() {
+    // Apply chassis angular offset to the encoder position to get the position
+    // relative to the chassis.
+    return new SwerveModuleState(drivingEncoder.getVelocity(),
+        new Rotation2d(turningEncoder.getPosition() - chassisAngularOffset));
+  }
 
+  /**
+   * Returns the current position of the module.
+   *
+   * @return The current position of the module.
+   */
     public SwerveModulePosition getPosition() {
         // Apply chassis angular offset to the encoder position to get the position
         // relative to the chassis.

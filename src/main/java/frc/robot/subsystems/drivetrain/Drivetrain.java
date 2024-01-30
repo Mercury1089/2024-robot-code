@@ -69,29 +69,29 @@ public class Drivetrain extends SubsystemBase {
     pigeon = new WPI_PigeonIMU(CAN.PIGEON_DRIVETRAIN);
     pigeon.configFactoryDefault();
     pigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
-    
+
     // photonvision wrapper
     photonCam = new AprilTagCamera();
 
     smartdashField = new Field2d();
     SmartDashboard.putData("Swerve Odometry", smartdashField);
 
-   // testInitialPose = new Pose2d(Units.inchesToMeters(54.93), Units.inchesToMeters(199.65), getPigeonRotation());
+    // testInitialPose = new Pose2d(Units.inchesToMeters(54.93), Units.inchesToMeters(199.65), getPigeonRotation());
     testInitialPose = new Pose2d(0, 0, getPigeonRotation()); //  will be reset by setManualPose()
 
     // wpilib convienence classes
     /*
-     * swerve modules relative to robot center --> kinematics object --> odometry object 
-     */
+    * swerve modules relative to robot center --> kinematics object --> odometry object 
+    */
 
     double widthFromCenter = Units.inchesToMeters(WHEEL_WIDTH) / 2;
     double lengthFromCenter = Units.inchesToMeters(WHEEL_LENGTH) / 2;
 
     swerveKinematics = new SwerveDriveKinematics(
-      new Translation2d(lengthFromCenter, widthFromCenter),
-      new Translation2d(lengthFromCenter, -widthFromCenter),
-      new Translation2d(-lengthFromCenter, widthFromCenter),
-      new Translation2d(-lengthFromCenter, -widthFromCenter)
+    new Translation2d(lengthFromCenter, widthFromCenter),
+    new Translation2d(lengthFromCenter, -widthFromCenter),
+    new Translation2d(-lengthFromCenter, widthFromCenter),
+    new Translation2d(-lengthFromCenter, -widthFromCenter)
     );
     odometry = new SwerveDrivePoseEstimator(
       swerveKinematics, 
@@ -102,7 +102,8 @@ public class Drivetrain extends SubsystemBase {
         backLeftModule.getPosition(),
         backRightModule.getPosition()
       },
-      getInitialPose());
+      getInitialPose()
+    );
 
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
@@ -187,7 +188,6 @@ public class Drivetrain extends SubsystemBase {
       } else {
         directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
       }
-      
 
       double currentTime = WPIUtilJNI.now() * 1e-6;
       double elapsedTime = currentTime - prevTime;
@@ -235,10 +235,7 @@ public class Drivetrain extends SubsystemBase {
       fieldRelativeSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered);
     }
     
-    // general swerve speeds --> speed per module
-    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(fieldRelativeSpeeds);
-
-    setModuleStates(moduleStates);
+    driveFieldRelative(fieldRelativeSpeeds);
   }
 
   public void joyDrive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative) {
@@ -249,6 +246,12 @@ public class Drivetrain extends SubsystemBase {
     joyDrive(xSpeed, ySpeed, angularSpeed, true);
   }
 
+  public void driveFieldRelative(ChassisSpeeds fieldRelativeSpeeds) {
+    // general swerve speeds --> speed per module
+    SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(fieldRelativeSpeeds);
+
+    setModuleStates(moduleStates);
+  }
 
   /** update smartdash with trajectory */
   public void setTrajectorySmartdash(Trajectory trajectory, String type) {
@@ -278,6 +281,14 @@ public class Drivetrain extends SubsystemBase {
     return swerveKinematics;
   }
 
+  public ChassisSpeeds getFieldRelativSpeeds() {
+    return swerveKinematics.toChassisSpeeds(new SwerveModuleState[] {
+        frontLeftModule.getState(),
+        frontRightModule.getState(),
+        backLeftModule.getState(),
+        backRightModule.getState()
+    });
+  }
 
   public Rotation2d getPigeonRotation() {
     /* return the pigeon's yaw as Rotation2d object */
@@ -290,12 +301,12 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     odometry.update(
-    getPigeonRotation(),
-    new SwerveModulePosition[] {
-      frontLeftModule.getPosition(),
-      frontRightModule.getPosition(),
-      backLeftModule.getPosition(),
-      backRightModule.getPosition()
+      getPigeonRotation(),
+      new SwerveModulePosition[] {
+        frontLeftModule.getPosition(),
+        frontRightModule.getPosition(),
+        backLeftModule.getPosition(),
+        backRightModule.getPosition()
     });
 
     if (fieldWidgetType.equals("Odometry")) {
