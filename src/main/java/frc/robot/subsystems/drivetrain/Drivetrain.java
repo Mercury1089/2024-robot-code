@@ -11,9 +11,11 @@ import org.photonvision.EstimatedRobotPose;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -22,9 +24,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.AprilTagCamera;
@@ -218,6 +223,20 @@ public class Drivetrain extends SubsystemBase {
 
     // Yaw is negated for field-centric in order to ensure 'true' forward of robot
     return Rotation2d.fromDegrees(-(pigeon.getAngle()));
+  }
+
+  public double getDistanceToSpeaker() {
+    Optional<Alliance> allianceColor = DriverStation.getAlliance();
+    double distance = 0.0;
+    if (allianceColor.isPresent()) {
+      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+        photonCam.getTagPose(APRILTAGS.BLUE_SPEAKER) : 
+        photonCam.getTagPose(APRILTAGS.RED_SPEAKER);
+      if (tagPose.isPresent()) {
+        distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
+      }
+    }
+    return distance;
   }
 
   @Override

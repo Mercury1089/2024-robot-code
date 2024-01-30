@@ -26,6 +26,7 @@ import frc.robot.Constants.CAN;
 import frc.robot.subsystems.GamePieceLEDs;
 import frc.robot.subsystems.GamePieceLEDs.GamePiece;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class Wrist extends SubsystemBase {
 
@@ -33,13 +34,16 @@ public class Wrist extends SubsystemBase {
   private SparkPIDController wristPIDController;
   private AbsoluteEncoder wristAbsoluteEncoder;
   private RelativeEncoder wristRelativeEncoder;
+  private Drivetrain drivetrain;
 
   /** Creates a new intake. */
-  public Wrist() {
+  public Wrist(Drivetrain driveTrain) {
     wrist = new CANSparkMax(CAN.WRIST_SPARKMAX, MotorType.kBrushless);
     wrist.restoreFactoryDefaults();
     wristAbsoluteEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
     wristPIDController = wrist.getPIDController();
+    
+    this.drivetrain = driveTrain;
     //TODO: set encoder conversion
   }
   public void resetEncoders() {
@@ -58,4 +62,9 @@ public class Wrist extends SubsystemBase {
         WristPosition(double degreePos) {
           this.degreePos = degreePos;
         }
+  }
+
+  public double getDistanceToSpeaker() {
+    return drivetrain.getDistanceToSpeaker();
+  }
 }

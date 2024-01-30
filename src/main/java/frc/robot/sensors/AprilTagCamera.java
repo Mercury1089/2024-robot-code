@@ -16,10 +16,14 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Constants.APRILTAGS;
 
 /** Wrapper for PhotonCamera class */
 public class AprilTagCamera extends PhotonCamera {
@@ -81,6 +85,10 @@ public class AprilTagCamera extends PhotonCamera {
 
     public double getApriltagID() {
         return getLatestResult().getBestTarget().getFiducialId();
+    }
+
+    public Optional<Pose3d> getTagPose(int tagId) {
+        return fieldLayout.getTagPose(tagId);
     }
 }
 

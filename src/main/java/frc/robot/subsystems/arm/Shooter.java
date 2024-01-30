@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.PIDGain;
 
 public class Shooter extends SubsystemBase {
@@ -39,7 +40,7 @@ public class Shooter extends SubsystemBase {
   private boolean useSpeed, setPID;
   private double smartdashkP = 0.00024, smartdashkF = 0.0002016, smartdashkI = 0.00000001, smartDashkD = 0.01;
   private int shootCount = 0;
-
+  private Drivetrain drivetrain;
   
 
   public enum ShooterMode {
@@ -71,7 +72,8 @@ public class Shooter extends SubsystemBase {
   
     setPIDGain(SHOOTER_PID_SLOTS.VELOCITY_GAINS.getValue(), velocityGains);
 
-    this.breakBeamSensor = new DigitalInput(BREAKBEAM_DIO); 
+    this.breakBeamSensor = new DigitalInput(BREAKBEAM_DIO);
+    this.drivetrain = drivetrain;
   }
 
   public void stopShooter() {
@@ -79,6 +81,9 @@ public class Shooter extends SubsystemBase {
     shooterFront.stopMotor();
   }
 
+  public double getDistanceToSpeaker() {
+    return drivetrain.getDistanceToSpeaker();
+  }
   /**
    * Get the current velocity of the shooter
    * @return the velocity in RPM
@@ -248,6 +253,7 @@ public class Shooter extends SubsystemBase {
     return this.setPID;
   }
 
+  
 
 
   @Override

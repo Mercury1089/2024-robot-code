@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.management.relation.Relation;
@@ -20,12 +21,18 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 
 
 public class Arm extends SubsystemBase {
@@ -53,12 +60,15 @@ public class Arm extends SubsystemBase {
   private SparkPIDController armPIDController;
   private AbsoluteEncoder armAbsoluteEncoder;
   private RelativeEncoder armRelativeEncoder;
+  private Drivetrain drivetrain;
 
-  public Arm() {
+  public Arm(Drivetrain drivetrain) {
     arm = new CANSparkMax(CAN.ARM_SPARKMAX, MotorType.kBrushless);
     arm.restoreFactoryDefaults();
     armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
     armPIDController = arm.getPIDController();
+    this.drivetrain = drivetrain;
+
     //TODO: set encoder conversion
     
     /* 
@@ -106,6 +116,10 @@ public class Arm extends SubsystemBase {
 
   public void setPosition(ArmPosition pos) {
     armPIDController.setReference(pos.degreePos, CANSparkMax.ControlType.kPosition);
+  }
+
+  public double getDistanceToSpeaker() {
+    return drivetrain.getDistanceToSpeaker();
   }
   /* 
   public double getError() {

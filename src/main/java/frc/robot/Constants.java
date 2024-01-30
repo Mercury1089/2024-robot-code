@@ -40,6 +40,13 @@ public final class Constants {
     }
   }
 
+  public static class APRILTAGS {
+    public static final int BLUE_SPEAKER = 7;
+    public static final int RED_SPEAKER = 4;
+    public APRILTAGS() {
+    }
+  }
+
   public static class SWERVE {
 
     public static final double WHEEL_DIAMETER = 0.0762; // meters
