@@ -307,13 +307,34 @@ public class Drivetrain extends SubsystemBase {
     double distance = 0.0;
     if (allianceColor.isPresent()) {
       Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-        photonCam.getTagPose(APRILTAGS.BLUE_SPEAKER) : 
-        photonCam.getTagPose(APRILTAGS.RED_SPEAKER);
+        photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
+        photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
       if (tagPose.isPresent()) {
         distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
       }
     }
     return distance;
+  }
+
+  public double getDegreesToSpeaker() {
+    Optional<Alliance> allianceColor = DriverStation.getAlliance();
+    double theta = 0.0;
+
+    //TODO: fix logic for getting theta
+    if (allianceColor.isPresent()) {
+      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+        photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
+        photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
+      if (tagPose.isPresent()) {
+        if (allianceColor.get() == Alliance.Blue) {
+          theta = getPose().getRotation().getDegrees() > 180 ? 180 - getPose().getRotation().getDegrees() : getPose().getRotation().getDegrees() - 180;
+        } else {
+          theta = getPose().getRotation().getDegrees() < 180 ? 180 - getPose().getRotation().getDegrees() : getPose().getRotation().getDegrees() - 180;
+        }
+      }
+    }
+
+    return theta;
   }
 
   @Override
@@ -342,6 +363,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Roll", getRoll());
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
+    SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker", getDegreesToSpeaker());
 
 
     Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
