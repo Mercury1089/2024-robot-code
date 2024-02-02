@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems.drivetrain;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
@@ -373,6 +375,21 @@ public class Drivetrain extends SubsystemBase {
     return theta;
   }
 
+  public double getDegreesToSpeakerApriltag() {
+    var result = photonCam.getLatestResult();
+    double yaw = 0.0;
+
+    if (result.hasTargets()) {
+      List<PhotonTrackedTarget> targets = result.getTargets();
+      
+      for(int i = 0; i < targets.size() - 1; i++) {
+        if (targets.get(i).getFiducialId() == APRILTAGS.MIDDLE_BLUE_SPEAKER) {
+          yaw = targets.get(i).getYaw();
+        }
+      }
+    }
+    return yaw;
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -400,7 +417,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
     SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker", getDegreesToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker without AprilTag", getDegreesToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
 
