@@ -25,27 +25,34 @@ public class KnownLocations {
 
     // auton starts
     public final Pose2d 
-        START_LEFT_NOTE,
-        START_MID_NOTE,
-        START_RIGHT_NOTE;
-
-    // notes -> NOTE_WING_1 lines up w/NOTE_CENTER_1
-    public final Pose2d
-        NOTE_WING_1,
-        NOTE_WING_2,
-        NOTE_WING_3,
-        NOTE_CENTER_1,
-        NOTE_CENTER_2,
-        NOTE_CENTER_3,
-        NOTE_CENTER_4,
-        NOTE_CENTER_5;
+        START_TOPMOST,
+        START_TOP_SECOND,
+        START_BOTTOM_SECOND,
+        START_BOTTOMMOST,
+        START_MIDDLE_CONE;
     
-    //field -> SUBWOOFER_1 points w/NOTE_WING_1
+    // elements
     public final Pose2d
-        AMP,
-        SUBWOOFER_1,
-        SUBWOOFER_2,
-        SUBWOOFER_3;
+        ELEMENT1,
+        ELEMENT2,
+        ELEMENT3,
+        ELEMENT4;
+    
+    //charging station
+    public final Pose2d
+        CHARGING_MIDDLE_CONE,
+        CHARGING_CENTER,
+        CHARGING_TOP_LEFT,
+        CHARGING_TOP_RIGHT,
+        CHARGING_BOTTOM_LEFT,
+        CHARGING_BOTTOM_RIGHT;
+
+    public final Pose2d
+        WAYPOINT_TOP,
+        WAYPOINT_BOTTOM,
+        WAYPOINT_CHARGING;
+        // WAYPOINT_CHARGING_BACK;
+    
         
     public Optional<Alliance> allianceColor = DriverStation.getAlliance();
 
@@ -54,12 +61,11 @@ public class KnownLocations {
         allianceColor = DriverStation.getAlliance();
 
         if ( allianceColor.isPresent() && allianceColor.get() == Alliance.Blue) {
-            /*START_TOPMOST = PathPointInch(54.93+16.5, 199.65, 0);
+            START_TOPMOST = PathPointInch(54.93+16.5, 199.65, 0);
             START_TOP_SECOND = PathPointInch(54.93+16.5, 173.52, 0);
             START_BOTTOM_SECOND = PathPointInch(54.93+16.5, 41.67, 0);
             START_BOTTOMMOST = PathPointInch(54.93+16.5, 16.15, 0);
-            START_MIDDLE_CONE = PathPointInch(54.93+16.5, 129.9, 0);  */
-
+            START_MIDDLE_CONE = PathPointInch(54.93+16.5, 129.9, 0);
             // START_MIDDLE_CONE = new PathPoint(
             //     new Translation2d(
             //         START_TOPMOST.position.getX(),
@@ -69,18 +75,12 @@ public class KnownLocations {
             //     Rotation2d.fromDegrees(180)
             // );
 
-            NOTE_WING_1 = PathPointInch(279.31-27.5, 180.02, 0);
-            NOTE_WING_2 = PathPointInch(279.31-27.5, 180.02, 0);
-            NOTE_WING_3 = PathPointInch(279.31-27.5, 180.02, 0);
+            ELEMENT1 = PathPointInch(279.31-27.5, 180.02, 0);
+            ELEMENT2 = PathPointInch(279.31-27.5, 132.02, 0);
+            ELEMENT3 = PathPointInch(279.31-27.5, 84.02, 0);
+            ELEMENT4 = PathPointInch(279.31-27.5, 36.02, 0);
 
-            NOTE_CENTER_1 = PathPointInch(279.31-27.5, 180.02, 0);
-            NOTE_CENTER_2 = PathPointInch(279.31-27.5, 180.02, 0);
-            NOTE_CENTER_3 = PathPointInch(279.31-27.5, 180.02, 0);
-            NOTE_CENTER_4 = PathPointInch(279.31-27.5, 180.02, 0);
-            NOTE_CENTER_5 = PathPointInch(279.31-27.5, 180.02, 0);
-
-            
-            /* CHARGING_MIDDLE_CONE = PathPointInch(153.93+12, 129.9, 0); // For auton starting at mid cone
+            CHARGING_MIDDLE_CONE = PathPointInch(153.93+12, 129.9, 0); // For auton starting at mid cone
             CHARGING_CENTER = PathPointInch(153.93-12, 107.85, 0);
             CHARGING_TOP_LEFT=  PathPointInch(117.16, 155.51, 0);
             CHARGING_TOP_RIGHT = PathPointInch(190.96, 155.51, 0);
@@ -128,10 +128,10 @@ public class KnownLocations {
             WAYPOINT_CHARGING = new Pose2d(
                 new Translation2d(
                     (ELEMENT1.getX() + CHARGING_BOTTOM_LEFT.getX()) / 2.0,
-                    (CHARGING_TOP_RIGHT.getY() + CHARGING_BOTTOM_RIGHT.getY()) / 2.0 
+                    (CHARGING_TOP_RIGHT.getY() + CHARGING_BOTTOM_RIGHT.getY()) / 2.0
                 ),
                 Rotation2d.fromDegrees(0)
-            ); */
+            );
 
             
         }
