@@ -13,11 +13,13 @@ import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -320,17 +322,29 @@ public class Drivetrain extends SubsystemBase {
     Optional<Alliance> allianceColor = DriverStation.getAlliance();
     double theta = 0.0;
 
-    //TODO: fix logic for getting theta
     if (allianceColor.isPresent()) {
       Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
         photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
         photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
       if (tagPose.isPresent()) {
-        if (allianceColor.get() == Alliance.Blue) {
-          theta = getPose().getRotation().getDegrees() > 180 ? 180 - getPose().getRotation().getDegrees() : getPose().getRotation().getDegrees() - 180;
-        } else {
-          theta = getPose().getRotation().getDegrees() < 180 ? 180 - getPose().getRotation().getDegrees() : getPose().getRotation().getDegrees() - 180;
-        }
+        double tagX = tagPose.get().toPose2d().getX();
+        double roboX = getPose().getX();
+        double tagY = tagPose.get().toPose2d().getY();
+        double roboY = getPose().getY();
+        double headingReferenceAngle = getPose().getRotation().getDegrees() > 0 ? 
+          180 - getPose().getRotation().getDegrees() : 
+          getPose().getRotation().getDegrees() - 180;
+          
+        double x = ((180/Math.PI) * Math.atan(Math.abs(roboX-tagX)/Math.abs(roboY-tagY)));
+       // Transform2d targetTransform = new Transform2d(getPose(), tagPose.get().toPose2d());
+       // theta = targetTransform.getRotation().getDegrees();
+        //theta = getPose().getRotation().getDegrees() - 90.0 + (180/Math.PI) * Math.atan(Math.abs(roboX-tagX)/Math.abs(roboY-tagY));
+        theta =  ((90 - x) - headingReferenceAngle);
+        //Transform2d relativePose = getPose().minus(tagPose.get().toPose2d());
+        //theta = 180 - relativePose.getRotation().getDegrees();
+        /*allianceColor.get() == Alliance.Blue ? 
+          Math.abs(MathUtil.inputModulus(getPose().getRotation().getDegrees() - 180, -180, 180)) : 
+          Math.abs(MathUtil.inputModulus(getPose().getRotation().getDegrees() + 180, -180, 180)); */
       }
     }
 
@@ -365,6 +379,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
     SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
     SmartDashboard.putNumber("Angle to speaker", getDegreesToSpeaker());
+    SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("Tag Pose", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
 
 
     Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
