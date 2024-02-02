@@ -77,7 +77,7 @@ public class Autons {
 
         this.knownLocations = new KnownLocations();
         this.currentSelectedAuton = KnownLocations.DO_NOTHING;
-        this.currentSelectedPose = knownLocations.START_TOPMOST;
+        //this.currentSelectedPose = knownLocations.START_TOPMOST;
         this.currentSelectedAutonType = AutonTypes.LEAVE_COMMUNITY;
 
         this.drivetrain = drivetrain;
