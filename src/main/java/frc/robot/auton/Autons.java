@@ -113,24 +113,24 @@ public class Autons {
 
     public void setChoosers() {
 
-        // select the ELEMENT to visit during auton (or DO NOTHING)
-        autonChooser = new SendableChooser<Pose2d>();
-        autonChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        autonChooser.addOption("Element 1", knownLocations.ELEMENT1);
-        autonChooser.addOption("Element 2", knownLocations.ELEMENT2);
-        autonChooser.addOption("Element 3", knownLocations.ELEMENT3);
-        autonChooser.addOption("Element 4", knownLocations.ELEMENT4);
-        SmartDashboard.putData("Auton Element Chooser", autonChooser);
-        SmartDashboard.putString("Auton Selected: ", this.currentSelectedAuton.toString());
+        // // select the ELEMENT to visit during auton (or DO NOTHING)
+        // autonChooser = new SendableChooser<Pose2d>();
+        // autonChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
+        // autonChooser.addOption("Element 1", knownLocations.ELEMENT1);
+        // autonChooser.addOption("Element 2", knownLocations.ELEMENT2);
+        // autonChooser.addOption("Element 3", knownLocations.ELEMENT3);
+        // autonChooser.addOption("Element 4", knownLocations.ELEMENT4);
+        // SmartDashboard.putData("Auton Element Chooser", autonChooser);
+        // SmartDashboard.putString("Auton Selected: ", this.currentSelectedAuton.toString());
 
-        // select the MANUAL STARTING POSITION of the robot
-        this.startingPoseChooser = new SendableChooser<Pose2d>();
-        this.startingPoseChooser.setDefaultOption("TOPMOST", knownLocations.START_TOPMOST);
-        this.startingPoseChooser.addOption("TOP SECOND", knownLocations.START_TOP_SECOND);
-        this.startingPoseChooser.addOption("BOTTOM SECOND", knownLocations.START_BOTTOM_SECOND);
-        this.startingPoseChooser.addOption("BOTTOMMOST", knownLocations.START_BOTTOMMOST);
-        this.startingPoseChooser.addOption("MIDDLE CONE", knownLocations.START_MIDDLE_CONE);
-        SmartDashboard.putData("Manual Starting Pose", startingPoseChooser);
+        // // select the MANUAL STARTING POSITION of the robot
+        // this.startingPoseChooser = new SendableChooser<Pose2d>();
+        // this.startingPoseChooser.setDefaultOption("TOPMOST", knownLocations.START_TOPMOST);
+        // this.startingPoseChooser.addOption("TOP SECOND", knownLocations.START_TOP_SECOND);
+        // this.startingPoseChooser.addOption("BOTTOM SECOND", knownLocations.START_BOTTOM_SECOND);
+        // this.startingPoseChooser.addOption("BOTTOMMOST", knownLocations.START_BOTTOMMOST);
+        // this.startingPoseChooser.addOption("MIDDLE CONE", knownLocations.START_MIDDLE_CONE);
+        // SmartDashboard.putData("Manual Starting Pose", startingPoseChooser);
 
         // select whether to visit charging station or score 2nd piece (or leave community)
         this.autonTypeChooser = new SendableChooser<AutonTypes>();
