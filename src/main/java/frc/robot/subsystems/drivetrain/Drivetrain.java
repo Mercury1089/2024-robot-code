@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems.drivetrain;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
@@ -331,15 +333,37 @@ public class Drivetrain extends SubsystemBase {
         double roboX = getPose().getX();
         double tagY = tagPose.get().toPose2d().getY();
         double roboY = getPose().getY();
-        double headingReferenceAngle = getPose().getRotation().getDegrees() > 0 ? 
-          180 - getPose().getRotation().getDegrees() : 
-          getPose().getRotation().getDegrees() - 180;
+        double robotRelativeAngle = 0.0;
+        double tempAngle = 0.0;
+        double tagAngle = (180 / Math.PI) * Math.atan(Math.abs(roboX - tagX) / Math.abs(roboY - tagY));
+        double robotDegrees = getPose().getRotation().getDegrees();
+        boolean flipped = false;
+        if (roboY - tagY > 0) {
+          roboY -= 2 * (roboY - tagY);
+          robotRelativeAngle = -1 * robotDegrees;
+          flipped = true;
+        } else {
+          robotRelativeAngle = robotDegrees;
+        }
           
-        double x = ((180/Math.PI) * Math.atan(Math.abs(roboX-tagX)/Math.abs(roboY-tagY)));
+        if (robotDegrees > -1 * (90 - tagAngle) && robotDegrees < 90) {
+          tempAngle = (90 - robotRelativeAngle) + tagAngle;
+        }  
+        if (robotDegrees > 90 && robotDegrees < tagAngle ){
+          tempAngle = tagAngle - (90 - robotRelativeAngle);
+        }  
+        if (robotDegrees > tagAngle) {
+          tempAngle = (90 - robotRelativeAngle) - tagAngle;
+        }
+        if (robotDegrees < -1 * tagAngle) {
+          tempAngle = (-180 - robotRelativeAngle) - (90 - tagAngle);
+        }
+        theta = flipped ? tempAngle * -1 : tempAngle;
+        //double x = ((180/Math.PI) * Math.atan(Math.abs(roboX-tagX)/Math.abs(roboY-tagY)));
        // Transform2d targetTransform = new Transform2d(getPose(), tagPose.get().toPose2d());
        // theta = targetTransform.getRotation().getDegrees();
         //theta = getPose().getRotation().getDegrees() - 90.0 + (180/Math.PI) * Math.atan(Math.abs(roboX-tagX)/Math.abs(roboY-tagY));
-        theta =  ((90 - x) - headingReferenceAngle);
+       // theta =  ((90 - x) - headingReferenceAngle);
         //Transform2d relativePose = getPose().minus(tagPose.get().toPose2d());
         //theta = 180 - relativePose.getRotation().getDegrees();
         /*allianceColor.get() == Alliance.Blue ? 
@@ -351,6 +375,21 @@ public class Drivetrain extends SubsystemBase {
     return theta;
   }
 
+  public double getDegreesToSpeakerApriltag() {
+    var result = photonCam.getLatestResult();
+    double yaw = 0.0;
+
+    if (result.hasTargets()) {
+      List<PhotonTrackedTarget> targets = result.getTargets();
+      
+      for(int i = 0; i < targets.size() - 1; i++) {
+        if (targets.get(i).getFiducialId() == APRILTAGS.MIDDLE_BLUE_SPEAKER) {
+          yaw = targets.get(i).getYaw();
+        }
+      }
+    }
+    return yaw;
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -378,7 +417,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
     SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker", getDegreesToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker without AprilTag", getDegreesToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
 
