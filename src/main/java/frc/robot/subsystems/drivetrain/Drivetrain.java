@@ -49,8 +49,8 @@ public class Drivetrain extends SubsystemBase {
   private Field2d smartdashField;
   private final String fieldWidgetType = "Odometry";
   
-  private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
-  private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
+  private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
+  private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
   public final double ROLL_WHEN_LEVEL = -1.75;
 
   // Slew rate filter variables for controlling lateral acceleration
