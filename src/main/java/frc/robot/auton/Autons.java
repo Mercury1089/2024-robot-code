@@ -10,6 +10,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -44,12 +45,12 @@ import frc.robot.util.PathUtils;
 
 public class Autons {
 
-    private SendableChooser<Pose2d> autonChooser;
+    private SendableChooser<Pose2d> firstElementChooser;
     private SendableChooser<Pose2d> startingPoseChooser;
     private SendableChooser<AutonTypes> autonTypeChooser;
-    private Pose2d currentSelectedAuton;
+    private Pose2d firstElement;
     private Pose2d currentSelectedPose;
-    private AutonTypes currentSelectedAutonType;
+    private AutonTypes firstElementType;
     private PathConstraints pathConstraints;
     private PIDController turningPIDController;
     private PIDController xController, yController;
@@ -76,9 +77,9 @@ public class Autons {
         this.allianceColor = allianceColor.isPresent() ? allianceColor.get() : Alliance.Blue;
 
         this.knownLocations = new KnownLocations();
-        this.currentSelectedAuton = KnownLocations.DO_NOTHING;
+        this.firstElement = KnownLocations.DO_NOTHING;
         this.currentSelectedPose = KnownLocations.DO_NOTHING;
-        this.currentSelectedAutonType = AutonTypes.LEAVE_COMMUNITY;
+        this.firstElementType = AutonTypes.LEAVE_STARTING_ZONE;
 
         this.drivetrain = drivetrain;
         this.pathConstraints = new PathConstraints(
@@ -114,28 +115,34 @@ public class Autons {
     public void setChoosers() {
 
         // select the ELEMENT to visit during auton (or DO NOTHING)
-        autonChooser = new SendableChooser<Pose2d>();
-        autonChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        // autonChooser.addOption("Element 1", knownLocations.ELEMENT1);
-        // autonChooser.addOption("Element 2", knownLocations.ELEMENT2);
-        // autonChooser.addOption("Element 3", knownLocations.ELEMENT3);
-        // autonChooser.addOption("Element 4", knownLocations.ELEMENT4);
-        SmartDashboard.putData("Auton Element Chooser", autonChooser);
-        SmartDashboard.putString("Auton Selected: ", this.currentSelectedAuton.toString());
+        firstElementChooser = new SendableChooser<Pose2d>();
+        firstElementChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
+        firstElementChooser.addOption("NOTE 1", knownLocations.WING_NOTE_1);
+        firstElementChooser.addOption("NOTE 2", knownLocations.WING_NOTE_2);
+        firstElementChooser.addOption("NOTE 3", knownLocations.WING_NOTE_3);
+        SmartDashboard.putData("Auton Element Chooser", firstElementChooser);
+        SmartDashboard.putString("Auton Selected: ", this.firstElement.toString());
+
+        // secondElement = new SendableChooser<Pose2d>();
+        // secondElement.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
+        // secondElement.addOption("NOTE 1", knownLocations.WING_NOTE_1);
+        // secondElement.addOption("NOTE 2", knownLocations.WING_NOTE_2);
+        // secondElement.addOption("NOTE 3", knownLocations.WING_NOTE_3);
+        // secondElement.putData("Auton Element Chooser", firstElementChooser);
+        // secondElement.putString("Auton Selected: ", this.secondElement.toString());
 
         // select the MANUAL STARTING POSITION of the robot
         this.startingPoseChooser = new SendableChooser<Pose2d>();
-        this.startingPoseChooser.setDefaultOption("TOPMOST", KnownLocations.DO_NOTHING);
-        this.startingPoseChooser.addOption("LEFT NOTE", knownLocations.START_LEFT_NOTE);
-        this.startingPoseChooser.addOption("MIDDLE NOTE", knownLocations.START_MID_NOTE);
-        this.startingPoseChooser.addOption("RIGHT NOTE", knownLocations.START_RIGHT_NOTE);
+        this.startingPoseChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
+        this.startingPoseChooser.addOption("START LEFT NOTE", knownLocations.START_LEFT_NOTE);
+        this.startingPoseChooser.addOption("START MIDDLE NOTE", knownLocations.START_MID_NOTE);
+        this.startingPoseChooser.addOption("START RIGHT NOTE", knownLocations.START_RIGHT_NOTE);
         SmartDashboard.putData("Manual Starting Pose", startingPoseChooser);
 
         // select whether to visit charging station or score 2nd piece (or leave community)
         this.autonTypeChooser = new SendableChooser<AutonTypes>();
-        autonTypeChooser.setDefaultOption("LEAVE COMMUNITY", AutonTypes.LEAVE_COMMUNITY);
+        autonTypeChooser.setDefaultOption("LEAVE STARTING ZONE", AutonTypes.LEAVE_STARTING_ZONE);
         autonTypeChooser.addOption("2ND PIECE SCORE", AutonTypes.SCORE_2ND_PIECE);
-        autonTypeChooser.addOption("CHARGING STATION", AutonTypes.CHARGING_STATION);
         SmartDashboard.putData("Auton Type", autonTypeChooser);
     }
     
@@ -147,7 +154,7 @@ public class Autons {
         // SET OUR INITIAL POST
         drivetrain.setManualPose(currentSelectedPose);
         
-        if (currentSelectedAuton == KnownLocations.DO_NOTHING) {
+        if (firstElement == KnownLocations.DO_NOTHING) {
             SmartDashboard.putBoolean("isDoNothing", true);
             drivetrain.setTrajectorySmartdash(new Trajectory(), "traj1");
             drivetrain.setTrajectorySmartdash(new Trajectory(), "traj2");
@@ -155,9 +162,18 @@ public class Autons {
         }
         
 
-        Pose2d finalPose = currentSelectedPose;
-        List<Pose2d> waypoints = List.of(knownLocations.WING_NOTE_1);
-        PathPlannerPath  path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+        Pose2d finalPose = knownLocations.WING_NOTE_2;
+        List<Pose2d> waypoints = new ArrayList<Pose2d>();
+
+        if (firstElement == knownLocations.WING_NOTE_1) {
+            waypoints.add(knownLocations.WING_NOTE_1);
+        } else if (firstElement == knownLocations.WING_NOTE_2) {
+            waypoints.add(knownLocations.WING_NOTE_2);
+        } else if (firstElement == knownLocations.WING_NOTE_3) {
+            waypoints.add(knownLocations.WING_NOTE_3);
+        }
+
+        PathPlannerPath path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
 
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path1.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
         Command firstSwerveCommand = AutoBuilder.followPath(path1);
@@ -166,13 +182,14 @@ public class Autons {
     }
 
     public PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
-        List<Pose2d> poses = List.of();
+        List<Pose2d> poses = new ArrayList<Pose2d>();
         poses.add(initialPose); poses.addAll(waypoints); poses.add(finalPose);
+
         List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(poses);
         return new PathPlannerPath(
             bezierPoints,
             pathConstraints,
-            new GoalEndState(0.0, Rotation2d.fromDegrees(-90)));
+            new GoalEndState(0.0, finalPose.getRotation()));
     }
 
     /**
@@ -187,7 +204,7 @@ public class Autons {
         boolean rebuildAutonCommand = false;
         
         // runs constantly when disabled
-        Pose2d currAuton = autonChooser.getSelected();
+        Pose2d currAuton = firstElementChooser.getSelected();
         Pose2d currPose = startingPoseChooser.getSelected();
         AutonTypes currAutonType = autonTypeChooser.getSelected();
 
@@ -202,9 +219,9 @@ public class Autons {
             rebuildAutonCommand = true;
         }
         
-        if (currAuton != this.currentSelectedAuton) {
-            this.currentSelectedAuton = currAuton;
-            SmartDashboard.putString("Auton Selected: ", this.currentSelectedAuton.toString());
+        if (currAuton != this.firstElement) {
+            this.firstElement = currAuton;
+            SmartDashboard.putString("Auton Selected: ", this.firstElement.toString());
             rebuildAutonCommand = true;
         }
 
@@ -213,10 +230,11 @@ public class Autons {
             rebuildAutonCommand = true;
         }
 
-        if (currAutonType != this.currentSelectedAutonType) {
-            this.currentSelectedAutonType = currAutonType;
+        if (currAutonType != this.firstElementType) {
+            this.firstElementType = currAutonType;
             rebuildAutonCommand = true;
         }
+
         if (rebuildAutonCommand) {
             this.autonCommand = buildAutonCommand();
         }
@@ -230,8 +248,7 @@ public class Autons {
      * CHARGING_STATION - center onto the charging station
      */
     public enum AutonTypes {
-        LEAVE_COMMUNITY,
-        SCORE_2ND_PIECE,
-        CHARGING_STATION
+        LEAVE_STARTING_ZONE,
+        SCORE_2ND_PIECE
     }
 }

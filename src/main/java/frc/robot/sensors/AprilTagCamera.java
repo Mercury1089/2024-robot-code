@@ -47,7 +47,7 @@ public class AprilTagCamera extends PhotonCamera {
             fieldLayout = null;
         }
         Transform3d robotToCam = new Transform3d(
-            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0, 0, 0)
+            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0, 180, 0)
         );
         estimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, this, robotToCam);
     }
