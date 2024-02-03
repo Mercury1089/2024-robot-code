@@ -126,10 +126,9 @@ public class Autons {
         // select the MANUAL STARTING POSITION of the robot
         this.startingPoseChooser = new SendableChooser<Pose2d>();
         this.startingPoseChooser.setDefaultOption("TOPMOST", KnownLocations.DO_NOTHING);
-        // this.startingPoseChooser.addOption("TOP SECOND", knownLocations.START_TOP_SECOND);
-        // this.startingPoseChooser.addOption("BOTTOM SECOND", knownLocations.START_BOTTOM_SECOND);
-        // this.startingPoseChooser.addOption("BOTTOMMOST", knownLocations.START_BOTTOMMOST);
-        // this.startingPoseChooser.addOption("MIDDLE CONE", knownLocations.START_MIDDLE_CONE);
+        this.startingPoseChooser.addOption("LEFT NOTE", knownLocations.START_LEFT_NOTE);
+        this.startingPoseChooser.addOption("MIDDLE NOTE", knownLocations.START_MID_NOTE);
+        this.startingPoseChooser.addOption("RIGHT NOTE", knownLocations.START_RIGHT_NOTE);
         SmartDashboard.putData("Manual Starting Pose", startingPoseChooser);
 
         // select whether to visit charging station or score 2nd piece (or leave community)
@@ -154,10 +153,11 @@ public class Autons {
             drivetrain.setTrajectorySmartdash(new Trajectory(), "traj2");
             return new PrintCommand("Do Nothing Auton");
         }
+        
 
         Pose2d finalPose = currentSelectedPose;
-        List<Pose2d> waypoints = List.of();
-        PathPlannerPath  path1 = generateSwerveTrajectory(currentSelectedAuton, waypoints, finalPose);
+        List<Pose2d> waypoints = List.of(knownLocations.WING_NOTE_1);
+        PathPlannerPath  path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
 
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path1.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
         Command firstSwerveCommand = AutoBuilder.followPath(path1);
