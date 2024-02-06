@@ -83,8 +83,8 @@ public class RobotContainer {
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
   
     // in honor of resetTurret
-//    left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
-//    left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
+    left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
+    left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
     
 //    right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   

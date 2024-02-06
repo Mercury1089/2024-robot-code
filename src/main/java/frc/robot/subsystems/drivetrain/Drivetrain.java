@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -335,46 +336,7 @@ public class Drivetrain extends SubsystemBase {
         photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
         photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
       if (tagPose.isPresent()) {
-        double tagX = tagPose.get().toPose2d().getX();
-        double roboX = getPose().getX();
-        double tagY = tagPose.get().toPose2d().getY();
-        double roboY = getPose().getY();
-        double robotRelativeAngle = 0.0;
-        double tempAngle = 0.0;
-        double tagAngle = (180 / Math.PI) * Math.atan(Math.abs(roboX - tagX) / Math.abs(roboY - tagY));
-        double robotDegrees = getPose().getRotation().getDegrees();
-        boolean flipped = false;
-        if (roboY - tagY > 0) {
-          roboY -= 2 * (roboY - tagY);
-          robotRelativeAngle = -1 * robotDegrees;
-          flipped = true;
-        } else {
-          robotRelativeAngle = robotDegrees;
-        }
-          
-        if (robotDegrees > -1 * (90 - tagAngle) && robotDegrees < 90) {
-          tempAngle = (90 - robotRelativeAngle) + tagAngle;
-        }  
-        if (robotDegrees > 90 && robotDegrees < tagAngle ){
-          tempAngle = tagAngle - (90 - robotRelativeAngle);
-        }  
-        if (robotDegrees > tagAngle) {
-          tempAngle = (90 - robotRelativeAngle) - tagAngle;
-        }
-        if (robotDegrees < -1 * tagAngle) {
-          tempAngle = (-180 - robotRelativeAngle) - (90 - tagAngle);
-        }
-        theta = flipped ? tempAngle * -1 : tempAngle;
-        //double x = ((180/Math.PI) * Math.atan(Math.abs(roboX-tagX)/Math.abs(roboY-tagY)));
-       // Transform2d targetTransform = new Transform2d(getPose(), tagPose.get().toPose2d());
-       // theta = targetTransform.getRotation().getDegrees();
-        //theta = getPose().getRotation().getDegrees() - 90.0 + (180/Math.PI) * Math.atan(Math.abs(roboX-tagX)/Math.abs(roboY-tagY));
-       // theta =  ((90 - x) - headingReferenceAngle);
-        //Transform2d relativePose = getPose().minus(tagPose.get().toPose2d());
-        //theta = 180 - relativePose.getRotation().getDegrees();
-        /*allianceColor.get() == Alliance.Blue ? 
-          Math.abs(MathUtil.inputModulus(getPose().getRotation().getDegrees() - 180, -180, 180)) : 
-          Math.abs(MathUtil.inputModulus(getPose().getRotation().getDegrees() + 180, -180, 180)); */
+        theta = (180 - Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI));
       }
     }
 
@@ -422,11 +384,12 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Roll", getRoll());
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
-    SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker without AprilTag", getDegreesToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
+   SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
+   SmartDashboard.putNumber("Angle to speaker without AprilTag", getDegreesToSpeaker());
+   SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
+    SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
 
 
     Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
