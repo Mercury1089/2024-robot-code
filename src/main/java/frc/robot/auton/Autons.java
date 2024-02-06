@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -239,6 +240,17 @@ public class Autons {
             this.autonCommand = buildAutonCommand();
         }
     }
+
+    public Command aimToSpeaker() {
+
+        Pose2d targetPose = KnownLocations.PathPointInch(Units.metersToInches(drivetrain.getPose().getX()), Units.metersToInches(drivetrain.getPose().getX()), drivetrain.getTargetHeadingToSpeaker());
+        PathPlannerPath targPlannerPath = generateSwerveTrajectory(drivetrain.getPose(), new ArrayList<Pose2d>(), targetPose);
+
+        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(targPlannerPath.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
+        Command aimCommand = AutoBuilder.followPath(targPlannerPath);
+
+        return aimCommand;
+    }
     
     /**
      * Determines what we do with our 2nd path
@@ -247,7 +259,7 @@ public class Autons {
      * SCORE_2ND_PIECE - return to appropriate node
      * CHARGING_STATION - center onto the charging station
      */
-    public enum AutonTypes {
+    public enum AutonTypes { 
         LEAVE_STARTING_ZONE,
         SCORE_2ND_PIECE
     }

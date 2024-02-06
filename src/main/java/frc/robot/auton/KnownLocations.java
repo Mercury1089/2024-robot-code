@@ -88,12 +88,12 @@ public class KnownLocations {
     }
 
     /** Convenience method to create PathPoint from inches */
-    private static Pose2d PathPointInch(double xInches, double yInches, double headingDegrees) {
+    public static Pose2d PathPointInch(double xInches, double yInches, double headingDegrees) {
         return new Pose2d(new Translation2d(Units.inchesToMeters(xInches), Units.inchesToMeters(yInches)), Rotation2d.fromDegrees(headingDegrees));
     }
 
     /** Convenience method to create waypoint excluding holonomic rotation */
-    private static Pose2d PathWayPoint(double xInches, double yInches, double headingDegrees) {
+    public static Pose2d PathWayPoint(double xInches, double yInches, double headingDegrees) {
         return new Pose2d(new Translation2d(Units.inchesToMeters(xInches), Units.inchesToMeters(yInches)), Rotation2d.fromDegrees(headingDegrees));
     }
 

@@ -143,7 +143,7 @@ public final class Constants {
     public static final int INTAKE_SPARKMAX = 15;
     
     
-    private CAN() {}
+    private CAN() {} 
   }
 
   public static class CAN_STATUS_FREQ {

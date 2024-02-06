@@ -81,6 +81,7 @@ public class RobotContainer {
     auton = new Autons(drivetrain);
 
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
+    left7.onTrue(new RunCommand(() -> auton.aimToSpeaker(), drivetrain)); 
   
     // in honor of resetTurret
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
