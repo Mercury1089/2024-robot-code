@@ -370,6 +370,11 @@ public class Drivetrain extends SubsystemBase {
         backRightModule.getPosition()
     });
 
+    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
+    if (result.isPresent()) {
+      odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
+    }
+  
     if (fieldWidgetType.equals("Odometry")) {
       smartdashField.setRobotPose(getPose());
     } else if (fieldWidgetType.equals("photonvision")) {
@@ -384,19 +389,12 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Roll", getRoll());
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
-   SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-   SmartDashboard.putNumber("Angle to speaker without AprilTag", getDegreesToSpeaker());
-   SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
+    SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker without AprilTag", getDegreesToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
-
-
-    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
-    if (result.isEmpty()) {
-      return;
-    }
-    odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
 
   }
 }
