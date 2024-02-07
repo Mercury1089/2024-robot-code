@@ -104,10 +104,10 @@ public class Drivetrain extends SubsystemBase {
     double lengthFromCenter = Units.inchesToMeters(WHEEL_LENGTH) / 2;
 
     swerveKinematics = new SwerveDriveKinematics(
-    new Translation2d(lengthFromCenter, widthFromCenter),
-    new Translation2d(lengthFromCenter, -widthFromCenter),
-    new Translation2d(-lengthFromCenter, widthFromCenter),
-    new Translation2d(-lengthFromCenter, -widthFromCenter)
+      new Translation2d(lengthFromCenter, widthFromCenter),
+      new Translation2d(lengthFromCenter, -widthFromCenter),
+      new Translation2d(-lengthFromCenter, widthFromCenter),
+      new Translation2d(-lengthFromCenter, -widthFromCenter)
     );
     odometry = new SwerveDrivePoseEstimator(
       swerveKinematics, 
@@ -336,9 +336,10 @@ public class Drivetrain extends SubsystemBase {
         photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
         photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
       if (tagPose.isPresent()) {
-        targetHeading = getPose().getY() < tagPose.get().getTranslation().getX() ? 
-          -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI) :
-          Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
+        // targetHeading = getPose().getY() < tagPose.get().getTranslation().getX() ? 
+        //   -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI) :
+        //   Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
+        targetHeading = -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
       }
     }
 
@@ -393,9 +394,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
     SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
     SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
+    SmartDashboard.putNumber("Angle Offset", 0);
+   // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
-    SmartDashboard.putNumber("Tag Pose", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
+    SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
 
   }

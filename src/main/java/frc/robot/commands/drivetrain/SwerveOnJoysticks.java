@@ -42,8 +42,8 @@ public class SwerveOnJoysticks extends Command {
     ySpeed = MathUtil.applyDeadband(leftJoyX.get(), SWERVE.JOYSTICK_DEADBAND);
     angularSpeed = MathUtil.applyDeadband(-rightJoyX.get(), SWERVE.JOYSTICK_DEADBAND);
 
-    xSpeed = xSpeed > 0.0 ? Math.pow(xSpeed, 2) : -Math.pow(xSpeed, 2);
-    ySpeed = ySpeed > 0.0 ? Math.pow(ySpeed, 2) : -Math.pow(ySpeed, 2);
+    xSpeed = xSpeed > 0.0 ? -Math.pow(xSpeed, 2) : Math.pow(xSpeed, 2);
+    ySpeed = ySpeed > 0.0 ? -Math.pow(ySpeed, 2) : Math.pow(ySpeed, 2);
     angularSpeed = angularSpeed > 0.0 ? Math.pow(angularSpeed, 2) : -Math.pow(angularSpeed, 2);
     
     

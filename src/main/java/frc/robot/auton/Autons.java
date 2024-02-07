@@ -163,14 +163,17 @@ public class Autons {
         }
         
 
-        Pose2d finalPose = knownLocations.WING_NOTE_2;
+        Pose2d finalPose = knownLocations.WING_NOTE_1;
         List<Pose2d> waypoints = new ArrayList<Pose2d>();
 
         if (firstElement == knownLocations.WING_NOTE_1) {
+            waypoints = new ArrayList<Pose2d>();
             waypoints.add(knownLocations.WING_NOTE_1);
         } else if (firstElement == knownLocations.WING_NOTE_2) {
+            waypoints = new ArrayList<Pose2d>();
             waypoints.add(knownLocations.WING_NOTE_2);
         } else if (firstElement == knownLocations.WING_NOTE_3) {
+            waypoints = new ArrayList<Pose2d>();
             waypoints.add(knownLocations.WING_NOTE_3);
         }
 
@@ -243,7 +246,7 @@ public class Autons {
 
     public Command aimToSpeaker() {
 
-        Pose2d targetPose = KnownLocations.PathPointInch(Units.metersToInches(drivetrain.getPose().getX()), Units.metersToInches(drivetrain.getPose().getX()), drivetrain.getTargetHeadingToSpeaker());
+        Pose2d targetPose = KnownLocations.PathPointInch(Units.metersToInches(drivetrain.getPose().getX()), Units.metersToInches(drivetrain.getPose().getY()), drivetrain.getTargetHeadingToSpeaker());
         PathPlannerPath targPlannerPath = generateSwerveTrajectory(drivetrain.getPose(), new ArrayList<Pose2d>(), targetPose);
 
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(targPlannerPath.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
