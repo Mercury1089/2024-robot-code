@@ -67,8 +67,6 @@ public class RobotContainer {
     gamepad = new CommandXboxController(DS_USB.GAMEPAD);
     configureBindings();
     
-//    arm = new Arm();
-    
 //    intake = new Intake();
 
     //shooter = new Shooter();
@@ -78,8 +76,8 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
     drivetrain.resetGyro();
 
-    auton = new Autons(drivetrain);
-
+    arm = new Arm(drivetrain);
+    arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftX), arm));
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
   
     // in honor of resetTurret

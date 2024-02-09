@@ -65,8 +65,10 @@ public class Arm extends SubsystemBase {
   public Arm(Drivetrain drivetrain) {
     arm = new CANSparkMax(CAN.ARM_SPARKMAX, MotorType.kBrushless);
     arm.restoreFactoryDefaults();
-    armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
+    //armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
     armPIDController = arm.getPIDController();
+    armRelativeEncoder = arm.getEncoder();
+    armPIDController.setFeedbackDevice(armRelativeEncoder);
     this.drivetrain = drivetrain;
 
     //TODO: set encoder conversion
@@ -114,6 +116,10 @@ public class Arm extends SubsystemBase {
     armRelativeEncoder.setPosition(0);
   }
 
+  public void setSpeed(Supplier<Double> speedSupplier) {
+    arm.set(speedSupplier.get());
+  }
+
   public void setPosition(ArmPosition pos) {
     armPIDController.setReference(pos.degreePos, CANSparkMax.ControlType.kPosition);
   }
@@ -157,15 +163,18 @@ public class Arm extends SubsystemBase {
 
   }
   */
+
   public enum ArmPosition {
-    INSIDE(0.0),
-    HOME(-5.0);
+    SPEAKER(0.0),
+    AMP(0.0),
+    PICKUP_FLOOR(0.0),
+    PICKUP_SOURCE(0.0);
+  
     
     public final double degreePos;
-
-        ArmPosition(double degreePos) {
-          this.degreePos = degreePos;
-        }
+      ArmPosition(double degreePos) {
+        this.degreePos = degreePos;
+      }
   }
- 
+
 }
