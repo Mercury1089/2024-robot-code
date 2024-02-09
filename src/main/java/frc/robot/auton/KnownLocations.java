@@ -34,6 +34,9 @@ public class KnownLocations {
         WING_NOTE_1,
         WING_NOTE_2,
         WING_NOTE_3,
+        INTERMEDIARY_NOTE_1,
+        INTERMEDIARY_NOTE_2,
+        INTERMEDIARY_NOTE_3,
         CENTER_NOTE_1,
         CENTER_NOTE_2,
         CENTER_NOTE_3,
@@ -55,6 +58,10 @@ public class KnownLocations {
             WING_NOTE_1 = PathPointInch(114.261, 276, 0);
             WING_NOTE_2 = PathPointInch(114.261, 219, 0);
             WING_NOTE_3 = PathPointInch(114.261, 162, 0);
+                                    
+            INTERMEDIARY_NOTE_1 = PathPointInch(84.261 - 7, 276, 0);
+            INTERMEDIARY_NOTE_2 = PathPointInch(84.261 - 7, 219, 0);
+            INTERMEDIARY_NOTE_3 = PathPointInch(84.261 - 7, 162, 0);
 
             CENTER_NOTE_1 = PathPointInch(325.862, 30, 0);
             CENTER_NOTE_2 = PathPointInch(325.862, 96, 0);
@@ -66,17 +73,23 @@ public class KnownLocations {
             START_MID_NOTE = PathPointInch(55.43, 218.777885, 0);
             START_RIGHT_NOTE = PathPointInch(24.741, 169.374, -60); 
 
+            
+
         } else {
 
-            WING_NOTE_1 = PathPointInch(537.464, 276, 0);
-            WING_NOTE_2 = PathPointInch(537.464, 219, 0);
-            WING_NOTE_3 = PathPointInch(537.464, 162, 0);
+            WING_NOTE_1 = PathPointInch(537.464, 276, 180);
+            WING_NOTE_2 = PathPointInch(537.464, 219, 180);
+            WING_NOTE_3 = PathPointInch(537.464, 162, 180);
 
-            CENTER_NOTE_1 = PathPointInch(325.862, 30, 0);
-            CENTER_NOTE_2 = PathPointInch(325.862, 96, 0);
-            CENTER_NOTE_3 = PathPointInch(325.862, 162, 0);
-            CENTER_NOTE_4 = PathPointInch(325.862, 228, 0);
-            CENTER_NOTE_5 = PathPointInch(325.862, 294, 0);
+            INTERMEDIARY_NOTE_1 = PathPointInch(567.464 + 7, 276, 180);
+            INTERMEDIARY_NOTE_2 = PathPointInch(567.464 + 7, 219, 180);
+            INTERMEDIARY_NOTE_3 = PathPointInch(567.464 + 7, 162, 180);
+
+            CENTER_NOTE_1 = PathPointInch(325.862, 30, 180);
+            CENTER_NOTE_2 = PathPointInch(325.862, 96, 180);
+            CENTER_NOTE_3 = PathPointInch(325.862, 162, 180);
+            CENTER_NOTE_4 = PathPointInch(325.862, 228, 180);
+            CENTER_NOTE_5 = PathPointInch(325.862, 294, 180);
 
             //TODO: HAVE TO ASK DESIGN
             START_LEFT_NOTE = PathPointInch(24.741, 268.182, -120);
@@ -96,5 +109,7 @@ public class KnownLocations {
     public static Pose2d PathWayPoint(double xInches, double yInches, double headingDegrees) {
         return new Pose2d(new Translation2d(Units.inchesToMeters(xInches), Units.inchesToMeters(yInches)), Rotation2d.fromDegrees(headingDegrees));
     }
+
+
 
 }

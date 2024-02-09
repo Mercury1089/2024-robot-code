@@ -30,8 +30,9 @@ import frc.robot.Constants.APRILTAGS;
 /** Wrapper for PhotonCamera class */
 public class AprilTagCamera extends PhotonCamera {
 
+    //TODO: UPDATE CAM SETTINGS FOR NEW ROBOT
     private static final String DEFAULT_CAM_NAME = "AprilTagCamera";
-    private static final double DEFAULT_CAM_X = Units.inchesToMeters(-10.5); // .5m forward of center
+    private static final double DEFAULT_CAM_X = Units.inchesToMeters(10.5); // .5m forward of center
     private static final double DEFAULT_CAM_Y = 0.0; // centered in robot Y
     private static final double DEFAULT_CAM_Z = Units.inchesToMeters(52.25); // 52in up from center
     private final double CAMERA_HEIGHT = DEFAULT_CAM_Z; // height on robot (meters)
@@ -49,7 +50,7 @@ public class AprilTagCamera extends PhotonCamera {
             fieldLayout = null;
         }
         Transform3d robotToCam = new Transform3d(
-            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0, 180, 0)
+            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0, Math.PI, 0)
         );
         estimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, this, robotToCam);
     }
@@ -68,12 +69,12 @@ public class AprilTagCamera extends PhotonCamera {
 
     public Optional<EstimatedRobotPose> getGlobalPose() {
         Optional<EstimatedRobotPose> globalPose = Optional.empty();
-        try {
-          // globalPose = estimator.update();  
-        } catch (Exception e) {
+        // try {
+        //   // globalPose = estimator.update();  
+        // } catch (Exception e) {
           
-        }
-
+        // }
+        globalPose = estimator.update();
         return globalPose;
     }
 

@@ -53,12 +53,12 @@ public class Drivetrain extends SubsystemBase {
   private final String fieldWidgetType = "Odometry";
   
   //2024 robot
-  private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
-  private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
+  // private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
+  // private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
 
   // bolt
-  // private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
-  // private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
+  private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
+  private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
 
   public final double ROLL_WHEN_LEVEL = -1.75;
 

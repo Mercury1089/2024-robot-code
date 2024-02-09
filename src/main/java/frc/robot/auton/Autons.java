@@ -51,12 +51,17 @@ public class Autons {
     private SendableChooser<AutonTypes> autonTypeChooser;
     private Pose2d firstElement;
     private Pose2d currentSelectedPose;
+    private Pose2d thirdPathPose;
+    private Pose2d secondPathPose;
     private AutonTypes firstElementType;
     private PathConstraints pathConstraints;
     private PIDController turningPIDController;
     private PIDController xController, yController;
     private Command autonCommand;
     private KnownLocations knownLocations;
+    private final int wingNote1 = 1;
+    private final int wingNote2 = 2;
+    private final int wingNote3 = 3;
 
     private Alliance allianceColor;
 
@@ -165,24 +170,86 @@ public class Autons {
 
         Pose2d finalPose = knownLocations.WING_NOTE_1;
         List<Pose2d> waypoints = new ArrayList<Pose2d>();
+        waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
 
-        if (firstElement == knownLocations.WING_NOTE_1) {
+        // if (firstElement == knownLocations.WING_NOTE_1) {
+        //     waypoints = new ArrayList<Pose2d>();
+        //     waypoints.add(knownLocations.WING_NOTE_1);
+        // } else if (firstElement == knownLocations.WING_NOTE_2) {
+        //     waypoints = new ArrayList<Pose2d>();
+        //     waypoints.add(knownLocations.WING_NOTE_2);
+        // } else if (firstElement == knownLocations.WING_NOTE_3) {
+        //     waypoints = new ArrayList<Pose2d>();
+        //     waypoints.add(knownLocations.WING_NOTE_3);
+        // }
+        PathPlannerPath path1 = null, path2 = null, path3 = null;
+
+        if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.WING_NOTE_1);
-        } else if (firstElement == knownLocations.WING_NOTE_2) {
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+            finalPose = knownLocations.WING_NOTE_1;
+        } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
+            if (firstElement == knownLocations.WING_NOTE_1) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                finalPose = knownLocations.WING_NOTE_1;
+            } else if (firstElement == knownLocations.WING_NOTE_3) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                finalPose = knownLocations.WING_NOTE_3;
+            }
+        } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.WING_NOTE_2);
-        } else if (firstElement == knownLocations.WING_NOTE_3) {
-            waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.WING_NOTE_3);
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+            finalPose = knownLocations.WING_NOTE_3;
         }
 
-        PathPlannerPath path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+        path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+
+        secondPathPose = finalPose == knownLocations.WING_NOTE_1 ? knownLocations.WING_NOTE_1 : knownLocations.WING_NOTE_3;
+        waypoints = new ArrayList<Pose2d>();
+        waypoints.add(knownLocations.INTERMEDIARY_NOTE_2);
+        finalPose = knownLocations.WING_NOTE_2;
+
+        path2 = generateSwerveTrajectory(secondPathPose, waypoints, finalPose);
+
+        thirdPathPose = finalPose;
+        waypoints = new ArrayList<Pose2d>();
+
+        if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
+            waypoints = new ArrayList<Pose2d>();
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+            finalPose = knownLocations.WING_NOTE_3;
+        } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
+            if (firstElement == knownLocations.WING_NOTE_1) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                finalPose = knownLocations.WING_NOTE_3;
+            } else if (firstElement == knownLocations.WING_NOTE_3) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                finalPose = knownLocations.WING_NOTE_1;
+            }
+        } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
+            waypoints = new ArrayList<Pose2d>();
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+            finalPose = knownLocations.WING_NOTE_1;
+        }
+
+        path3 = generateSwerveTrajectory(thirdPathPose, waypoints, finalPose);
 
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path1.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
+        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path2.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj2");
+        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path3.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj3");
         Command firstSwerveCommand = AutoBuilder.followPath(path1);
+        Command secondSwerveCommand = AutoBuilder.followPath(path2);
+        Command thirdSwerveCommand = AutoBuilder.followPath(path3);
 
-        return firstSwerveCommand;
+        return new SequentialCommandGroup(
+            firstSwerveCommand,
+            secondSwerveCommand,
+            thirdSwerveCommand
+        );
     }
 
     public PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
@@ -194,6 +261,27 @@ public class Autons {
             bezierPoints,
             pathConstraints,
             new GoalEndState(0.0, finalPose.getRotation()));
+    }
+
+    public List<Pose2d> getWayPoints(int waypoint) {
+        List<Pose2d> points = new ArrayList<Pose2d>();
+
+        switch (waypoint) {
+            case wingNote1:
+                points.add(knownLocations.INTERMEDIARY_NOTE_1);
+                points.add(knownLocations.WING_NOTE_1);
+                return points;
+            case wingNote2:
+                points.add(knownLocations.INTERMEDIARY_NOTE_2);
+                points.add(knownLocations.WING_NOTE_2);
+                return points; 
+            case wingNote3:
+                points.add(knownLocations.INTERMEDIARY_NOTE_3);
+                points.add(knownLocations.WING_NOTE_3);
+                return points;
+        }
+
+        return points;
     }
 
     /**
@@ -246,7 +334,7 @@ public class Autons {
 
     public Command aimToSpeaker() {
 
-        Pose2d targetPose = KnownLocations.PathPointInch(Units.metersToInches(drivetrain.getPose().getX()), Units.metersToInches(drivetrain.getPose().getY()), drivetrain.getTargetHeadingToSpeaker());
+        Pose2d targetPose = KnownLocations.PathPointInch(Units.metersToInches(drivetrain.getPose().getX()) + 50, Units.metersToInches(drivetrain.getPose().getY()), drivetrain.getTargetHeadingToSpeaker());
         PathPlannerPath targPlannerPath = generateSwerveTrajectory(drivetrain.getPose(), new ArrayList<Pose2d>(), targetPose);
 
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(targPlannerPath.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
