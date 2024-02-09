@@ -53,12 +53,12 @@ public class Drivetrain extends SubsystemBase {
   private final String fieldWidgetType = "Odometry";
   
   //2024 robot
-  // private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
-  // private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
+  private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
+  private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
 
   // bolt
-  private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
-  private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
+  // private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
+  // private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
 
   public final double ROLL_WHEN_LEVEL = -1.75;
 
@@ -104,10 +104,10 @@ public class Drivetrain extends SubsystemBase {
     double lengthFromCenter = Units.inchesToMeters(WHEEL_LENGTH) / 2;
 
     swerveKinematics = new SwerveDriveKinematics(
-    new Translation2d(lengthFromCenter, widthFromCenter),
-    new Translation2d(lengthFromCenter, -widthFromCenter),
-    new Translation2d(-lengthFromCenter, widthFromCenter),
-    new Translation2d(-lengthFromCenter, -widthFromCenter)
+      new Translation2d(lengthFromCenter, widthFromCenter),
+      new Translation2d(lengthFromCenter, -widthFromCenter),
+      new Translation2d(-lengthFromCenter, widthFromCenter),
+      new Translation2d(-lengthFromCenter, -widthFromCenter)
     );
     odometry = new SwerveDrivePoseEstimator(
       swerveKinematics, 
@@ -327,20 +327,23 @@ public class Drivetrain extends SubsystemBase {
     return distance;
   }
 
-  public double getDegreesToSpeaker() {
+  public double getTargetHeadingToSpeaker() {
     Optional<Alliance> allianceColor = DriverStation.getAlliance();
-    double theta = 0.0;
+    double targetHeading = 0.0;
 
     if (allianceColor.isPresent()) {
       Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
         photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
         photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
       if (tagPose.isPresent()) {
-        theta = (180 - Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI));
+        // targetHeading = getPose().getY() < tagPose.get().getTranslation().getX() ? 
+        //   -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI) :
+        //   Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
+        targetHeading = -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
       }
     }
 
-    return theta;
+    return targetHeading;
   }
 
   public double getDegreesToSpeakerApriltag() {
@@ -370,6 +373,11 @@ public class Drivetrain extends SubsystemBase {
         backRightModule.getPosition()
     });
 
+    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
+    if (result.isPresent()) {
+      odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
+    }
+  
     if (fieldWidgetType.equals("Odometry")) {
       smartdashField.setRobotPose(getPose());
     } else if (fieldWidgetType.equals("photonvision")) {
@@ -384,19 +392,13 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Roll", getRoll());
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
-   SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-   SmartDashboard.putNumber("Angle to speaker without AprilTag", getDegreesToSpeaker());
-   SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
+    SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToSpeaker());
+    SmartDashboard.putNumber("Angle Offset", 0);
+   // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
-    SmartDashboard.putNumber("Tag Pose", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
+    SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
-
-
-    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
-    if (result.isEmpty()) {
-      return;
-    }
-    odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
 
   }
 }

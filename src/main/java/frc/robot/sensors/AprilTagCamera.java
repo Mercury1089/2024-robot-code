@@ -7,6 +7,8 @@ package frc.robot.sensors;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.imageio.IIOException;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -65,7 +67,14 @@ public class AprilTagCamera extends PhotonCamera {
     }
 
     public Optional<EstimatedRobotPose> getGlobalPose() {
-        return estimator.update();
+        Optional<EstimatedRobotPose> globalPose = Optional.empty();
+        try {
+          // globalPose = estimator.update();  
+        } catch (Exception e) {
+          
+        }
+
+        return globalPose;
     }
 
     public double getYaw() {

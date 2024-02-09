@@ -62,9 +62,9 @@ public class KnownLocations {
             CENTER_NOTE_4 = PathPointInch(325.862, 228, 0);
             CENTER_NOTE_5 = PathPointInch(325.862, 294, 0);
 
-            START_LEFT_NOTE = PathPointInch(24.741, 268.182, 0);
+            START_LEFT_NOTE = PathPointInch(24.741, 268.182, 60);
             START_MID_NOTE = PathPointInch(55.43, 218.777885, 0);
-            START_RIGHT_NOTE = PathPointInch(24.741, 169.374, 0); //120
+            START_RIGHT_NOTE = PathPointInch(24.741, 169.374, -60); 
 
         } else {
 
@@ -88,12 +88,12 @@ public class KnownLocations {
     }
 
     /** Convenience method to create PathPoint from inches */
-    private static Pose2d PathPointInch(double xInches, double yInches, double headingDegrees) {
+    public static Pose2d PathPointInch(double xInches, double yInches, double headingDegrees) {
         return new Pose2d(new Translation2d(Units.inchesToMeters(xInches), Units.inchesToMeters(yInches)), Rotation2d.fromDegrees(headingDegrees));
     }
 
     /** Convenience method to create waypoint excluding holonomic rotation */
-    private static Pose2d PathWayPoint(double xInches, double yInches, double headingDegrees) {
+    public static Pose2d PathWayPoint(double xInches, double yInches, double headingDegrees) {
         return new Pose2d(new Translation2d(Units.inchesToMeters(xInches), Units.inchesToMeters(yInches)), Rotation2d.fromDegrees(headingDegrees));
     }
 
