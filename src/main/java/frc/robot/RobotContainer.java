@@ -103,6 +103,8 @@ public class RobotContainer {
         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
        angularSpeed),
       drivetrain));
+
+    gamepadX.onTrue(drivetrain.getDefaultCommand());
     
 //    right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   
