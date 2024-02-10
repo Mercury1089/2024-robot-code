@@ -65,6 +65,7 @@ public class Arm extends SubsystemBase {
   public Arm(Drivetrain drivetrain) {
     arm = new CANSparkMax(CAN.ARM_SPARKMAX, MotorType.kBrushless);
     arm.restoreFactoryDefaults();
+    arm.setInverted(true);
     //armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
     armPIDController = arm.getPIDController();
     armRelativeEncoder = arm.getEncoder();
@@ -117,7 +118,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void setSpeed(Supplier<Double> speedSupplier) {
-    arm.set(speedSupplier.get());
+    arm.set(-(speedSupplier.get() * 0.5));
   }
 
   public void setPosition(ArmPosition pos) {

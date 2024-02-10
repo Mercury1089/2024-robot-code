@@ -57,7 +57,6 @@ public class RobotContainer {
   private Arm arm;
   private Intake intake;
   private Drivetrain drivetrain;
-  private CANSparkMax neoMotor;
   private Shooter shooter;
 
 
@@ -69,11 +68,6 @@ public class RobotContainer {
     rightJoystick = new CommandJoystick(DS_USB.RIGHT_STICK);
     gamepad = new CommandXboxController(DS_USB.GAMEPAD);
     configureBindings();
-    
-//    intake = new Intake();
-
-    //shooter = new Shooter();
-    //shooter.setDefaultCommand(new RunCommand(() -> shooter.runShooter(gamepadLeftX), shooter));
 
     drivetrain = new Drivetrain();
     drivetrain.setDefaultCommand(new RunCommand(
@@ -87,7 +81,15 @@ public class RobotContainer {
     auton = new Autons(drivetrain);
 
     arm = new Arm(drivetrain);
-    arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftX), arm));
+    arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
+
+    intake = new Intake();
+    intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));
+    gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(1.0), intake));
+
+    // shooter = new Shooter(drivetrain);
+    // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
+
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
   
     // in honor of resetTurret
@@ -106,7 +108,7 @@ public class RobotContainer {
 
     gamepadX.onTrue(drivetrain.getDefaultCommand());
     
-//    right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
+    //right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   
     //gamepadX.onTrue(new RunCommand(() -> shooter.setVelocity(5600), shooter));
     //gamepadY.onTrue(new RunCommand(() -> shooter.setVelocity(4500), shooter));

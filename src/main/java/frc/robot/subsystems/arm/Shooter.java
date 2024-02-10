@@ -9,6 +9,7 @@
 package frc.robot.subsystems.arm;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkBase.ControlType;
@@ -31,7 +32,7 @@ public class Shooter extends SubsystemBase {
   private final double TARGET_VELOCITY_THRESHOLD = 50.0; // within a +- 50 rpm range to shoot
   private final double MAX_VOLTAGE = 11.5;
 
-  private CANSparkMax shooterFront, shooterBack;
+  private CANSparkFlex shooterFront, shooterBack;
   private double targetVelocity;
   private PIDGain velocityGains;
   private DigitalInput breakBeamSensor;
@@ -47,20 +48,20 @@ public class Shooter extends SubsystemBase {
     ONE_WHEEL, NONE
   }
 
-  public Shooter() {
-    shooterFront = new CANSparkMax(CAN.SHOOTER_FRONT_SPARKMAX, CANSparkLowLevel.MotorType.kBrushless);
-    shooterBack = new CANSparkMax(CAN.SHOOTER_BACK_SPARKMAX, CANSparkLowLevel.MotorType.kBrushless);
+  public Shooter(Drivetrain drivetrain) {
+    shooterFront = new CANSparkFlex(CAN.SHOOTER_SPARKFLEX, CANSparkLowLevel.MotorType.kBrushless);
+    shooterBack = null;
 
     shooterFront.restoreFactoryDefaults();
-    shooterBack.restoreFactoryDefaults();
+    //shooterBack.restoreFactoryDefaults();
     shooterFront.enableVoltageCompensation(MAX_VOLTAGE);
-    shooterBack.enableVoltageCompensation(MAX_VOLTAGE);
+    //shooterBack.enableVoltageCompensation(MAX_VOLTAGE);
 
     shooterFront.getPIDController().setOutputRange(NOMINAL_OUT, PEAK_OUT);
     shooterBack.getPIDController().setOutputRange(NOMINAL_OUT, PEAK_OUT);
 
     shooterFront.setIdleMode(IdleMode.kCoast);
-    shooterBack.setIdleMode(IdleMode.kCoast);
+    //shooterBack.setIdleMode(IdleMode.kCoast);
     // TODO: Double check these with final mechanism
     shooterFront.setInverted(true);
     shooterBack.follow(shooterFront, false); // Do not follow inverted
@@ -283,7 +284,7 @@ public class Shooter extends SubsystemBase {
     return this.velocityGains;
   }
 
-  private void configPID(CANSparkMax sparkmax, int slot, PIDGain gains) {
+  private void configPID(CANSparkFlex sparkmax, int slot, PIDGain gains) {
     sparkmax.getPIDController().setP(gains.kP, slot);
     sparkmax.getPIDController().setI(gains.kI, slot);
     sparkmax.getPIDController().setD(gains.kD, slot);

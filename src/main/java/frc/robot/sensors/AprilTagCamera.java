@@ -69,12 +69,12 @@ public class AprilTagCamera extends PhotonCamera {
 
     public Optional<EstimatedRobotPose> getGlobalPose() {
         Optional<EstimatedRobotPose> globalPose = Optional.empty();
-        // try {
-        //   // globalPose = estimator.update();  
-        // } catch (Exception e) {
+        try {
+            globalPose = estimator.update();  
+        } catch (Exception e) {
           
-        // }
-        globalPose = estimator.update();
+        }
+        // globalPose = estimator.update();
         return globalPose;
     }
 

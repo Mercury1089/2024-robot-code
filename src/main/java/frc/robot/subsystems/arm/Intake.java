@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.EncoderType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
@@ -44,12 +45,12 @@ public class Intake extends SubsystemBase {
   private double maxCurrent = 0.0;
   private int maxCurrentCtr = 0;
 
-  private CANSparkMax intake;
+  private CANSparkFlex intake;
 
   /** Creates a new intake. */
   public Intake() {
 
-    intake = new CANSparkMax(CAN.INTAKE_SPARKMAX, MotorType.kBrushless);
+    intake = new CANSparkFlex(CAN.INTAKE_SPARKFLEX, MotorType.kBrushless);
 
     intake.restoreFactoryDefaults();
 
@@ -72,7 +73,7 @@ public class Intake extends SubsystemBase {
     */
   }
 
-  public void setSpeed() {
-    intake.set(0.0); //change later
+  public void setSpeed(double speed) {
+    intake.set(speed);
   }
 }
