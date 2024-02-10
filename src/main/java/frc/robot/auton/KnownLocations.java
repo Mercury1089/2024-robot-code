@@ -91,11 +91,9 @@ public class KnownLocations {
             CENTER_NOTE_4 = PathPointInch(325.862, 228, 180);
             CENTER_NOTE_5 = PathPointInch(325.862, 294, 180);
 
-            //TODO: HAVE TO ASK DESIGN
-            START_LEFT_NOTE = PathPointInch(24.741, 268.182, -120);
-            START_MID_NOTE = PathPointInch(55.43, 218.777885, 180);
-            START_RIGHT_NOTE = PathPointInch(24.741, 169.374, 120);
-
+            START_LEFT_NOTE = PathPointInch(626.983, 169.372, 60);
+            START_RIGHT_NOTE = PathPointInch(623.735, 266.305, -60);
+            START_MID_NOTE = PathPointInch(596.295, 169.374, 0);
 
         }
     }

@@ -16,6 +16,7 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -51,7 +52,9 @@ public class Drivetrain extends SubsystemBase {
   private AprilTagCamera photonCam;
   private Field2d smartdashField;
   private final String fieldWidgetType = "Odometry";
-  
+  PIDController rotationPIDController;
+  private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
+    
   //2024 robot
   // private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
   // private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
@@ -85,6 +88,10 @@ public class Drivetrain extends SubsystemBase {
     pigeon = new WPI_PigeonIMU(CAN.PIGEON_DRIVETRAIN);
     pigeon.configFactoryDefault();
     pigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
+
+    rotationPIDController = new PIDController(P, I, D);
+    rotationPIDController.enableContinuousInput(-180, 180);
+    rotationPIDController.setTolerance(1.0);
 
     // photonvision wrapper
     photonCam = new AprilTagCamera();
@@ -124,6 +131,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
     SmartDashboard.putNumber("CurrentPose Rotation", getPose().getRotation().getDegrees());
+  }
+
+  public PIDController getRotationalController() {
+    return rotationPIDController;
   }
 
   public void resetYaw() {
@@ -336,10 +347,9 @@ public class Drivetrain extends SubsystemBase {
         photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
         photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
       if (tagPose.isPresent()) {
-        // targetHeading = getPose().getY() < tagPose.get().getTranslation().getX() ? 
-        //   -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI) :
-        //   Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
-        targetHeading = -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
+          targetHeading = getPose().getY() < tagPose.get().getTranslation().getY() ? 
+            -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI) :
+            Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
       }
     }
 
@@ -353,8 +363,10 @@ public class Drivetrain extends SubsystemBase {
     if (result.hasTargets()) {
       List<PhotonTrackedTarget> targets = result.getTargets();
       
-      for(int i = 0; i < targets.size() - 1; i++) {
+      for(int i = 0; i < targets.size(); i++) {
         if (targets.get(i).getFiducialId() == APRILTAGS.MIDDLE_BLUE_SPEAKER) {
+          yaw = targets.get(i).getYaw();
+        } else if (targets.get(i).getFiducialId() == APRILTAGS.MIDDLE_RED_SPEAKER) {
           yaw = targets.get(i).getYaw();
         }
       }

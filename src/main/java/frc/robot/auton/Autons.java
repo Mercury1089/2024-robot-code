@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.SWERVE;
-import frc.robot.commands.drivetrain.SwerveOnGyro;
 import frc.robot.subsystems.GamePieceLEDs;
 import frc.robot.subsystems.GamePieceLEDs.LEDState;
 import frc.robot.subsystems.arm.Arm;
@@ -83,8 +82,8 @@ public class Autons {
         this.allianceColor = allianceColor.isPresent() ? allianceColor.get() : Alliance.Blue;
 
         this.knownLocations = new KnownLocations();
-        this.firstElement = KnownLocations.DO_NOTHING;
-        this.currentSelectedPose = KnownLocations.DO_NOTHING;
+        this.firstElement = knownLocations.WING_NOTE_1;
+        this.currentSelectedPose = knownLocations.START_LEFT_NOTE;
         this.firstElementType = AutonTypes.LEAVE_STARTING_ZONE;
 
         this.drivetrain = drivetrain;
@@ -182,62 +181,118 @@ public class Autons {
         //     waypoints = new ArrayList<Pose2d>();
         //     waypoints.add(knownLocations.WING_NOTE_3);
         // }
-        PathPlannerPath path1 = null, path2 = null, path3 = null;
-
-        if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
-            waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
-            finalPose = knownLocations.WING_NOTE_1;
-        } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
-            if (firstElement == knownLocations.WING_NOTE_1) {
+        PathPlannerPath path1, path2, path3;
+        if (allianceColor == Alliance.Blue) {
+            if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
                 waypoints = new ArrayList<Pose2d>();
                 waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
                 finalPose = knownLocations.WING_NOTE_1;
-            } else if (firstElement == knownLocations.WING_NOTE_3) {
+            } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
+                if (firstElement == knownLocations.WING_NOTE_1) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                    finalPose = knownLocations.WING_NOTE_1;
+                } else if (firstElement == knownLocations.WING_NOTE_3) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                    finalPose = knownLocations.WING_NOTE_3;
+                }
+            } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
                 waypoints = new ArrayList<Pose2d>();
                 waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
                 finalPose = knownLocations.WING_NOTE_3;
             }
-        } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
+
+            path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+
+            secondPathPose = finalPose == knownLocations.WING_NOTE_1 ? knownLocations.WING_NOTE_1 : knownLocations.WING_NOTE_3;
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
-            finalPose = knownLocations.WING_NOTE_3;
-        }
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_2);
+            finalPose = knownLocations.WING_NOTE_2;
 
-        path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+            path2 = generateSwerveTrajectory(secondPathPose, waypoints, finalPose);
 
-        secondPathPose = finalPose == knownLocations.WING_NOTE_1 ? knownLocations.WING_NOTE_1 : knownLocations.WING_NOTE_3;
-        waypoints = new ArrayList<Pose2d>();
-        waypoints.add(knownLocations.INTERMEDIARY_NOTE_2);
-        finalPose = knownLocations.WING_NOTE_2;
-
-        path2 = generateSwerveTrajectory(secondPathPose, waypoints, finalPose);
-
-        thirdPathPose = finalPose;
-        waypoints = new ArrayList<Pose2d>();
-
-        if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
+            thirdPathPose = finalPose;
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
-            finalPose = knownLocations.WING_NOTE_3;
-        } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
-            if (firstElement == knownLocations.WING_NOTE_1) {
+
+            if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
                 waypoints = new ArrayList<Pose2d>();
                 waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
                 finalPose = knownLocations.WING_NOTE_3;
-            } else if (firstElement == knownLocations.WING_NOTE_3) {
+            } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
+                if (firstElement == knownLocations.WING_NOTE_1) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                    finalPose = knownLocations.WING_NOTE_3;
+                } else if (firstElement == knownLocations.WING_NOTE_3) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                    finalPose = knownLocations.WING_NOTE_1;
+                }
+            } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
                 waypoints = new ArrayList<Pose2d>();
                 waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
                 finalPose = knownLocations.WING_NOTE_1;
             }
-        } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
+
+            path3 = generateSwerveTrajectory(thirdPathPose, waypoints, finalPose);
+
+        } else {
+            if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                finalPose = knownLocations.WING_NOTE_3;
+            } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
+                if (firstElement == knownLocations.WING_NOTE_1) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                    finalPose = knownLocations.WING_NOTE_1;
+                } else if (firstElement == knownLocations.WING_NOTE_3) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                    finalPose = knownLocations.WING_NOTE_3;
+                }
+            } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                finalPose = knownLocations.WING_NOTE_1;
+            }
+
+            path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+
+            secondPathPose = finalPose == knownLocations.WING_NOTE_1 ? knownLocations.WING_NOTE_1 : knownLocations.WING_NOTE_3;
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
-            finalPose = knownLocations.WING_NOTE_1;
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_2);
+            finalPose = knownLocations.WING_NOTE_2;
+
+            path2 = generateSwerveTrajectory(secondPathPose, waypoints, finalPose);
+
+            thirdPathPose = finalPose;
+            waypoints = new ArrayList<Pose2d>();
+
+            if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                finalPose = knownLocations.WING_NOTE_1;
+            } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
+                if (firstElement == knownLocations.WING_NOTE_1) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                    finalPose = knownLocations.WING_NOTE_3;
+                } else if (firstElement == knownLocations.WING_NOTE_3) {
+                    waypoints = new ArrayList<Pose2d>();
+                    waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+                    finalPose = knownLocations.WING_NOTE_1;
+                }
+            } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
+                waypoints = new ArrayList<Pose2d>();
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
+                finalPose = knownLocations.WING_NOTE_3;
+            }
+
+            path3 = generateSwerveTrajectory(thirdPathPose, waypoints, finalPose);
         }
-
-        path3 = generateSwerveTrajectory(thirdPathPose, waypoints, finalPose);
-
+        
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path1.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path2.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj2");
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path3.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj3");
@@ -330,17 +385,6 @@ public class Autons {
         if (rebuildAutonCommand) {
             this.autonCommand = buildAutonCommand();
         }
-    }
-
-    public Command aimToSpeaker() {
-
-        Pose2d targetPose = KnownLocations.PathPointInch(Units.metersToInches(drivetrain.getPose().getX()) + 50, Units.metersToInches(drivetrain.getPose().getY()), drivetrain.getTargetHeadingToSpeaker());
-        PathPlannerPath targPlannerPath = generateSwerveTrajectory(drivetrain.getPose(), new ArrayList<Pose2d>(), targetPose);
-
-        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(targPlannerPath.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
-        Command aimCommand = AutoBuilder.followPath(targPlannerPath);
-
-        return aimCommand;
     }
     
     /**

@@ -6,14 +6,15 @@ package frc.robot;
 
 import frc.robot.Constants.DS_USB;
 import frc.robot.Constants.JOYSTICK_BUTTONS;
+import frc.robot.Constants.SWERVE;
 import frc.robot.auton.Autons;
-import frc.robot.commands.drivetrain.SwerveOnJoysticks;
 import frc.robot.subsystems.GamePieceLEDs;
 import frc.robot.subsystems.GamePieceLEDs.LEDState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.util.MercMath;
 
 import java.util.function.Supplier;
 
@@ -21,7 +22,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -73,17 +76,33 @@ public class RobotContainer {
     //shooter.setDefaultCommand(new RunCommand(() -> shooter.runShooter(gamepadLeftX), shooter));
 
     drivetrain = new Drivetrain();
-    drivetrain.setDefaultCommand(new SwerveOnJoysticks(drivetrain, leftJoystickX, leftJoystickY, rightJoystickX));
+    drivetrain.setDefaultCommand(new RunCommand(
+      () -> drivetrain.joyDrive(
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+        -MercMath.sqaureInput(MathUtil.applyDeadband(rightJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)))
+    , drivetrain));
     drivetrain.resetGyro();
+
+    auton = new Autons(drivetrain);
 
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftX), arm));
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
-    left7.onTrue(new RunCommand(() -> auton.aimToSpeaker(), drivetrain)); 
   
     // in honor of resetTurret
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
+
+    gamepadB.onTrue(new PIDCommand(
+      drivetrain.getRotationalController(),
+      () -> drivetrain.getPose().getRotation().getDegrees(), 
+      () -> drivetrain.getTargetHeadingToSpeaker(), 
+      (angularSpeed) -> drivetrain.joyDrive(
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+       angularSpeed),
+      drivetrain));
     
 //    right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   

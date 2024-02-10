@@ -18,4 +18,8 @@ public class MercMath {
     public static double encoderTicksToDegrees(double ticks) {
         return ticks * 360 / UNITS.MAG_ENCODER_TICKS_PER_REVOLUTION;
     }
+
+    public static double sqaureInput(double input) {
+        return input > 0.0 ? Math.pow(input, 2) : -Math.pow(input, 2);
+    }
 }
