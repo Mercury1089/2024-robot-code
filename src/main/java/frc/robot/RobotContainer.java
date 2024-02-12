@@ -106,6 +106,16 @@ public class RobotContainer {
        angularSpeed),
       drivetrain));
 
+    gamepadY.onTrue(new PIDCommand(
+      drivetrain.getRotationalController(),
+      () -> drivetrain.getPose().getRotation().getDegrees(), 
+      () -> drivetrain.getTargetHeadingToAmp(), 
+      (angularSpeed) -> drivetrain.joyDrive(
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+       angularSpeed),
+      drivetrain));
+
     gamepadX.onTrue(drivetrain.getDefaultCommand());
     
     //right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));

@@ -338,6 +338,20 @@ public class Drivetrain extends SubsystemBase {
     return distance;
   }
 
+  public double getDistanceToAmp() {
+    Optional<Alliance> allianceColor = DriverStation.getAlliance();
+    double distance = 0.0;
+    if (allianceColor.isPresent()) {
+      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+        photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
+        photonCam.getTagPose(APRILTAGS.RED_AMP);
+      if (tagPose.isPresent()) {
+        distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
+      }
+    }
+    return distance;
+  }
+
   public double getTargetHeadingToSpeaker() {
     Optional<Alliance> allianceColor = DriverStation.getAlliance();
     double targetHeading = 0.0;
@@ -350,6 +364,24 @@ public class Drivetrain extends SubsystemBase {
           targetHeading = getPose().getY() < tagPose.get().getTranslation().getY() ? 
             -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI) :
             Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
+      }
+    }
+
+    return targetHeading;
+  }
+
+  public double getTargetHeadingToAmp() {
+    Optional<Alliance> allianceColor = DriverStation.getAlliance();
+    double targetHeading = 0.0;
+
+    if (allianceColor.isPresent()) {
+      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+        photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
+        photonCam.getTagPose(APRILTAGS.RED_AMP);
+      if (tagPose.isPresent()) {
+          targetHeading = getPose().getX() < tagPose.get().getTranslation().getX() ? 
+            Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToAmp()) * (180 / Math.PI) - 180 :
+            -Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToAmp()) * (180 / Math.PI);
       }
     }
 
