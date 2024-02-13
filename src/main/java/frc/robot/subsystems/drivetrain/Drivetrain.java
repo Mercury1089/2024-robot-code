@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.drivetrain;
 
+import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,7 @@ import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.AprilTagCamera;
+import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.util.SwerveUtils;
 
 public class Drivetrain extends SubsystemBase {
@@ -50,6 +52,7 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator odometry;
   private SwerveDriveKinematics swerveKinematics;
   private AprilTagCamera photonCam;
+  private ObjectDetectionCamera objectDetectionCamera;
   private Field2d smartdashField;
   private final String fieldWidgetType = "Odometry";
   PIDController rotationPIDController;
@@ -95,6 +98,7 @@ public class Drivetrain extends SubsystemBase {
 
     // photonvision wrapper
     photonCam = new AprilTagCamera();
+    objectDetectionCamera = new ObjectDetectionCamera();
 
     smartdashField = new Field2d();
     SmartDashboard.putData("Swerve Odometry", smartdashField);
@@ -405,6 +409,13 @@ public class Drivetrain extends SubsystemBase {
     }
     return yaw;
   }
+
+  public double getTargetHeadingToClosestNote() {
+    Rotation2d targetRotation = new Rotation2d(objectDetectionCamera.getYaw() * (Math.PI /180));
+    return objectDetectionCamera.getYaw() != 0.0 ?
+      -getPose().rotateBy(targetRotation).getRotation().getDegrees() :
+      getPose().getRotation().getDegrees();
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -440,6 +451,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToSpeaker());
     SmartDashboard.putNumber("Angle Offset", 0);
    // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
+    SmartDashboard.putNumber("X to closest note", objectDetectionCamera.getClosestNote().getX());
+    SmartDashboard.putNumber("Y to closest note", objectDetectionCamera.getClosestNote().getY());
+    SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
+    SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
