@@ -428,10 +428,10 @@ public class Drivetrain extends SubsystemBase {
         backRightModule.getPosition()
     });
 
-    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
-    if (result.isPresent()) {
-      odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
-    }
+    // Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
+    // if (result.isPresent()) {
+    //   odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
+    // }
   
     if (fieldWidgetType.equals("Odometry")) {
       smartdashField.setRobotPose(getPose());
@@ -451,10 +451,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToSpeaker());
     SmartDashboard.putNumber("Angle Offset", 0);
    // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
-    SmartDashboard.putNumber("X to closest note", objectDetectionCamera.getClosestNote().getX());
-    SmartDashboard.putNumber("Y to closest note", objectDetectionCamera.getClosestNote().getY());
-    SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
-    SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
+    //SmartDashboard.putNumber("X to closest note", objectDetectionCamera.getClosestNote().getX());
+    // SmartDashboard.putNumber("Y to closest note", objectDetectionCamera.getClosestNote().getY());
+    // SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
+    // SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());

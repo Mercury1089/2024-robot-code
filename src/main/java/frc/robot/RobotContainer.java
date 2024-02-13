@@ -130,7 +130,7 @@ public class RobotContainer {
     
     //right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   
-    //gamepadX.onTrue(new RunCommand(() -> shooter.setVelocity(5600), shooter));
+    //gamepadPOVUp.onTrue(new RunCommand(() -> shooter.setVelocity(5600), shooter));
     //gamepadY.onTrue(new RunCommand(() -> shooter.setVelocity(4500), shooter));
     //gamepadA.onTrue(new RunCommand(() -> shooter.setVelocity(4000), shooter));
     //gamepadB.onTrue(new RunCommand(() -> shooter.stopShooter(), shooter));
