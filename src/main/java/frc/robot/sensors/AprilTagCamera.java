@@ -52,6 +52,8 @@ public class AprilTagCamera extends PhotonCamera {
         Transform3d robotToCam = new Transform3d(
             new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0, Math.PI, 0)
         );
+        // Uncomment the following to silence missing camera errors
+        // PhotonCamera.setVersionCheckEnabled(false);
         estimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, this, robotToCam);
     }
 
@@ -68,14 +70,7 @@ public class AprilTagCamera extends PhotonCamera {
     }
 
     public Optional<EstimatedRobotPose> getGlobalPose() {
-        Optional<EstimatedRobotPose> globalPose = Optional.empty();
-        try {
-            globalPose = estimator.update();  
-        } catch (Exception e) {
-          
-        }
-        // globalPose = estimator.update();
-        return globalPose;
+        return estimator.update();
     }
 
     public double getYaw() {
