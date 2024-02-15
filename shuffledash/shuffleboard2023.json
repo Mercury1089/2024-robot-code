@@ -11,32 +11,6 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {
-          "10,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/claw fwd limit",
-              "_title": "SmartDashboard/claw fwd limit",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "10,1": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Claw Position",
-              "_title": "SmartDashboard/Claw Position",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "12,2": {
             "size": [
               1,
@@ -50,103 +24,10 @@
               "_showGlyph": false
             }
           },
-          "5,0": {
+          "0,1": {
             "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/claw supply current",
-              "_title": "SmartDashboard/claw supply current",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Auton Selected: ",
-              "_title": "SmartDashboard/Auton Selected: ",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "3,0": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Claw Position",
-              "_title": "SmartDashboard/Claw Position",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "7,0": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/telescope encoder",
-              "_title": "SmartDashboard/telescope encoder",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "3,1": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/arm encoder",
-              "_title": "SmartDashboard/arm encoder",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,4": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Wrist Ready",
-              "_title": "/SmartDashboard/Wrist Ready",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "3,2": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Wrist Roll",
-              "_title": "/SmartDashboard/Wrist Roll",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "5,2": {
-            "size": [
-              4,
-              3
+              7,
+              4
             ],
             "content": {
               "_type": "Field",
@@ -154,95 +35,22 @@
               "_title": "/SmartDashboard/Swerve Odometry",
               "_glyph": 148,
               "_showGlyph": false,
-              "Game/Game": "A2023_Charged_Up",
+              "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
           },
-          "9,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/arm isFinished",
-              "_title": "/SmartDashboard/arm isFinished",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "10,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/arm atPosition",
-              "_title": "/SmartDashboard/arm atPosition",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "9,4": {
+          "2,0": {
             "size": [
               2,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/telescope isAtPosition",
-              "_title": "/SmartDashboard/telescope isAtPosition",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "7,1": {
-            "size": [
-              1,
               1
             ],
             "content": {
               "_type": "ComboBox Chooser",
               "_source0": "network_table:///SmartDashboard/Manual Starting Pose",
               "_title": "SmartDashboard/Manual Starting Pose",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "3,4": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/isDoNothing",
-              "_title": "SmartDashboard/isDoNothing",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "3,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/alliance color!",
-              "_title": "/SmartDashboard/alliance color!",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -260,7 +68,7 @@
               "_showGlyph": false
             }
           },
-          "5,1": {
+          "4,0": {
             "size": [
               2,
               1
@@ -273,7 +81,7 @@
               "_showGlyph": false
             }
           },
-          "8,1": {
+          "6,0": {
             "size": [
               2,
               1
@@ -297,6 +105,118 @@
               "_title": "/SmartDashboard/Drive Angle",
               "_glyph": 148,
               "_showGlyph": false
+            }
+          },
+          "7,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Angle to speaker without AprilTag",
+              "_title": "/SmartDashboard/Angle to speaker without AprilTag",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/CurrentPose Rotation",
+              "_title": "/SmartDashboard/CurrentPose Rotation",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Drive Yaw",
+              "_title": "/SmartDashboard/Drive Yaw",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "7,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Robot Angle",
+              "_title": "/SmartDashboard/Robot Angle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "7,1": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Angle to closest note",
+              "_title": "/SmartDashboard/Angle to closest note",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,1": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Target Heading to note",
+              "_title": "/SmartDashboard/Target Heading to note",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "11,1": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Angle to note",
+              "_title": "SmartDashboard/Angle to note",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Camera Stream",
+              "_source0": "camera_server://limelight-merc",
+              "_title": "limelight-merc",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Crosshair/Show crosshair": true,
+              "Crosshair/Crosshair color": "#FFFFFFFF",
+              "Controls/Show controls": true,
+              "Controls/Rotation": "NONE",
+              "compression": -1.0,
+              "fps": -1,
+              "imageWidth": -1,
+              "imageHeight": -1
             }
           }
         }
@@ -324,7 +244,7 @@
               "_title": "/SmartDashboard/Swerve Odometry",
               "_glyph": 148,
               "_showGlyph": false,
-              "Game/Game": "A2023_Charged_Up",
+              "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
               "Colors/traj2": "#FFFFFFFF",

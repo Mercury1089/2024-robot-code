@@ -42,7 +42,7 @@ import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.AprilTagCamera;
-import frc.robot.sensors.ObjectDetectionCamera;
+import frc.robot.sensors.Limelight;
 import frc.robot.util.SwerveUtils;
 
 public class Drivetrain extends SubsystemBase {
@@ -52,7 +52,7 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator odometry;
   private SwerveDriveKinematics swerveKinematics;
   private AprilTagCamera photonCam;
-  private ObjectDetectionCamera objectDetectionCamera;
+  private Limelight limelight;
   private Field2d smartdashField;
   private final String fieldWidgetType = "Odometry";
   PIDController rotationPIDController;
@@ -98,7 +98,7 @@ public class Drivetrain extends SubsystemBase {
 
     // photonvision wrapper
     photonCam = new AprilTagCamera();
-    objectDetectionCamera = new ObjectDetectionCamera();
+    limelight = new Limelight();
 
     smartdashField = new Field2d();
     SmartDashboard.putData("Swerve Odometry", smartdashField);
@@ -392,30 +392,15 @@ public class Drivetrain extends SubsystemBase {
     return targetHeading;
   }
 
-  public double getDegreesToSpeakerApriltag() {
-    var result = photonCam.getLatestResult();
-    double yaw = 0.0;
-
-    if (result.hasTargets()) {
-      List<PhotonTrackedTarget> targets = result.getTargets();
-      
-      for(int i = 0; i < targets.size(); i++) {
-        if (targets.get(i).getFiducialId() == APRILTAGS.MIDDLE_BLUE_SPEAKER) {
-          yaw = targets.get(i).getYaw();
-        } else if (targets.get(i).getFiducialId() == APRILTAGS.MIDDLE_RED_SPEAKER) {
-          yaw = targets.get(i).getYaw();
-        }
-      }
-    }
-    return yaw;
-  }
-
   public double getTargetHeadingToClosestNote() {
-    Rotation2d targetRotation = new Rotation2d(objectDetectionCamera.getYaw() * (Math.PI /180));
-    return objectDetectionCamera.getYaw() != 0.0 ?
-      -getPose().rotateBy(targetRotation).getRotation().getDegrees() :
+    Rotation2d targetRotation = Rotation2d.fromDegrees(-limelight.getTargetCenterXAngle());
+    Rotation2d turnAround = new Rotation2d(180.0);
+    return limelight.getTargetCenterXAngle() != 0.0?
+      // -targetRotation.rotateBy(getPose().getRotation()).getDegrees() :
+      getPose().rotateBy(targetRotation).getRotation().getDegrees() :
       getPose().getRotation().getDegrees();
   }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -428,10 +413,10 @@ public class Drivetrain extends SubsystemBase {
         backRightModule.getPosition()
     });
 
-    // Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
-    // if (result.isPresent()) {
-    //   odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
-    // }
+    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
+    if (result.isPresent()) {
+      odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
+    }
   
     if (fieldWidgetType.equals("Odometry")) {
       smartdashField.setRobotPose(getPose());
@@ -454,7 +439,8 @@ public class Drivetrain extends SubsystemBase {
     //SmartDashboard.putNumber("X to closest note", objectDetectionCamera.getClosestNote().getX());
     // SmartDashboard.putNumber("Y to closest note", objectDetectionCamera.getClosestNote().getY());
     // SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
-    // SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
+    SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
+    SmartDashboard.putNumber("Angle to note", limelight.getTargetCenterXAngle());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
