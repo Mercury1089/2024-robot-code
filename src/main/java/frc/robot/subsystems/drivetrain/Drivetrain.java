@@ -43,6 +43,7 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.AprilTagCamera;
 import frc.robot.sensors.Limelight;
+import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.util.SwerveUtils;
 
 public class Drivetrain extends SubsystemBase {
@@ -56,6 +57,7 @@ public class Drivetrain extends SubsystemBase {
   private Field2d smartdashField;
   private final String fieldWidgetType = "Odometry";
   PIDController rotationPIDController;
+  private ObjectDetectionCamera objectDetectionCam;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
     
   //2024 robot
@@ -99,6 +101,7 @@ public class Drivetrain extends SubsystemBase {
     // photonvision wrapper
     photonCam = new AprilTagCamera();
     limelight = new Limelight();
+    objectDetectionCam = new ObjectDetectionCamera();
 
     smartdashField = new Field2d();
     SmartDashboard.putData("Swerve Odometry", smartdashField);
@@ -393,8 +396,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getTargetHeadingToClosestNote() {
-    Rotation2d targetRotation = Rotation2d.fromDegrees(-limelight.getTargetCenterXAngle());
-    Rotation2d turnAround = new Rotation2d(180.0);
+    Rotation2d targetRotation = Rotation2d.fromDegrees(-objectDetectionCam.getYaw());
     return limelight.getTargetCenterXAngle() != 0.0?
       // -targetRotation.rotateBy(getPose().getRotation()).getDegrees() :
       getPose().rotateBy(targetRotation).getRotation().getDegrees() :

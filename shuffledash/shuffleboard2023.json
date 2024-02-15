@@ -11,19 +11,6 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {
-          "12,2": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/angularSpeedJoystick",
-              "_title": "/SmartDashboard/angularSpeedJoystick",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "0,1": {
             "size": [
               7,
@@ -120,32 +107,6 @@
               "_showGlyph": false
             }
           },
-          "10,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/CurrentPose Rotation",
-              "_title": "/SmartDashboard/CurrentPose Rotation",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,3": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Drive Yaw",
-              "_title": "/SmartDashboard/Drive Yaw",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "7,2": {
             "size": [
               2,
@@ -193,15 +154,15 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Angle to note",
-              "_title": "SmartDashboard/Angle to note",
+              "_title": "/SmartDashboard/Angle to note",
               "_glyph": 148,
               "_showGlyph": false
             }
           },
-          "9,4": {
+          "9,2": {
             "size": [
-              3,
-              2
+              4,
+              3
             ],
             "content": {
               "_type": "Camera Stream",
@@ -211,7 +172,7 @@
               "_showGlyph": false,
               "Crosshair/Show crosshair": true,
               "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": true,
+              "Controls/Show controls": false,
               "Controls/Rotation": "NONE",
               "compression": -1.0,
               "fps": -1,
