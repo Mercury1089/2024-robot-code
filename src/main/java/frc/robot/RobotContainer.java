@@ -13,6 +13,7 @@ import frc.robot.subsystems.GamePieceLEDs.LEDState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Shooter;
+import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.MercMath;
 
@@ -82,6 +83,9 @@ public class RobotContainer {
 
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
+    gamepadPOVLeft.onTrue(new RunCommand(() -> arm.setPosition(90.0), arm));
+    gamepadPOVUp.onTrue(new RunCommand(() -> arm.setPosition(0.0), arm));
+    gamepadPOVRight.onTrue(new RunCommand(() -> arm.setPosition(-90.0), arm));
 
     intake = new Intake();
     intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));

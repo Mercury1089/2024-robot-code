@@ -41,10 +41,9 @@ public class Arm extends SubsystemBase {
     ARM_PID_SLOT = 0;
 
   private static final double 
-    ARM_NORMAL_P_VAL = 1.0 / 18.0 * 1024.0,
+    ARM_NORMAL_P_VAL = 1.0 / 180.0,
     ARM_NORMAL_I_VAL = 0.0,
-    ARM_NORMAL_D_VAL = 0.0,
-    ARM_NORMAL_F_VAL = 0.0;
+    ARM_NORMAL_D_VAL = 0.0;
 
   private final double 
     NOMINAL_OUTPUT_FORWARD = 0.01, //0.02,
@@ -52,7 +51,7 @@ public class Arm extends SubsystemBase {
     NOMINAL_OUTPUT_REVERSE = -0.01, //-0.5,
     PEAK_OUTPUT_REVERSE = -0.6;
 
-  public final double GEAR_RATIO = 1;
+  public final double GEAR_RATIO = 125.0 / 1.0;
   public final double THRESHOLD_DEGREES = 2.0;
 
   
@@ -69,68 +68,37 @@ public class Arm extends SubsystemBase {
     //armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
     armPIDController = arm.getPIDController();
     armRelativeEncoder = arm.getEncoder();
+
+    // armRelativeEncoder.setInverted(true);
+    armRelativeEncoder.setPositionConversionFactor(GEAR_RATIO / 360.0);
     armPIDController.setFeedbackDevice(armRelativeEncoder);
     this.drivetrain = drivetrain;
 
-    //TODO: set encoder conversion
-    
-    /* 
-    // Account for motor orientation.
-    arm.setSensorPhase(true);
-    arm.setInverted(false);
+    armPIDController.setOutputRange(NOMINAL_OUTPUT_FORWARD, PEAK_OUTPUT_FORWARD);
 
-    SmartDashboard.putNumber("ARM P", ARM_NORMAL_P_VAL);
-    SmartDashboard.putNumber("ARM I", ARM_NORMAL_I_VAL);
-    SmartDashboard.putNumber("ARM D", ARM_NORMAL_D_VAL);
-    SmartDashboard.putNumber("ARM MIN REV", NOMINAL_OUTPUT_REVERSE);
-    SmartDashboard.putNumber("ARM MIN FWD", NOMINAL_OUTPUT_FORWARD);
-
-    arm.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, ARM_PID_SLOT, Constants.CTRE.TIMEOUT_MS);
-    arm.configSelectedFeedbackCoefficient(100.0 / 200000.0);
-
-    arm.configForwardSoftLimitThreshold(100.0);
-    arm.configForwardSoftLimitEnable(true);
-
-    arm.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, Constants.CAN_STATUS_FREQ.HIGH);
-    arm.setNeutralMode(NeutralMode.Brake);
-
-    arm.configClearPositionOnLimitR(true, Constants.CTRE.TIMEOUT_MS);
-
-    arm.configNominalOutputForward(NOMINAL_OUTPUT_FORWARD, Constants.CTRE.TIMEOUT_MS);
-    arm.configNominalOutputReverse(NOMINAL_OUTPUT_REVERSE, Constants.CTRE.TIMEOUT_MS);
-    arm.configPeakOutputForward(PEAK_OUTPUT_FORWARD, Constants.CTRE.TIMEOUT_MS);
-    arm.configPeakOutputReverse(PEAK_OUTPUT_REVERSE, Constants.CTRE.TIMEOUT_MS);
-    
-    arm.configAllowableClosedloopError(ARM_PID_SLOT, 0, Constants.CTRE.TIMEOUT_MS);
-
-    arm.config_kP(ARM_PID_SLOT, ARM_NORMAL_P_VAL, Constants.CTRE.TIMEOUT_MS);
-    arm.config_kI(ARM_PID_SLOT, ARM_NORMAL_I_VAL, Constants.CTRE.TIMEOUT_MS);
-    arm.config_kD(ARM_PID_SLOT, ARM_NORMAL_D_VAL, Constants.CTRE.TIMEOUT_MS);
-    arm.config_kF(ARM_PID_SLOT, ARM_NORMAL_F_VAL, Constants.CTRE.TIMEOUT_MS);
-
-    arm.selectProfileSlot(ARM_PID_SLOT, Constants.CTRE.PRIMARY_PID_LOOP);
-    */
+    armPIDController.setP(ARM_NORMAL_P_VAL);
+    armPIDController.setI(ARM_NORMAL_I_VAL);
+    armPIDController.setD(ARM_NORMAL_D_VAL);
   }
-
   
   public void resetEncoders() {
     armRelativeEncoder.setPosition(0);
   }
 
   public void setSpeed(Supplier<Double> speedSupplier) {
-    arm.set(-(speedSupplier.get()));
+    arm.set((speedSupplier.get() * 0.5));
   }
 
-  public void setPosition(ArmPosition pos) {
-    armPIDController.setReference(pos.degreePos, CANSparkMax.ControlType.kPosition);
+  public void setPosition(double pos) {
+    armPIDController.setReference(pos, CANSparkMax.ControlType.kPosition);
   }
 
   public double getDistanceToSpeaker() {
     return drivetrain.getDistanceToSpeaker();
   }
-  /* 
+  
   public double getError() {
-    return arm.getClosedLoopError(ARM_PID_SLOT);
+    return 0.0;
   }
 
   public boolean isFinishedMoving() {
@@ -142,7 +110,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getArmPosition() {
-    return arm.getSelectedSensorPosition();
+    return armRelativeEncoder.getPosition();
   }
 
   @Override
@@ -150,9 +118,7 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("arm encoder", getArmPosition());
     SmartDashboard.putNumber("arm error", getError());
-    SmartDashboard.putNumber("arm rev limit", arm.isRevLimitSwitchClosed());
     SmartDashboard.putBoolean("arm isFinished", isFinishedMoving());
-    SmartDashboard.putBoolean("arm atPosition", isAtPosition(ArmPosition.BULLDOZER));
 
     // configPID(
     //   SmartDashboard.getNumber("ARM P", ARM_LOWER_LIMIT),
@@ -163,10 +129,10 @@ public class Arm extends SubsystemBase {
     // );
 
   }
-  */
+  
 
   public enum ArmPosition {
-    SPEAKER(0.0),
+    SPEAKER(90.0),
     AMP(0.0),
     PICKUP_FLOOR(0.0),
     PICKUP_SOURCE(0.0);

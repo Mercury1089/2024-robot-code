@@ -25,6 +25,7 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
+              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
@@ -166,18 +167,31 @@
             ],
             "content": {
               "_type": "Camera Stream",
-              "_source0": "camera_server://limelight-merc",
-              "_title": "limelight-merc",
+              "_source0": "camera_server://photonvision-apriltag_Port_1184_Output_MJPEG_Server",
+              "_title": "photonvision-apriltag_Port_1184_Output_MJPEG_Server",
               "_glyph": 148,
               "_showGlyph": false,
               "Crosshair/Show crosshair": true,
               "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": false,
+              "Controls/Show controls": true,
               "Controls/Rotation": "NONE",
               "compression": -1.0,
               "fps": -1,
               "imageWidth": -1,
               "imageHeight": -1
+            }
+          },
+          "7,4": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/arm encoder",
+              "_title": "/SmartDashboard/arm encoder",
+              "_glyph": 148,
+              "_showGlyph": false
             }
           }
         }
@@ -208,6 +222,7 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
+              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
