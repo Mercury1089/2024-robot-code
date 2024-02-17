@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,8 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -41,9 +44,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
+import frc.robot.auton.Autons;
 import frc.robot.sensors.AprilTagCamera;
 import frc.robot.sensors.Limelight;
 import frc.robot.sensors.ObjectDetectionCamera;
+import frc.robot.util.PathUtils;
 import frc.robot.util.SwerveUtils;
 
 public class Drivetrain extends SubsystemBase {
@@ -397,10 +402,22 @@ public class Drivetrain extends SubsystemBase {
 
   public double getTargetHeadingToClosestNote() {
     Rotation2d targetRotation = Rotation2d.fromDegrees(-objectDetectionCam.getYaw());
-    return limelight.getTargetCenterXAngle() != 0.0?
+    return objectDetectionCam.getYaw() != 0.0 ?
       // -targetRotation.rotateBy(getPose().getRotation()).getDegrees() :
       getPose().rotateBy(targetRotation).getRotation().getDegrees() :
       getPose().getRotation().getDegrees();
+  }
+
+  public double getClosestNoteX() {
+    double x = objectDetectionCam.getDistanceToTarget() * Math.sin(getTargetHeadingToClosestNote());
+
+    return getPose().getX() + x;
+  }
+
+  public double getClosestNoteY() {
+    double y = objectDetectionCam.getDistanceToTarget() * Math.cos(getTargetHeadingToClosestNote());
+    
+    return getPose().getY() + y;
   }
 
   @Override
@@ -426,6 +443,12 @@ public class Drivetrain extends SubsystemBase {
       smartdashField.setRobotPose(getInitialPose());
     }
 
+    PathPlannerPath pathToNote;
+        Pose2d notePose = new Pose2d(getClosestNoteX(), getClosestNoteY(), new Rotation2d(getTargetHeadingToClosestNote()));
+
+        pathToNote = Autons.generateSwerveTrajectory(getPose(), new ArrayList<>(), notePose);
+        setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToNote");
+
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
     SmartDashboard.putNumber("CurrentPose Rotation", getPose().getRotation().getDegrees());
@@ -438,9 +461,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToSpeaker());
     SmartDashboard.putNumber("Angle Offset", 0);
     // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
-    // SmartDashboard.putNumber("X to closest note", objectDetectionCamera.getClosestNote().getX());
-    // SmartDashboard.putNumber("Y to closest note", objectDetectionCamera.getClosestNote().getY());
+    SmartDashboard.putNumber("X to closest note", getClosestNoteX());
+    SmartDashboard.putNumber("Y to closest note", getClosestNoteY());
     // SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
+    SmartDashboard.putNumber("Distance to closest note", objectDetectionCam.getDistanceToTarget());
     SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());

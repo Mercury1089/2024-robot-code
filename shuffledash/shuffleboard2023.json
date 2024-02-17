@@ -25,7 +25,7 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
-              "Colors/traj3": "#FFFFFFFF",
+              "Colors/pathToNote": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
@@ -193,6 +193,45 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "8,0": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/X to closest note",
+              "_title": "SmartDashboard/X to closest note",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,0": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Y to closest note",
+              "_title": "SmartDashboard/Y to closest note",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Distance to closest note",
+              "_title": "SmartDashboard/Distance to closest note",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -222,7 +261,7 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
-              "Colors/traj3": "#FFFFFFFF",
+              "Colors/pathToNote": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }

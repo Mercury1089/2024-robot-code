@@ -22,6 +22,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -34,12 +35,9 @@ public class ObjectDetectionCamera extends PhotonCamera {
 
     //TODO: UPDATE CAM SETTINGS FOR NEW ROBOT
     private static final String DEFAULT_CAM_NAME = "ObjectDetectionCam";
-    private final double CAMERA_HEIGHT_METERS = 0.0457; // height on robot (meters)
-    private final double TARGET_HEIGHT_METERS = 0.0254; // may need to change 
-    private final int CAMERA_PITCH_RADIANS = 0; // tilt of our camera (radians)
-
-    private AprilTagFieldLayout fieldLayout;
-    private PhotonPoseEstimator estimator;
+    private final double CAMERA_HEIGHT_METERS = 0.356; // height on robot (meters)
+    private final double TARGET_HEIGHT_METERS = 0.0; // may need to change 
+    private final double CAMERA_PITCH_RADIANS = -5.0 * (Math.PI / 180.0); // tilt of our camera (radians)
 
     public ObjectDetectionCamera() {
         super(DEFAULT_CAM_NAME);
@@ -62,15 +60,20 @@ public class ObjectDetectionCamera extends PhotonCamera {
         return getLatestResult().getBestTarget().getSkew();
     }
 
-    public double getDistanceToNote() {
-        double range = 0.0;
-        if (getLatestResult().hasTargets()) {
-            range = PhotonUtils.calculateDistanceToTargetMeters(
-                CAMERA_HEIGHT_METERS,
-                TARGET_HEIGHT_METERS,
-                CAMERA_PITCH_RADIANS,
-                Units.degreesToRadians(getLatestResult().getBestTarget().getPitch()));
+    public double getDistanceToTarget() {
+        PhotonPipelineResult result = getLatestResult();
+        if (result.hasTargets()) {
+            double range = PhotonUtils.calculateDistanceToTargetMeters(
+                CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, 
+                Units.degreesToRadians(result.getBestTarget().getPitch())
+            );
+            return range;
         }
-        return range;
+        return 0.0;
     }
+    
+    // public Transform3d transformToNote() {
+    //     Transform3d pose = getLatestResult().getBestTarget().getBestCameraToTarget();
+    //     return pose;
+    // }
 }

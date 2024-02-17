@@ -53,7 +53,7 @@ public class Autons {
     private Pose2d thirdPathPose;
     private Pose2d secondPathPose;
     private AutonTypes firstElementType;
-    private PathConstraints pathConstraints;
+    private static PathConstraints pathConstraints;
     private PIDController turningPIDController;
     private PIDController xController, yController;
     private Command autonCommand;
@@ -307,7 +307,7 @@ public class Autons {
         );
     }
 
-    public PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
+    public static PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
         List<Pose2d> poses = new ArrayList<Pose2d>();
         poses.add(initialPose); poses.addAll(waypoints); poses.add(finalPose);
 
@@ -339,6 +339,16 @@ public class Autons {
         return points;
     }
 
+    public Command pickUpNote() {
+        PathPlannerPath pathToNote;
+        Pose2d notePose = new Pose2d(drivetrain.getClosestNoteX(), drivetrain.getClosestNoteY(), new Rotation2d(drivetrain.getTargetHeadingToClosestNote()));
+
+        pathToNote = generateSwerveTrajectory(drivetrain.getPose(), new ArrayList<>(), notePose);
+        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "pathToNote");
+
+        // return AutoBuilder.followPath(pathToNote);
+        return new Command() {};
+    }
     /**
      * Rebuilds the autonCommand when ONE of the following conditions changes:
      * - Starting Pose
