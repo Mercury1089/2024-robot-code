@@ -232,6 +232,19 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "10,5": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///photonvision/ObjectDetectionCam/targetYaw",
+              "_title": "/photonvision/ObjectDetectionCam/targetYaw",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }

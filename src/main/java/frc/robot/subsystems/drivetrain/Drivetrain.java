@@ -16,6 +16,7 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
@@ -61,8 +63,10 @@ public class Drivetrain extends SubsystemBase {
   private Limelight limelight;
   private Field2d smartdashField;
   private final String fieldWidgetType = "Odometry";
-  PIDController rotationPIDController;
+  private PIDController rotationPIDController;
+  private PathPlannerPath pathToNote;
   private ObjectDetectionCamera objectDetectionCam;
+  private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
     
   //2024 robot
@@ -139,6 +143,10 @@ public class Drivetrain extends SubsystemBase {
       },
       getInitialPose()
     );
+
+    goToNote = new Command() {
+      
+    };
 
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
@@ -409,15 +417,26 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getClosestNoteX() {
-    double x = objectDetectionCam.getDistanceToTarget() * Math.sin(getTargetHeadingToClosestNote());
-
-    return getPose().getX() + x;
+    return objectDetectionCam.getLatestResult().hasTargets() ?
+      getPose().getX() + objectDetectionCam.getDistanceToTarget() * Math.cos(getTargetHeadingToClosestNote() * (Math.PI / 180)) :
+      getPose().getX();
   }
 
   public double getClosestNoteY() {
-    double y = objectDetectionCam.getDistanceToTarget() * Math.cos(getTargetHeadingToClosestNote());
-    
-    return getPose().getY() + y;
+    return objectDetectionCam.getLatestResult().hasTargets() ?
+      getPose().getY() + objectDetectionCam.getDistanceToTarget() * Math.sin(getTargetHeadingToClosestNote() * (Math.PI / 180)) :
+      getPose().getY();
+  }
+
+  public Command goToNote() {
+    if (objectDetectionCam.getDistanceToTarget() < 3.0) {
+      return AutoBuilder.followPath(pathToNote);
+    } else {
+      return new Command() {
+        
+      };
+    }
+      
   }
 
   @Override
@@ -443,11 +462,10 @@ public class Drivetrain extends SubsystemBase {
       smartdashField.setRobotPose(getInitialPose());
     }
 
-    PathPlannerPath pathToNote;
-        Pose2d notePose = new Pose2d(getClosestNoteX(), getClosestNoteY(), new Rotation2d(getTargetHeadingToClosestNote()));
+    Pose2d notePose = new Pose2d(new Translation2d(getClosestNoteX(), getClosestNoteY()), Rotation2d.fromDegrees(getTargetHeadingToClosestNote()));
 
-        pathToNote = Autons.generateSwerveTrajectory(getPose(), new ArrayList<>(), notePose);
-        setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToNote");
+    pathToNote = Autons.generateSwerveTrajectory(getPose(), new ArrayList<>(), notePose);
+    setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToNote");
 
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());

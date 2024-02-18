@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -55,25 +56,25 @@ public class Arm extends SubsystemBase {
   public final double THRESHOLD_DEGREES = 2.0;
 
   
-  private CANSparkMax arm;
+  private CANSparkFlex arm;
   private SparkPIDController armPIDController;
   private AbsoluteEncoder armAbsoluteEncoder;
-  private RelativeEncoder armRelativeEncoder;
   private Drivetrain drivetrain;
 
   public Arm(Drivetrain drivetrain) {
-    arm = new CANSparkMax(CAN.ARM_SPARKMAX, MotorType.kBrushless);
+    arm = new CANSparkFlex(CAN.ARM_SPARKMAX, MotorType.kBrushless);
     arm.restoreFactoryDefaults();
     arm.setInverted(true);
-    //armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
     armPIDController = arm.getPIDController();
-    armRelativeEncoder = arm.getEncoder();
+    // armRelativeEncoder = arm.getEncoder();
+    armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
 
     // armRelativeEncoder.setInverted(true);
-    armRelativeEncoder.setPositionConversionFactor(GEAR_RATIO / 360.0);
-    armPIDController.setFeedbackDevice(armRelativeEncoder);
+    armAbsoluteEncoder.setPositionConversionFactor(GEAR_RATIO / 360.0);
+    armPIDController.setFeedbackDevice(armAbsoluteEncoder);
     this.drivetrain = drivetrain;
 
+    armPIDController.setPositionPIDWrappingEnabled(false);
     armPIDController.setOutputRange(NOMINAL_OUTPUT_FORWARD, PEAK_OUTPUT_FORWARD);
 
     armPIDController.setP(ARM_NORMAL_P_VAL);
@@ -82,7 +83,7 @@ public class Arm extends SubsystemBase {
   }
   
   public void resetEncoders() {
-    armRelativeEncoder.setPosition(0);
+    armPIDController.setReference(0, CANSparkMax.ControlType.kPosition);
   }
 
   public void setSpeed(Supplier<Double> speedSupplier) {
@@ -110,7 +111,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getArmPosition() {
-    return armRelativeEncoder.getPosition();
+    return armAbsoluteEncoder.getPosition();
   }
 
   @Override

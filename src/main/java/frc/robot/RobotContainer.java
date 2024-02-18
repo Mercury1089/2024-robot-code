@@ -17,13 +17,17 @@ import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.MercMath;
 
+import java.util.Set;
 import java.util.function.Supplier;
+
+import javax.swing.text.DefaultFormatterFactory;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -130,7 +134,7 @@ public class RobotContainer {
     //    angularSpeed),
     //   drivetrain));
 
-    gamepadA.onTrue(auton.pickUpNote());
+    gamepadA.onTrue(new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
 
     gamepadX.onTrue(drivetrain.getDefaultCommand());
     
