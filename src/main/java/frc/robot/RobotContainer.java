@@ -88,8 +88,8 @@ public class RobotContainer {
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
     gamepadPOVLeft.onTrue(new RunCommand(() -> arm.setPosition(90.0), arm));
-    gamepadPOVUp.onTrue(new RunCommand(() -> arm.setPosition(0.0), arm));
-    gamepadPOVRight.onTrue(new RunCommand(() -> arm.setPosition(-90.0), arm));
+    gamepadPOVUp.onTrue(new RunCommand(() -> arm.setPosition(180), arm));
+    gamepadPOVRight.onTrue(new RunCommand(() -> arm.setPosition(350), arm));
 
     intake = new Intake();
     intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));

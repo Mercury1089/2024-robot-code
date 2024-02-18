@@ -70,12 +70,12 @@ public class Arm extends SubsystemBase {
     armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
 
     // armRelativeEncoder.setInverted(true);
-    armAbsoluteEncoder.setPositionConversionFactor(GEAR_RATIO / 360.0);
+    armAbsoluteEncoder.setPositionConversionFactor(360.0);
     armPIDController.setFeedbackDevice(armAbsoluteEncoder);
     this.drivetrain = drivetrain;
 
     armPIDController.setPositionPIDWrappingEnabled(false);
-    armPIDController.setOutputRange(NOMINAL_OUTPUT_FORWARD, PEAK_OUTPUT_FORWARD);
+    // armPIDController.setOutputRange(NOMINAL_OUTPUT_FORWARD, PEAK_OUTPUT_FORWARD);
 
     armPIDController.setP(ARM_NORMAL_P_VAL);
     armPIDController.setI(ARM_NORMAL_I_VAL);
