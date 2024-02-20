@@ -68,6 +68,14 @@ public class Drivetrain extends SubsystemBase {
   private ObjectDetectionCamera objectDetectionCam;
   private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
+    
+  //2024 robot
+  // private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
+  // private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
+
+  // bolt
+  private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
+  private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
 
   public final double ROLL_WHEN_LEVEL = -1.75;
 
@@ -115,8 +123,8 @@ public class Drivetrain extends SubsystemBase {
     * swerve modules relative to robot center --> kinematics object --> odometry object 
     */
 
-    double widthFromCenter = Units.inchesToMeters(SWERVE.WHEEL_WIDTH) / 2;
-    double lengthFromCenter = Units.inchesToMeters(SWERVE.WHEEL_LENGTH) / 2;
+    double widthFromCenter = Units.inchesToMeters(WHEEL_WIDTH) / 2;
+    double lengthFromCenter = Units.inchesToMeters(WHEEL_LENGTH) / 2;
 
     swerveKinematics = new SwerveDriveKinematics(
       new Translation2d(lengthFromCenter, widthFromCenter),
@@ -336,68 +344,61 @@ public class Drivetrain extends SubsystemBase {
     return Rotation2d.fromDegrees(-(pigeon.getAngle()));
   }
 
-  public double getDistanceToSpeaker() {
+  public double getDistanceToFieldPos(FieldPosition fieldPos) {
     Optional<Alliance> allianceColor = DriverStation.getAlliance();
     double distance = 0.0;
-    if (allianceColor.isPresent()) {
-      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-        photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
-        photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
-      if (tagPose.isPresent()) {
-        distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
+    if (fieldPos == FieldPosition.SPEAKER) {
+      if (allianceColor.isPresent()) {
+        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+          photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
+          photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
+        if (tagPose.isPresent()) {
+          distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
+        }
       }
-    }
-    return distance;
+      return distance;
+    } else {
+      if (allianceColor.isPresent()) {
+        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+          photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
+          photonCam.getTagPose(APRILTAGS.RED_AMP);
+        if (tagPose.isPresent()) {
+          distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
+        }
+      }
+      return distance;
+    } 
   }
 
-  public double getDistanceToAmp() {
-    Optional<Alliance> allianceColor = DriverStation.getAlliance();
-    double distance = 0.0;
-    if (allianceColor.isPresent()) {
-      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-        photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
-        photonCam.getTagPose(APRILTAGS.RED_AMP);
-      if (tagPose.isPresent()) {
-        distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
-      }
-    }
-    return distance;
-  }
-
-  public double getTargetHeadingToSpeaker() {
+  public double getTargetHeadingToFieldPosition(FieldPosition fieldPos) {
     Optional<Alliance> allianceColor = DriverStation.getAlliance();
     double targetHeading = 0.0;
 
-    if (allianceColor.isPresent()) {
-      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-        photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
-        photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
-      if (tagPose.isPresent()) {
-          targetHeading = getPose().getY() < tagPose.get().getTranslation().getY() ? 
-            -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI) :
-            Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToSpeaker()) * (180 / Math.PI);
+    if (fieldPos == FieldPosition.SPEAKER) {
+      if (allianceColor.isPresent()) {
+        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+          photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
+          photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
+        if (tagPose.isPresent()) {
+            targetHeading = getPose().getY() < tagPose.get().getTranslation().getY() ? 
+              -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToFieldPos(FieldPosition.SPEAKER)) * (180 / Math.PI) :
+              Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToFieldPos(FieldPosition.SPEAKER)) * (180 / Math.PI);
+        }
       }
-    }
-
-    return targetHeading;
-  }
-
-  public double getTargetHeadingToAmp() {
-    Optional<Alliance> allianceColor = DriverStation.getAlliance();
-    double targetHeading = 0.0;
-
-    if (allianceColor.isPresent()) {
-      Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-        photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
-        photonCam.getTagPose(APRILTAGS.RED_AMP);
-      if (tagPose.isPresent()) {
-          targetHeading = getPose().getX() < tagPose.get().getTranslation().getX() ? 
-            Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToAmp()) * (180 / Math.PI) - 180 :
-            -Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToAmp()) * (180 / Math.PI);
+      return targetHeading;
+    } else {
+      if (allianceColor.isPresent()) {
+        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
+          photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
+          photonCam.getTagPose(APRILTAGS.RED_AMP);
+        if (tagPose.isPresent()) {
+            targetHeading = getPose().getX() < tagPose.get().getTranslation().getX() ? 
+              Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToFieldPos(FieldPosition.AMP)) * (180 / Math.PI) - 180 :
+              -Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToFieldPos(FieldPosition.AMP)) * (180 / Math.PI);
+        }
       }
+      return targetHeading;
     }
-
-    return targetHeading;
   }
 
   public double getTargetHeadingToClosestNote() {
@@ -467,8 +468,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Roll", getRoll());
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
-    SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToSpeaker());
+    // SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
+    SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToFieldPosition(FieldPosition.SPEAKER));
     SmartDashboard.putNumber("Angle Offset", 0);
     // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
     SmartDashboard.putNumber("X to closest note", getClosestNoteX());
@@ -480,5 +481,10 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
 
+  }
+
+  public enum FieldPosition {
+    AMP,
+    SPEAKER;
   }
 }

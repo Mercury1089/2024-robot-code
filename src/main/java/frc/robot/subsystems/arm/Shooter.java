@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 import frc.robot.util.PIDGain;
 
 public class Shooter extends SubsystemBase {
@@ -83,7 +84,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getDistanceToSpeaker() {
-    return drivetrain.getDistanceToSpeaker();
+    return drivetrain.getDistanceToFieldPos(FieldPosition.SPEAKER);
   }
   /**
    * Get the current velocity of the shooter

@@ -34,6 +34,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 
 
 public class Arm extends SubsystemBase {
@@ -95,7 +96,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getDistanceToSpeaker() {
-    return drivetrain.getDistanceToSpeaker();
+    return drivetrain.getDistanceToFieldPos(FieldPosition.SPEAKER);
   }
   
   public double getError() {
