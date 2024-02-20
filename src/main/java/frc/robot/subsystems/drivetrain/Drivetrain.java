@@ -68,14 +68,6 @@ public class Drivetrain extends SubsystemBase {
   private ObjectDetectionCamera objectDetectionCam;
   private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
-    
-  //2024 robot
-  // private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
-  // private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
-
-  // bolt
-  private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
-  private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
 
   public final double ROLL_WHEN_LEVEL = -1.75;
 
@@ -123,8 +115,8 @@ public class Drivetrain extends SubsystemBase {
     * swerve modules relative to robot center --> kinematics object --> odometry object 
     */
 
-    double widthFromCenter = Units.inchesToMeters(WHEEL_WIDTH) / 2;
-    double lengthFromCenter = Units.inchesToMeters(WHEEL_LENGTH) / 2;
+    double widthFromCenter = Units.inchesToMeters(SWERVE.WHEEL_WIDTH) / 2;
+    double lengthFromCenter = Units.inchesToMeters(SWERVE.WHEEL_LENGTH) / 2;
 
     swerveKinematics = new SwerveDriveKinematics(
       new Translation2d(lengthFromCenter, widthFromCenter),

@@ -4,8 +4,8 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -67,6 +67,17 @@ public final class Constants {
   }
 
   public static class SWERVE {
+    //2024 robot
+    // public static final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
+    // public static final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
+
+    // bolt
+    public static final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
+    public static final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
+
+    // Distance from center to farthest wheel
+    public static final double WHEEL_RADIUS = (new Translation2d(Units.inchesToMeters(WHEEL_WIDTH / 2),Units.inchesToMeters(WHEEL_WIDTH / 2))).getNorm();
+
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
