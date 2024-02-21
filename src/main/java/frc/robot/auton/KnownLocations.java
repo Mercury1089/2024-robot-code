@@ -30,6 +30,7 @@ public class KnownLocations {
         START_RIGHT_NOTE;
 
     // notes -> NOTE_WING_1 lines up w/NOTE_CENTER_1 from the top 
+    // starting positions are looking from blue side of field 
     public final Pose2d
         WING_NOTE_1,
         WING_NOTE_2,
@@ -91,9 +92,9 @@ public class KnownLocations {
             CENTER_NOTE_4 = PathPointInch(325.862, 228, 180);
             CENTER_NOTE_5 = PathPointInch(325.862, 294, 180);
 
-            START_LEFT_NOTE = PathPointInch(626.983, 169.372, -120);
+            START_LEFT_NOTE = PathPointInch(626.983, 266.305, 120);
             START_MID_NOTE = PathPointInch(596.295, 218.777, 0);
-            START_RIGHT_NOTE = PathPointInch(623.735, 266.305, 120);
+            START_RIGHT_NOTE = PathPointInch(623.735, 169.372, -120);
 
         }
     }
