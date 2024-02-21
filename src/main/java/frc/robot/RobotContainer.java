@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController; 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -126,17 +127,21 @@ public class RobotContainer {
        angularSpeed),
       drivetrain));
 
-    // gamepadA.onTrue(new PIDCommand(
-    //   drivetrain.getRotationalController(),
-    //   () -> drivetrain.getPose().getRotation().getDegrees(), 
-    //   () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()), 
-    //   (angularSpeed) -> drivetrain.joyDrive(
-    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //    angularSpeed),
-    //   drivetrain));
+    gamepadA.onTrue(new SequentialCommandGroup(
+      new PIDCommand(
+        drivetrain.getRotationalController(),
+        () -> drivetrain.getPose().getRotation().getDegrees(), 
+        () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees(), 
+        (angularSpeed) -> drivetrain.joyDrive(
+          -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+          -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+          angularSpeed),
+        drivetrain).until(
+          () -> Math.abs(drivetrain.getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees()) < 1.0),
+      new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain))));
 
-    gamepadA.onTrue(new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
+
+    // gamepadA.onTrue(new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
 
     gamepadX.onTrue(drivetrain.getDefaultCommand());
     

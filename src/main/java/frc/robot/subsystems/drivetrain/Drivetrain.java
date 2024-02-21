@@ -43,6 +43,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
@@ -378,7 +379,7 @@ public class Drivetrain extends SubsystemBase {
         backLeftModule.getPosition(),
         backRightModule.getPosition()
     });
-
+    
     Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
     if (result.isPresent()) {
       odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
@@ -396,10 +397,10 @@ public class Drivetrain extends SubsystemBase {
     List<Pose2d> intermediaryNotePose = new ArrayList<>();
     
     //rotating in place
-    intermediaryNotePose.add(new Pose2d(getPose().getTranslation(), new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getDegrees())));
+    // intermediaryNotePose.add(new Pose2d(getPose().getTranslation(), new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getDegrees())));
 
     // check mid way
-    //intermediaryNotePose.add(new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget() * 0.7), 
+    // intermediaryNotePose.add(new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget() * 0.7), 
     //  new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getRadians())));
 
     pathToNote = Autons.generateSwerveTrajectory(getPose(), intermediaryNotePose, notePose);
