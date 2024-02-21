@@ -15,7 +15,9 @@ import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Shooter;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 import frc.robot.util.MercMath;
+import frc.robot.util.TargetUtils;
 
 import java.util.Set;
 import java.util.function.Supplier;
@@ -85,11 +87,11 @@ public class RobotContainer {
 
     auton = new Autons(drivetrain);
 
-    arm = new Arm(drivetrain);
-    arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
-    gamepadPOVLeft.onTrue(new RunCommand(() -> arm.setPosition(90.0), arm));
-    gamepadPOVUp.onTrue(new RunCommand(() -> arm.setPosition(180), arm));
-    gamepadPOVRight.onTrue(new RunCommand(() -> arm.setPosition(350), arm));
+    // arm = new Arm(drivetrain);
+    // arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
+    // gamepadPOVLeft.onTrue(new RunCommand(() -> arm.setPosition(90.0), arm));
+    // gamepadPOVUp.onTrue(new RunCommand(() -> arm.setPosition(180), arm));
+    // gamepadPOVRight.onTrue(new RunCommand(() -> arm.setPosition(350), arm));
 
     intake = new Intake();
     intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));
@@ -107,7 +109,7 @@ public class RobotContainer {
     gamepadB.onTrue(new PIDCommand(
       drivetrain.getRotationalController(),
       () -> drivetrain.getPose().getRotation().getDegrees(), 
-      () -> drivetrain.getTargetHeadingToSpeaker(), 
+      () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
       (angularSpeed) -> drivetrain.joyDrive(
         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
@@ -117,7 +119,7 @@ public class RobotContainer {
     gamepadY.onTrue(new PIDCommand(
       drivetrain.getRotationalController(),
       () -> drivetrain.getPose().getRotation().getDegrees(), 
-      () -> drivetrain.getTargetHeadingToAmp(), 
+      () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.AMP), 
       (angularSpeed) -> drivetrain.joyDrive(
         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
@@ -127,7 +129,7 @@ public class RobotContainer {
     // gamepadA.onTrue(new PIDCommand(
     //   drivetrain.getRotationalController(),
     //   () -> drivetrain.getPose().getRotation().getDegrees(), 
-    //   () -> drivetrain.getTargetHeadingToClosestNote(), 
+    //   () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()), 
     //   (angularSpeed) -> drivetrain.joyDrive(
     //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
     //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),

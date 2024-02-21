@@ -79,10 +79,12 @@ public class Autons {
 
         this.knownLocations = new KnownLocations();
 
+        firstElement = KnownLocations.DO_NOTHING;
+        currentSelectedPose = KnownLocations.DO_NOTHING;
         setChoosers();
         this.firstElement = firstElementChooser.getSelected();
         this.currentSelectedPose = startingPoseChooser.getSelected();
-        this.firstElementType = autonTypeChooser.getSelected();
+        // this.firstElementType = autonTypeChooser.getSelected();
         this.autonCommand = DO_NOTHING;
         
 
@@ -326,16 +328,6 @@ public class Autons {
         return points;
     }
 
-    public Command pickUpNote() {
-        PathPlannerPath pathToNote;
-        Pose2d notePose = new Pose2d(drivetrain.getClosestNoteX(), drivetrain.getClosestNoteY(), new Rotation2d(drivetrain.getTargetHeadingToClosestNote()));
-
-        pathToNote = generateSwerveTrajectory(drivetrain.getPose(), new ArrayList<>(), notePose);
-        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "pathToNote");
-
-        // return AutoBuilder.followPath(pathToNote);
-        return new Command() {};
-    }
     /**
      * Rebuilds the autonCommand when ONE of the following conditions changes:
      * - Starting Pose

@@ -83,9 +83,9 @@ public class Shooter extends SubsystemBase {
     shooterFront.stopMotor();
   }
 
-  public double getDistanceToSpeaker() {
-    return drivetrain.getDistanceToFieldPos(FieldPosition.SPEAKER);
-  }
+  // public double getDistanceToSpeaker() {
+  //   return drivetrain.getDistanceToFieldPos(FieldPosition.SPEAKER);
+  // }
   /**
    * Get the current velocity of the shooter
    * @return the velocity in RPM

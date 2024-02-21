@@ -25,12 +25,14 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
+              "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
+              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
           },
-          "2,0": {
+          "1,0": {
             "size": [
               2,
               1
@@ -56,7 +58,7 @@
               "_showGlyph": false
             }
           },
-          "4,0": {
+          "3,0": {
             "size": [
               2,
               1
@@ -69,7 +71,7 @@
               "_showGlyph": false
             }
           },
-          "6,0": {
+          "5,0": {
             "size": [
               2,
               1
@@ -194,7 +196,7 @@
               "_showGlyph": false
             }
           },
-          "8,0": {
+          "7,0": {
             "size": [
               2,
               1
@@ -207,7 +209,7 @@
               "_showGlyph": false
             }
           },
-          "10,0": {
+          "9,0": {
             "size": [
               2,
               1
@@ -220,9 +222,9 @@
               "_showGlyph": false
             }
           },
-          "12,0": {
+          "11,0": {
             "size": [
-              1,
+              2,
               1
             ],
             "content": {
@@ -274,7 +276,9 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
+              "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
+              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }

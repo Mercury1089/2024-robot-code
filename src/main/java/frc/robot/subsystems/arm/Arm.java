@@ -95,9 +95,9 @@ public class Arm extends SubsystemBase {
     armPIDController.setReference(pos, CANSparkMax.ControlType.kPosition);
   }
 
-  public double getDistanceToSpeaker() {
-    return drivetrain.getDistanceToFieldPos(FieldPosition.SPEAKER);
-  }
+  // public double getDistanceToSpeaker() {
+  //   return drivetrain.getDistanceToFieldPos(FieldPosition.SPEAKER);
+  // }
   
   public double getError() {
     return 0.0;

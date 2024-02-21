@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
@@ -52,6 +53,7 @@ import frc.robot.sensors.Limelight;
 import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.util.PathUtils;
 import frc.robot.util.SwerveUtils;
+import frc.robot.util.TargetUtils;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -305,6 +307,9 @@ public class Drivetrain extends SubsystemBase {
     smartdashField.getObject(type).setTrajectory(trajectory);
   }
 
+  public void setPoseSmartdash(Pose2d pose, String type) {
+    smartdashField.getObject(type).setPose(pose);
+  }
   /**
    * Set the odometry object to a predetermined pose
    * No need to reset gyro as it auto-applies offset
@@ -344,92 +349,22 @@ public class Drivetrain extends SubsystemBase {
     return Rotation2d.fromDegrees(-(pigeon.getAngle()));
   }
 
-  public double getDistanceToFieldPos(FieldPosition fieldPos) {
-    Optional<Alliance> allianceColor = DriverStation.getAlliance();
-    double distance = 0.0;
-    if (fieldPos == FieldPosition.SPEAKER) {
-      if (allianceColor.isPresent()) {
-        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-          photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
-          photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
-        if (tagPose.isPresent()) {
-          distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
-        }
-      }
-      return distance;
-    } else {
-      if (allianceColor.isPresent()) {
-        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-          photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
-          photonCam.getTagPose(APRILTAGS.RED_AMP);
-        if (tagPose.isPresent()) {
-          distance = getPose().getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
-        }
-      }
-      return distance;
-    } 
+  public AprilTagCamera getAprilTagCamera() {
+    return this.photonCam;
   }
 
-  public double getTargetHeadingToFieldPosition(FieldPosition fieldPos) {
-    Optional<Alliance> allianceColor = DriverStation.getAlliance();
-    double targetHeading = 0.0;
-
-    if (fieldPos == FieldPosition.SPEAKER) {
-      if (allianceColor.isPresent()) {
-        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-          photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER) : 
-          photonCam.getTagPose(APRILTAGS.MIDDLE_RED_SPEAKER);
-        if (tagPose.isPresent()) {
-            targetHeading = getPose().getY() < tagPose.get().getTranslation().getY() ? 
-              -Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToFieldPos(FieldPosition.SPEAKER)) * (180 / Math.PI) :
-              Math.acos((getPose().getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToFieldPos(FieldPosition.SPEAKER)) * (180 / Math.PI);
-        }
-      }
-      return targetHeading;
-    } else {
-      if (allianceColor.isPresent()) {
-        Optional<Pose3d> tagPose = (allianceColor.get() == Alliance.Blue) ? 
-          photonCam.getTagPose(APRILTAGS.BLUE_AMP) : 
-          photonCam.getTagPose(APRILTAGS.RED_AMP);
-        if (tagPose.isPresent()) {
-            targetHeading = getPose().getX() < tagPose.get().getTranslation().getX() ? 
-              Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToFieldPos(FieldPosition.AMP)) * (180 / Math.PI) - 180 :
-              -Math.asin((tagPose.get().getTranslation().getY() - getPose().getTranslation().getY()) / getDistanceToFieldPos(FieldPosition.AMP)) * (180 / Math.PI);
-        }
-      }
-      return targetHeading;
-    }
-  }
-
-  public double getTargetHeadingToClosestNote() {
-    Rotation2d targetRotation = Rotation2d.fromDegrees(-objectDetectionCam.getYaw());
-    return objectDetectionCam.getYaw() != 0.0 ?
-      // -targetRotation.rotateBy(getPose().getRotation()).getDegrees() :
-      getPose().rotateBy(targetRotation).getRotation().getDegrees() :
-      getPose().getRotation().getDegrees();
-  }
-
-  public double getClosestNoteX() {
-    return objectDetectionCam.getLatestResult().hasTargets() ?
-      getPose().getX() + objectDetectionCam.getDistanceToTarget() * Math.cos(getTargetHeadingToClosestNote() * (Math.PI / 180)) :
-      getPose().getX();
-  }
-
-  public double getClosestNoteY() {
-    return objectDetectionCam.getLatestResult().hasTargets() ?
-      getPose().getY() + objectDetectionCam.getDistanceToTarget() * Math.sin(getTargetHeadingToClosestNote() * (Math.PI / 180)) :
-      getPose().getY();
+  public ObjectDetectionCamera getObjCam() {
+    return this.objectDetectionCam;
   }
 
   public Command goToNote() {
-    if (objectDetectionCam.getDistanceToTarget() < 3.0) {
+    if (objectDetectionCam.getDistanceToTarget() > 0.0 && objectDetectionCam.getDistanceToTarget() < 1.65) {
       return AutoBuilder.followPath(pathToNote);
     } else {
       return new Command() {
         
       };
     }
-      
   }
 
   @Override
@@ -455,9 +390,19 @@ public class Drivetrain extends SubsystemBase {
       smartdashField.setRobotPose(getInitialPose());
     }
 
-    Pose2d notePose = new Pose2d(new Translation2d(getClosestNoteX(), getClosestNoteY()), Rotation2d.fromDegrees(getTargetHeadingToClosestNote()));
+    Pose2d notePose = new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget()), new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getRadians()));
 
-    pathToNote = Autons.generateSwerveTrajectory(getPose(), new ArrayList<>(), notePose);
+    setPoseSmartdash(notePose, "notepose");
+    List<Pose2d> intermediaryNotePose = new ArrayList<>();
+    
+    //rotating in place
+    intermediaryNotePose.add(new Pose2d(getPose().getTranslation(), new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getDegrees())));
+
+    // check mid way
+    //intermediaryNotePose.add(new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget() * 0.7), 
+    //  new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getRadians())));
+
+    pathToNote = Autons.generateSwerveTrajectory(getPose(), intermediaryNotePose, notePose);
     setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToNote");
 
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
@@ -469,14 +414,14 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
     SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
     // SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker without AprilTag", getTargetHeadingToFieldPosition(FieldPosition.SPEAKER));
+    SmartDashboard.putNumber("Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));
     SmartDashboard.putNumber("Angle Offset", 0);
     // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
-    SmartDashboard.putNumber("X to closest note", getClosestNoteX());
-    SmartDashboard.putNumber("Y to closest note", getClosestNoteY());
+    // SmartDashboard.putNumber("X to closest note", getClosestNoteX());
+    // SmartDashboard.putNumber("Y to closest note", getClosestNoteY());
     // SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
     SmartDashboard.putNumber("Distance to closest note", objectDetectionCam.getDistanceToTarget());
-    SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
+    // SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
