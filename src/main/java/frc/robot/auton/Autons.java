@@ -23,12 +23,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.GamePieceLEDs;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.Intake;
+// import frc.robot.subsystems.arm.Arm;
+// import frc.robot.subsystems.arm.Intake;
+import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.PathUtils;
 
@@ -252,6 +254,7 @@ public class Autons {
             new GoalEndState(0.0, finalPose.getRotation()));
     }
 
+
     // public List<Pose2d> getWayPoints(int waypoint) {
     //     List<Pose2d> points = new ArrayList<Pose2d>();
 
@@ -280,6 +283,7 @@ public class Autons {
      * - Desired Element
      * - Auton Type
      */
+
     public void updateDash() {
     
         boolean rebuildAutonCommand = false;
