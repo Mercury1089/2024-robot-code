@@ -4,31 +4,10 @@
 
 package frc.robot.sensors;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import javax.imageio.IIOException;
-
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Constants.APRILTAGS;
-import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /** Wrapper for PhotonCamera class */
 public class ObjectDetectionCamera extends PhotonCamera {
@@ -45,24 +24,26 @@ public class ObjectDetectionCamera extends PhotonCamera {
 
     public double getYaw() {
         /* The yaw of the target in degrees (positive right). */
-        try {
-            return getLatestResult().hasTargets() ? 
-                getLatestResult().getBestTarget().getYaw() :
-                0.0;
-        } catch (Exception e) {
-            return 0.0;
-        }
-        
+        var result = getLatestResult();
+        return result.hasTargets() ? 
+            result.getBestTarget().getYaw() :
+            0.0;
     }
 
     public double getPitch() {
         /* The pitch of the target in degrees (positive up). */
-        return getLatestResult().getBestTarget().getPitch();
+        var result = getLatestResult();
+        return result.hasTargets() ? 
+            result.getBestTarget().getPitch() :
+            0.0;
     }
 
     public double getSkew() {
         /* The skew of the target in degrees (counter-clockwise positive). */
-        return getLatestResult().getBestTarget().getSkew();
+        var result = getLatestResult();
+        return result.hasTargets() ? 
+            result.getBestTarget().getSkew() :
+            0.0;
     }
 
     public double getDistanceToTarget() {
