@@ -94,9 +94,9 @@ public class RobotContainer {
     // gamepadPOVUp.onTrue(new RunCommand(() -> arm.setPosition(180), arm));
     // gamepadPOVRight.onTrue(new RunCommand(() -> arm.setPosition(350), arm));
 
-    intake = new Intake();
-    intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));
-    gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(1.0), intake));
+    // intake = new Intake();
+    // intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));
+    // gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(1.0), intake));
 
     // shooter = new Shooter(drivetrain);
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
@@ -127,21 +127,21 @@ public class RobotContainer {
        angularSpeed),
       drivetrain));
 
-    gamepadA.onTrue(new SequentialCommandGroup(
-      new PIDCommand(
-        drivetrain.getRotationalController(),
-        () -> drivetrain.getPose().getRotation().getDegrees(), 
-        () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees(), 
-        (angularSpeed) -> drivetrain.joyDrive(
-          -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-          -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-          angularSpeed),
-        drivetrain).until(
-          () -> Math.abs(drivetrain.getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees()) < 1.0),
-      new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain))));
+    // gamepadA.onTrue(new SequentialCommandGroup(
+    //   new PIDCommand(
+    //     drivetrain.getRotationalController(),
+    //     () -> drivetrain.getPose().getRotation().getDegrees(), 
+    //     () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees(), 
+    //     (angularSpeed) -> drivetrain.joyDrive(
+    //       -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //       -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //       angularSpeed),
+    //     drivetrain).until(
+    //       () -> Math.abs(drivetrain.getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees()) < 1.0),
+    //   new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain))));
 
 
-    // gamepadA.onTrue(new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
+    gamepadA.onTrue(new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
 
     gamepadX.onTrue(drivetrain.getDefaultCommand());
     

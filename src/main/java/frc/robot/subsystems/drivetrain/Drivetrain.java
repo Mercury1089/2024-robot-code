@@ -14,7 +14,9 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
@@ -60,6 +62,7 @@ public class Drivetrain extends SubsystemBase {
 
   private SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
   private WPI_PigeonIMU pigeon;
+  // private WPI_Pigeon2 pigeon;
   private SwerveDrivePoseEstimator odometry;
   private SwerveDriveKinematics swerveKinematics;
   private AprilTagCamera photonCam;
@@ -103,6 +106,7 @@ public class Drivetrain extends SubsystemBase {
 
     //configure gyro
     pigeon = new WPI_PigeonIMU(CAN.PIGEON_DRIVETRAIN);
+    // pigeon = new WPI_Pigeon2(CAN.PIGEON_DRIVETRAIN);
     pigeon.configFactoryDefault();
     pigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
 
@@ -164,9 +168,10 @@ public class Drivetrain extends SubsystemBase {
     pigeon.setYaw(0);
   }
 
-  public void calibratePigeon() {
-    pigeon.enterCalibrationMode(PigeonIMU.CalibrationMode.BootTareGyroAccel);
-  }
+  //TODO: UPDATE IF NEEDED
+  // public void calibratePigeon() {
+  //   pigeon.enterCalibrationMode(PigeonIMU.CalibrationMode.BootTareGyroAccel);
+  // }
 
   public double getRoll() {
     return pigeon.getRoll();
@@ -391,7 +396,7 @@ public class Drivetrain extends SubsystemBase {
       smartdashField.setRobotPose(getInitialPose());
     }
 
-    Pose2d notePose = new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget()), new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getRadians()));
+    Pose2d notePose = new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget()), TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()));
 
     setPoseSmartdash(notePose, "notepose");
     List<Pose2d> intermediaryNotePose = new ArrayList<>();
@@ -413,7 +418,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drive Yaw", pigeon.getYaw());
     SmartDashboard.putNumber("Drive Roll", getRoll());
     SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
-    SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
+    // SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
     // SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
     SmartDashboard.putNumber("Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));
     SmartDashboard.putNumber("Angle Offset", 0);

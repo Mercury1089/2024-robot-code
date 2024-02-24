@@ -45,9 +45,14 @@ public class ObjectDetectionCamera extends PhotonCamera {
 
     public double getYaw() {
         /* The yaw of the target in degrees (positive right). */
-        return getLatestResult().hasTargets() ? 
-            getLatestResult().getBestTarget().getYaw() :
-            0.0;
+        try {
+            return getLatestResult().hasTargets() ? 
+                getLatestResult().getBestTarget().getYaw() :
+                0.0;
+        } catch (Exception e) {
+            return 0.0;
+        }
+        
     }
 
     public double getPitch() {

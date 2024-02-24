@@ -33,7 +33,7 @@ public class TargetUtils {
         Optional<Alliance> allianceColor = DriverStation.getAlliance();
         Optional<Pose3d> tagPose = Optional.empty();
         
-        if (tagPose.isPresent() && fieldPos == FieldPosition.SPEAKER) {
+        if (fieldPos == FieldPosition.SPEAKER) {
             int apriltag = (allianceColor.get() == Alliance.Blue) ?
                 APRILTAGS.MIDDLE_BLUE_SPEAKER :
                 APRILTAGS.MIDDLE_RED_SPEAKER;
