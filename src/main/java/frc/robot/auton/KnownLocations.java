@@ -60,9 +60,9 @@ public class KnownLocations {
             WING_NOTE_2 = PathPointInch(114.261, 219, 0);
             WING_NOTE_3 = PathPointInch(114.261, 162, 0);
                                     
-            INTERMEDIARY_NOTE_1 = PathPointInch(84.261 - 7, 276, 0);
-            INTERMEDIARY_NOTE_2 = PathPointInch(84.261 - 7, 219, 0);
-            INTERMEDIARY_NOTE_3 = PathPointInch(84.261 - 7, 162, 0);
+            INTERMEDIARY_NOTE_1 = PathPointInch(84.261, 276, 0);
+            INTERMEDIARY_NOTE_2 = PathPointInch(84.261, 219, 0);
+            INTERMEDIARY_NOTE_3 = PathPointInch(84.261, 162, 0);
 
             CENTER_NOTE_1 = PathPointInch(325.862, 30, 0);
             CENTER_NOTE_2 = PathPointInch(325.862, 96, 0);
@@ -82,9 +82,9 @@ public class KnownLocations {
             WING_NOTE_2 = PathPointInch(537.464, 219, 180);
             WING_NOTE_3 = PathPointInch(537.464, 162, 180);
 
-            INTERMEDIARY_NOTE_1 = PathPointInch(567.464 + 7, 276, 180);
-            INTERMEDIARY_NOTE_2 = PathPointInch(567.464 + 7, 219, 180);
-            INTERMEDIARY_NOTE_3 = PathPointInch(567.464 + 7, 162, 180);
+            INTERMEDIARY_NOTE_1 = PathPointInch(567.464, 276, 180);
+            INTERMEDIARY_NOTE_2 = PathPointInch(567.464, 219, 180);
+            INTERMEDIARY_NOTE_3 = PathPointInch(567.464, 162, 180);
 
             CENTER_NOTE_1 = PathPointInch(325.862, 30, 180);
             CENTER_NOTE_2 = PathPointInch(325.862, 96, 180);
