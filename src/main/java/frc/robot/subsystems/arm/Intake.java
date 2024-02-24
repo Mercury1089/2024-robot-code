@@ -18,10 +18,12 @@ import com.revrobotics.EncoderType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.BREAKBEAM;
 import frc.robot.Constants.CAN;
 import frc.robot.subsystems.GamePieceLEDs;
 import frc.robot.subsystems.GamePieceLEDs.GamePiece;
@@ -46,6 +48,8 @@ public class Intake extends SubsystemBase {
   private int maxCurrentCtr = 0;
 
   private CANSparkFlex intake;
+  private final int INTAKE_BREAKBEAM = BREAKBEAM.INTAKE_BREAKBEAM;
+  private DigitalInput intakeBreakBeam;
 
   /** Creates a new intake. */
   public Intake() {
@@ -53,6 +57,8 @@ public class Intake extends SubsystemBase {
     intake = new CANSparkFlex(CAN.INTAKE_SPARKFLEX, MotorType.kBrushless);
 
     intake.restoreFactoryDefaults();
+
+    intakeBreakBeam = new DigitalInput(INTAKE_BREAKBEAM);
 
     /* 
     // intake.setSensorPhase(false);

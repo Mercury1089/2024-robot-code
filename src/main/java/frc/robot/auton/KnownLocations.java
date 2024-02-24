@@ -4,6 +4,7 @@
 
 package frc.robot.auton;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -73,7 +74,6 @@ public class KnownLocations {
             START_LEFT_NOTE = PathPointInch(24.741, 268.182, 60);
             START_MID_NOTE = PathPointInch(55.43, 218.777885, 0);
             START_RIGHT_NOTE = PathPointInch(24.741, 169.374, -60); 
-
             
 
         } else {
@@ -95,6 +95,7 @@ public class KnownLocations {
             START_LEFT_NOTE = PathPointInch(626.983, 266.305, 120);
             START_MID_NOTE = PathPointInch(596.295, 218.777, 0);
             START_RIGHT_NOTE = PathPointInch(623.735, 169.372, -120);
+
 
         }
     }

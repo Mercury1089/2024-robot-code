@@ -51,6 +51,7 @@ import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.auton.Autons;
+import frc.robot.auton.KnownLocations;
 import frc.robot.sensors.AprilTagCamera;
 import frc.robot.sensors.Limelight;
 import frc.robot.sensors.ObjectDetectionCamera;
@@ -66,11 +67,12 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator odometry;
   private SwerveDriveKinematics swerveKinematics;
   private AprilTagCamera photonCam;
-  private Limelight limelight;
+  // private Limelight limelight;
   private Field2d smartdashField;
   private final String fieldWidgetType = "Odometry";
   private PIDController rotationPIDController;
-  private PathPlannerPath pathToNote;
+  private PathPlannerPath pathToNote, pathToAmp;
+  private Pose2d amp;
   private ObjectDetectionCamera objectDetectionCam;
   private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
@@ -116,7 +118,7 @@ public class Drivetrain extends SubsystemBase {
 
     // photonvision wrapper
     photonCam = new AprilTagCamera();
-    limelight = new Limelight();
+    // limelight = new Limelight();
     objectDetectionCam = new ObjectDetectionCamera();
 
     smartdashField = new Field2d();
@@ -124,6 +126,13 @@ public class Drivetrain extends SubsystemBase {
 
     // testInitialPose = new Pose2d(Units.inchesToMeters(54.93), Units.inchesToMeters(199.65), getPigeonRotation());
     testInitialPose = new Pose2d(0, 0, getPigeonRotation()); //  will be reset by setManualPose()
+
+    
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      amp = KnownLocations.PathPointInch(72.706, 304.638, -90.0);
+    } else {
+      amp = KnownLocations.PathPointInch(578.919, 304.638, -90.0);
+    }
 
     // wpilib convienence classes
     /*
@@ -348,6 +357,17 @@ public class Drivetrain extends SubsystemBase {
     });
   }
 
+  // meters/second
+  //up is pos
+  public double getXSpeeds() {
+    return getFieldRelativSpeeds().vxMetersPerSecond;
+  }
+
+  // left is pos
+  public double getYSpeeds() {
+    return getFieldRelativSpeeds().vyMetersPerSecond;
+  }
+
   public Rotation2d getPigeonRotation() {
     /* return the pigeon's yaw as Rotation2d object */
 
@@ -371,6 +391,10 @@ public class Drivetrain extends SubsystemBase {
         
       };
     }
+  }
+
+  public Command goToAmp() {
+    return AutoBuilder.followPath(pathToAmp);
   }
 
   @Override
@@ -411,6 +435,17 @@ public class Drivetrain extends SubsystemBase {
     pathToNote = Autons.generateSwerveTrajectory(getPose(), intermediaryNotePose, notePose);
     setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToNote");
 
+
+
+    // Pose2d intermediaryAmp = new Pose2d(amp.getX(), Units.inchesToMeters(Units.metersToInches(amp.getY()) - 15.0), amp.getRotation());
+
+    List<Pose2d> intermediaryAmpList = new ArrayList<>();
+
+    // intermediaryAmpList.add(intermediaryAmp);
+
+    pathToAmp = Autons.generateSwerveTrajectory(getPose(), intermediaryAmpList, amp);
+    setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToAmp");
+
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
     SmartDashboard.putNumber("CurrentPose Rotation", getPose().getRotation().getDegrees());
@@ -427,6 +462,8 @@ public class Drivetrain extends SubsystemBase {
     // SmartDashboard.putNumber("Y to closest note", getClosestNoteY());
     // SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
     SmartDashboard.putNumber("Distance to closest note", objectDetectionCam.getDistanceToTarget());
+    SmartDashboard.putNumber("getXSpeeds", getXSpeeds());
+    SmartDashboard.putNumber("getYSpeeds", getYSpeeds());
     // SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
     SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());

@@ -98,7 +98,7 @@ public class RobotContainer {
     // intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));
     // gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(1.0), intake));
 
-    // shooter = new Shooter(drivetrain);
+    shooter = new Shooter(drivetrain);
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
 
     // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
@@ -117,15 +117,17 @@ public class RobotContainer {
        angularSpeed),
       drivetrain));
 
-    gamepadY.onTrue(new PIDCommand(
-      drivetrain.getRotationalController(),
-      () -> drivetrain.getPose().getRotation().getDegrees(), 
-      () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.AMP), 
-      (angularSpeed) -> drivetrain.joyDrive(
-        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-       angularSpeed),
-      drivetrain));
+    // gamepadY.onTrue(new PIDCommand(
+    //   drivetrain.getRotationalController(),
+    //   () -> drivetrain.getPose().getRotation().getDegrees(), 
+    //   () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.AMP), 
+    //   (angularSpeed) -> drivetrain.joyDrive(
+    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //    angularSpeed),
+    //   drivetrain));
+
+    gamepadY.onTrue(new DeferredCommand(() -> drivetrain.goToAmp(), Set.of(drivetrain)));
 
     // gamepadA.onTrue(new SequentialCommandGroup(
     //   new PIDCommand(

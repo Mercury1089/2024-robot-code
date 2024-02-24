@@ -18,6 +18,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.BREAKBEAM;
 import frc.robot.Constants.CAN;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
@@ -29,14 +30,14 @@ public class Shooter extends SubsystemBase {
   public static final double MAX_RPM = 7000.0, STEADY_RPM = 3600.0, LOW_RPM = 1000.0, NULL_RPM = -1.0;
   public static final double MIN_DISTANCE = 6.7, MAX_DISTANCE = 17.0;
   //public static final double MIN_DISTANCE = 2.0, MAX_DISTANCE = 20.0;
-  public final int BREAKBEAM_DIO = 2;
+  public final int SHOOTER_BREAKBEAM = BREAKBEAM.SHOOTER_BREAKBEAM;
   private final double TARGET_VELOCITY_THRESHOLD = 50.0; // within a +- 50 rpm range to shoot
   private final double MAX_VOLTAGE = 11.5;
 
-  private CANSparkFlex shooterFront, shooterBack;
+  private CANSparkFlex shooterFront;
   private double targetVelocity;
   private PIDGain velocityGains;
-  private DigitalInput breakBeamSensor;
+  private DigitalInput shooterBreakBeam;
   private boolean autoShootEnable;
   private double smartDashboardTargetVelocity = 0.0;
   private boolean useSpeed, setPID;
@@ -51,21 +52,18 @@ public class Shooter extends SubsystemBase {
 
   public Shooter(Drivetrain drivetrain) {
     shooterFront = new CANSparkFlex(CAN.SHOOTER_SPARKFLEX, CANSparkLowLevel.MotorType.kBrushless);
-    shooterBack = null;
 
     shooterFront.restoreFactoryDefaults();
-    //shooterBack.restoreFactoryDefaults();
+    
     shooterFront.enableVoltageCompensation(MAX_VOLTAGE);
-    //shooterBack.enableVoltageCompensation(MAX_VOLTAGE);
+    
 
     shooterFront.getPIDController().setOutputRange(NOMINAL_OUT, PEAK_OUT);
-    shooterBack.getPIDController().setOutputRange(NOMINAL_OUT, PEAK_OUT);
-
+    
     shooterFront.setIdleMode(IdleMode.kCoast);
-    //shooterBack.setIdleMode(IdleMode.kCoast);
+    
     // TODO: Double check these with final mechanism
     shooterFront.setInverted(true);
-    shooterBack.follow(shooterFront, false); // Do not follow inverted
 
     stopShooter();
     targetVelocity = 0.0;
@@ -74,7 +72,7 @@ public class Shooter extends SubsystemBase {
   
     setPIDGain(SHOOTER_PID_SLOTS.VELOCITY_GAINS.getValue(), velocityGains);
 
-    this.breakBeamSensor = new DigitalInput(BREAKBEAM_DIO);
+    this.shooterBreakBeam = new DigitalInput(SHOOTER_BREAKBEAM);
     this.drivetrain = drivetrain;
   }
 
@@ -101,6 +99,7 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Shooter/Velocity", this.getVelocity());
+    SmartDashboard.putBoolean("Shooter/hasNote", hasNote());
   }
 
 
@@ -142,7 +141,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setVelocity(double velocity) {
-    if (shooterFront != null && shooterBack != null)
+    if (shooterFront != null)
     {
       // Record the target velocity for atTargetRPM()
       targetVelocity = velocity;
@@ -156,9 +155,9 @@ public class Shooter extends SubsystemBase {
     return SmartDashboard.getNumber(getName() + "/SetRPM", 0.0);
   }
 
-  public boolean hasBall() {
+  public boolean hasNote() {
     // if the shooter has a ball (if beam is broken)
-    return !breakBeamSensor.get();
+    return !shooterBreakBeam.get();
     
   }
 
@@ -255,32 +254,6 @@ public class Shooter extends SubsystemBase {
     return this.setPID;
   }
 
-  
-
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    
-    // builder.setActuator(true); // Only allow setting values when in Test mode
-    builder.addBooleanProperty("ShooterHasBall", () -> hasBall(), null);
-    builder.addDoubleProperty("CurrentRPM", () -> getVelocity(), null);
-    builder.addDoubleProperty("TargetRPM", () -> targetVelocity, null);
-    builder.addBooleanProperty("AtTargetRPM", () -> isAtTargetVelocity(), null);
-    builder.addDoubleProperty("setTargetRPM", () -> getTargetVelocity(), (x) -> setTargetVelocity(x));
-    builder.addBooleanProperty("setToTargetSpeed", () -> getUseSpeed(), (x) -> setSmartDashSpeed(x));
-
-    builder.addDoubleProperty("SetPVal", () -> getPVal(), (x) -> setPVal(x));
-    builder.addDoubleProperty("SetFVal", () -> getFVal(), (x) -> setFVal(x));
-    builder.addDoubleProperty("SetIVal", () -> getIVal(), (x) -> setIVal(x));
-    builder.addDoubleProperty("SetDVal", () -> getDVal(), (x) -> setDVal(x));
-    builder.addBooleanProperty("SetPID", () -> getSetPID(), (x) -> setSmartDashPID(x));
-    
-    builder.addStringProperty("Within Target", () -> insideShooterBounds().toString(), null);
-    builder.addDoubleProperty("Balls Shot", () -> getShootCount(), null);
-
-    
-  }
-
   public PIDGain getPIDGain(int slot) {
     return this.velocityGains;
   }
@@ -295,7 +268,7 @@ public class Shooter extends SubsystemBase {
   public void setPIDGain(int slot, PIDGain gains) {
     this.velocityGains = gains;
 
-    if (shooterFront != null && shooterBack != null) {
+    if (shooterFront != null) {
       configPID(shooterFront, SHOOTER_PID_SLOTS.VELOCITY_GAINS.getValue(), this.velocityGains);
       configPID(shooterFront, SHOOTER_PID_SLOTS.VELOCITY_GAINS.getValue(), this.velocityGains);
     }

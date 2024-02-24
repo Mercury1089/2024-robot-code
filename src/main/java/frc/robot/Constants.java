@@ -157,6 +157,13 @@ public final class Constants {
     private CAN() {} 
   }
 
+  public static class BREAKBEAM {
+    public static final int INTAKE_BREAKBEAM = 0;
+    public static final int SHOOTER_BREAKBEAM = 1;
+
+    private BREAKBEAM() {}
+  }
+
   public static class CAN_STATUS_FREQ {
     public static final int
         XTRA_HIGH = 5, // 5ms Very high - use sparingly
