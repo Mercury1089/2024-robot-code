@@ -113,26 +113,26 @@ public class Autons {
         // select the ELEMENT to visit during auton (or DO NOTHING)
         firstElementChooser = new SendableChooser<Pose2d>();
         firstElementChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        firstElementChooser.addOption("NOTE 1", knownLocations.WING_NOTE_1);
-        firstElementChooser.addOption("NOTE 2", knownLocations.WING_NOTE_2);
-        firstElementChooser.addOption("NOTE 3", knownLocations.WING_NOTE_3);
+        firstElementChooser.addOption("NOTE 1", knownLocations.WING_NOTE_TOP);
+        firstElementChooser.addOption("NOTE 2", knownLocations.WING_NOTE_MIDDLE);
+        firstElementChooser.addOption("NOTE 3", knownLocations.WING_NOTE_BOTTOM);
         SmartDashboard.putData("Auton Element Chooser", firstElementChooser);
         SmartDashboard.putString("Auton Selected: ", this.firstElement.toString());
 
         // secondElement = new SendableChooser<Pose2d>();
         // secondElement.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        // secondElement.addOption("NOTE 1", knownLocations.WING_NOTE_1);
-        // secondElement.addOption("NOTE 2", knownLocations.WING_NOTE_2);
-        // secondElement.addOption("NOTE 3", knownLocations.WING_NOTE_3);
+        // secondElement.addOption("NOTE 1", knownLocations.WING_NOTE_TOP);
+        // secondElement.addOption("NOTE 2", knownLocations.WING_NOTE_MIDDLE);
+        // secondElement.addOption("NOTE 3", knownLocations.WING_NOTE_BOTTOM);
         // secondElement.putData("Auton Element Chooser", firstElementChooser);
         // secondElement.putString("Auton Selected: ", this.secondElement.toString());
 
         // select the MANUAL STARTING POSITION of the robot
         this.startingPoseChooser = new SendableChooser<Pose2d>();
         this.startingPoseChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        this.startingPoseChooser.addOption("START LEFT NOTE", knownLocations.START_LEFT_NOTE);
-        this.startingPoseChooser.addOption("START MIDDLE NOTE", knownLocations.START_MID_NOTE);
-        this.startingPoseChooser.addOption("START RIGHT NOTE", knownLocations.START_RIGHT_NOTE);
+        this.startingPoseChooser.addOption("START LEFT NOTE", knownLocations.START_TOPMOST);
+        this.startingPoseChooser.addOption("START MIDDLE NOTE", knownLocations.START_MIDDLE);
+        this.startingPoseChooser.addOption("START RIGHT NOTE", knownLocations.START_BOTTOMMOST);
         SmartDashboard.putData("Manual Starting Pose", startingPoseChooser);
 
         // select whether to visit charging station or score 2nd piece (or leave community)
@@ -158,73 +158,73 @@ public class Autons {
         }
         
 
-        Pose2d finalPose = knownLocations.WING_NOTE_1;
+        Pose2d finalPose = knownLocations.WING_NOTE_TOP;
         List<Pose2d> waypoints = new ArrayList<Pose2d>();
-        waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
+        waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
 
-        // if (firstElement == knownLocations.WING_NOTE_1) {
+        // if (firstElement == knownLocations.WING_NOTE_TOP) {
         //     waypoints = new ArrayList<Pose2d>();
-        //     waypoints.add(knownLocations.WING_NOTE_1);
-        // } else if (firstElement == knownLocations.WING_NOTE_2) {
+        //     waypoints.add(knownLocations.WING_NOTE_TOP);
+        // } else if (firstElement == knownLocations.WING_NOTE_MIDDLE) {
         //     waypoints = new ArrayList<Pose2d>();
-        //     waypoints.add(knownLocations.WING_NOTE_2);
-        // } else if (firstElement == knownLocations.WING_NOTE_3) {
+        //     waypoints.add(knownLocations.WING_NOTE_MIDDLE);
+        // } else if (firstElement == knownLocations.WING_NOTE_BOTTOM) {
         //     waypoints = new ArrayList<Pose2d>();
-        //     waypoints.add(knownLocations.WING_NOTE_3);
+        //     waypoints.add(knownLocations.WING_NOTE_BOTTOM);
         // }
 
         PathPlannerPath path1, path2, path3;
         
-        if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
+        if (currentSelectedPose == knownLocations.START_TOPMOST) {
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
-            finalPose = knownLocations.WING_NOTE_1;
-        } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
-            if (firstElement == knownLocations.WING_NOTE_1) {
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
+            finalPose = knownLocations.WING_NOTE_TOP;
+        } else if (currentSelectedPose == knownLocations.START_MIDDLE) {
+            if (firstElement == knownLocations.WING_NOTE_TOP) {
                 waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
-                finalPose = knownLocations.WING_NOTE_1;
-            } else if (firstElement == knownLocations.WING_NOTE_3) {
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
+                finalPose = knownLocations.WING_NOTE_TOP;
+            } else if (firstElement == knownLocations.WING_NOTE_BOTTOM) {
                 waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
-                finalPose = knownLocations.WING_NOTE_3;
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+                finalPose = knownLocations.WING_NOTE_BOTTOM;
             }
-        } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
+        } else if (currentSelectedPose == knownLocations.START_BOTTOMMOST) {
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
-            finalPose = knownLocations.WING_NOTE_3;
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+            finalPose = knownLocations.WING_NOTE_BOTTOM;
         }
 
         path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
 
-        secondPathPose = finalPose == knownLocations.WING_NOTE_1 ? knownLocations.WING_NOTE_1 : knownLocations.WING_NOTE_3;
+        secondPathPose = finalPose == knownLocations.WING_NOTE_TOP ? knownLocations.WING_NOTE_TOP : knownLocations.WING_NOTE_BOTTOM;
         waypoints = new ArrayList<Pose2d>();
-        waypoints.add(knownLocations.INTERMEDIARY_NOTE_2);
-        finalPose = knownLocations.WING_NOTE_2;
+        waypoints.add(knownLocations.INTERMEDIARY_NOTE_MIDDLE);
+        finalPose = knownLocations.WING_NOTE_MIDDLE;
 
         path2 = generateSwerveTrajectory(secondPathPose, waypoints, finalPose);
 
         thirdPathPose = finalPose;
         waypoints = new ArrayList<Pose2d>();
 
-        if (currentSelectedPose == knownLocations.START_LEFT_NOTE) {
+        if (currentSelectedPose == knownLocations.START_TOPMOST) {
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
-            finalPose = knownLocations.WING_NOTE_3;
-        } else if (currentSelectedPose == knownLocations.START_MID_NOTE) {
-            if (firstElement == knownLocations.WING_NOTE_1) {
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+            finalPose = knownLocations.WING_NOTE_BOTTOM;
+        } else if (currentSelectedPose == knownLocations.START_MIDDLE) {
+            if (firstElement == knownLocations.WING_NOTE_TOP) {
                 waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_3);
-                finalPose = knownLocations.WING_NOTE_3;
-            } else if (firstElement == knownLocations.WING_NOTE_3) {
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+                finalPose = knownLocations.WING_NOTE_BOTTOM;
+            } else if (firstElement == knownLocations.WING_NOTE_BOTTOM) {
                 waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
-                finalPose = knownLocations.WING_NOTE_1;
+                waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
+                finalPose = knownLocations.WING_NOTE_TOP;
             }
-        } else if (currentSelectedPose == knownLocations.START_RIGHT_NOTE) {
+        } else if (currentSelectedPose == knownLocations.START_BOTTOMMOST) {
             waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_1);
-            finalPose = knownLocations.WING_NOTE_1;
+            waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
+            finalPose = knownLocations.WING_NOTE_TOP;
         }
 
         path3 = generateSwerveTrajectory(thirdPathPose, waypoints, finalPose);
@@ -260,16 +260,16 @@ public class Autons {
 
     //     switch (waypoint) {
     //         case wingNote1:
-    //             points.add(knownLocations.INTERMEDIARY_NOTE_1);
-    //             points.add(knownLocations.WING_NOTE_1);
+    //             points.add(knownLocations.INTERMEDIARY_NOTE_TOP);
+    //             points.add(knownLocations.WING_NOTE_TOP);
     //             return points;
     //         case wingNote2:
-    //             points.add(knownLocations.INTERMEDIARY_NOTE_2);
-    //             points.add(knownLocations.WING_NOTE_2);
+    //             points.add(knownLocations.INTERMEDIARY_NOTE_MIDDLE);
+    //             points.add(knownLocations.WING_NOTE_MIDDLE);
     //             return points; 
     //         case wingNote3:
-    //             points.add(knownLocations.INTERMEDIARY_NOTE_3);
-    //             points.add(knownLocations.WING_NOTE_3);
+    //             points.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+    //             points.add(knownLocations.WING_NOTE_BOTTOM);
     //             return points;
     //     }
 

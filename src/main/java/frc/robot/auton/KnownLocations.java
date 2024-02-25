@@ -26,19 +26,19 @@ public class KnownLocations {
 
     // looking from its alliance side
     public final Pose2d 
-        START_LEFT_NOTE,
-        START_MID_NOTE,
-        START_RIGHT_NOTE;
+        START_TOPMOST,
+        START_MIDDLE,
+        START_BOTTOMMOST;
 
     // notes -> NOTE_WING_1 lines up w/NOTE_CENTER_1 from the top 
     // starting positions are looking from blue side of field 
     public final Pose2d
-        WING_NOTE_1,
-        WING_NOTE_2,
-        WING_NOTE_3,
-        INTERMEDIARY_NOTE_1,
-        INTERMEDIARY_NOTE_2,
-        INTERMEDIARY_NOTE_3,
+        WING_NOTE_TOP,
+        WING_NOTE_MIDDLE,
+        WING_NOTE_BOTTOM,
+        INTERMEDIARY_NOTE_TOP,
+        INTERMEDIARY_NOTE_MIDDLE,
+        INTERMEDIARY_NOTE_BOTTOM,
         CENTER_NOTE_1,
         CENTER_NOTE_2,
         CENTER_NOTE_3,
@@ -57,13 +57,13 @@ public class KnownLocations {
 
         if (allianceColor.isPresent() && allianceColor.get() == Alliance.Blue) {
 
-            WING_NOTE_1 = PathPointInch(114.261, 276, 0);
-            WING_NOTE_2 = PathPointInch(114.261, 219, 0);
-            WING_NOTE_3 = PathPointInch(114.261, 162, 0);
+            WING_NOTE_TOP = PathPointInch(114.261, 276, 0);
+            WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
+            WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
                                     
-            INTERMEDIARY_NOTE_1 = PathPointInch(84.261, 276, 0);
-            INTERMEDIARY_NOTE_2 = PathPointInch(84.261, 219, 0);
-            INTERMEDIARY_NOTE_3 = PathPointInch(84.261, 162, 0);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(84.261, 276, 0);
+            INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261, 219, 0);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261, 162, 0);
 
             CENTER_NOTE_1 = PathPointInch(325.862, 30, 0);
             CENTER_NOTE_2 = PathPointInch(325.862, 96, 0);
@@ -71,20 +71,20 @@ public class KnownLocations {
             CENTER_NOTE_4 = PathPointInch(325.862, 228, 0);
             CENTER_NOTE_5 = PathPointInch(325.862, 294, 0);
 
-            START_LEFT_NOTE = PathPointInch(24.741, 268.182, 60);
-            START_MID_NOTE = PathPointInch(55.43, 218.777885, 0);
-            START_RIGHT_NOTE = PathPointInch(24.741, 169.374, -60); 
+            START_TOPMOST = PathPointInch(24.741, 268.182, 60);
+            START_MIDDLE = PathPointInch(55.43, 218.777885, 0);
+            START_BOTTOMMOST = PathPointInch(24.741, 169.374, -60); 
             
 
         } else {
 
-            WING_NOTE_1 = PathPointInch(537.464, 276, 180);
-            WING_NOTE_2 = PathPointInch(537.464, 219, 180);
-            WING_NOTE_3 = PathPointInch(537.464, 162, 180);
+            WING_NOTE_TOP = PathPointInch(537.464, 276, 180);
+            WING_NOTE_MIDDLE = PathPointInch(537.464, 219, 180);
+            WING_NOTE_BOTTOM = PathPointInch(537.464, 162, 180);
 
-            INTERMEDIARY_NOTE_1 = PathPointInch(567.464, 276, 180);
-            INTERMEDIARY_NOTE_2 = PathPointInch(567.464, 219, 180);
-            INTERMEDIARY_NOTE_3 = PathPointInch(567.464, 162, 180);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(567.464, 276, 180);
+            INTERMEDIARY_NOTE_MIDDLE = PathPointInch(567.464, 219, 180);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(567.464, 162, 180);
 
             CENTER_NOTE_1 = PathPointInch(325.862, 30, 180);
             CENTER_NOTE_2 = PathPointInch(325.862, 96, 180);
@@ -92,9 +92,9 @@ public class KnownLocations {
             CENTER_NOTE_4 = PathPointInch(325.862, 228, 180);
             CENTER_NOTE_5 = PathPointInch(325.862, 294, 180);
 
-            START_LEFT_NOTE = PathPointInch(626.983, 266.305, 120);
-            START_MID_NOTE = PathPointInch(596.295, 218.777, 0);
-            START_RIGHT_NOTE = PathPointInch(623.735, 169.372, -120);
+            START_TOPMOST = PathPointInch(626.983, 266.305, 120);
+            START_MIDDLE = PathPointInch(596.295, 218.777, 0);
+            START_BOTTOMMOST = PathPointInch(623.735, 169.372, -120);
 
 
         }
