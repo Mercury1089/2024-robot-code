@@ -76,6 +76,8 @@ public class Drivetrain extends SubsystemBase {
   private ObjectDetectionCamera objectDetectionCam;
   private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
+  private final double THRESHOLD_DEGREES = 1.0;
+  private final double THRESHOLD_SPEED = 0.001;
     
   //2024 robot
   // private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
@@ -384,17 +386,28 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public Command goToNote() {
-    if (objectDetectionCam.getDistanceToTarget() > 0.0 && objectDetectionCam.getDistanceToTarget() < 1.65) {
-      return AutoBuilder.followPath(pathToNote);
-    } else {
-      return new Command() {
-        
-      };
-    }
+    return AutoBuilder.followPath(pathToNote);
+  }
+
+  public boolean noteInRange() {
+    return objectDetectionCam.getDistanceToTarget() > 0.0 && objectDetectionCam.getDistanceToTarget() < 1.65;
   }
 
   public Command goToAmp() {
     return AutoBuilder.followPath(pathToAmp);
+  }
+
+  public boolean isPointedAtTarget() {
+    return Math.abs(getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToFieldPosition(getAprilTagCamera(), getPose(), FieldPosition.SPEAKER)) < THRESHOLD_DEGREES;
+  }
+
+  public boolean isNotMoving() {
+    return getXSpeeds() < THRESHOLD_SPEED && getYSpeeds() < THRESHOLD_SPEED;
+  }
+
+  //TODO: Put equation
+  public boolean inShootingRange() {
+    return false;
   }
 
   @Override

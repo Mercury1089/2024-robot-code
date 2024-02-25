@@ -12,6 +12,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,17 +23,24 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import frc.robot.Constants.SWERVE;
-import frc.robot.subsystems.GamePieceLEDs;
+import frc.robot.subsystems.RobotModeLEDs;
 // import frc.robot.subsystems.arm.Arm;
 // import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.*;
+import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.arm.Intake.IntakeSpeed;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
+import frc.robot.util.MercMath;
 import frc.robot.util.PathUtils;
+import frc.robot.util.TargetUtils;
 
 
 public class Autons {
@@ -54,9 +62,6 @@ public class Autons {
 
     private Command autonCommand;
     private KnownLocations knownLocations;
-    private final int wingNote1 = 1;
-    private final int wingNote2 = 2;
-    private final int wingNote3 = 3;
 
     private Alliance allianceColor;
 
@@ -67,14 +72,18 @@ public class Autons {
     private Drivetrain drivetrain;
     private Arm arm;
     private Intake intake;
-    private GamePieceLEDs LEDs;
+    private RobotModeLEDs LEDs;
+    private Shooter shooter;
 
     /**
      * made by rohan no thanks to owen :(
      */
-    public Autons(Drivetrain drivetrain) {
+    public Autons(Drivetrain drivetrain, Intake intake, Shooter shooter, Arm arm) {
 
         this.drivetrain = drivetrain;
+        this.arm = arm;
+        this.intake = intake;
+        this.shooter = shooter;
 
         Optional<Alliance> allianceColor = DriverStation.getAlliance();
         this.allianceColor = allianceColor.isPresent() ? allianceColor.get() : Alliance.Blue;
@@ -237,10 +246,52 @@ public class Autons {
         Command thirdSwerveCommand = AutoBuilder.followPath(path3);
 
         return new SequentialCommandGroup(
-            firstSwerveCommand,
-            secondSwerveCommand,
-            thirdSwerveCommand
+            setUpToShoot(),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake),
+
+            firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().hasTargets()),
+            new ParallelCommandGroup(
+                drivetrain.goToNote(),
+                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+            ).until(() -> intake.hasNote()),
+            setUpToShoot(),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake),
+
+            secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().hasTargets()),
+            new ParallelCommandGroup(
+                drivetrain.goToNote(),
+                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+            ).until(() -> intake.hasNote()),
+            setUpToShoot(),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake),
+
+            thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().hasTargets()),
+            new ParallelCommandGroup(
+                drivetrain.goToNote(),
+                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+            ).until(() -> intake.hasNote()),
+            setUpToShoot(),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
         );
+    }
+
+    public Command setUpToShoot() {
+        return new ParallelCommandGroup(
+          new RunCommand(() -> arm.setPosition(arm.getPosToTarget()), arm),
+          new RunCommand(() -> shooter.setVelocity(shooter.getVelocityToTarget()), shooter),
+          rotateToTarget()
+        );
+    }
+    public PIDCommand rotateToTarget() {
+        return new PIDCommand(
+            drivetrain.getRotationalController(),
+            () -> drivetrain.getPose().getRotation().getDegrees(), 
+            () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
+            (angularSpeed) -> drivetrain.joyDrive(
+                -MercMath.sqaureInput(MathUtil.applyDeadband(0.0, SWERVE.JOYSTICK_DEADBAND)),
+                -MercMath.sqaureInput(MathUtil.applyDeadband(0.0, SWERVE.JOYSTICK_DEADBAND)),
+            angularSpeed),
+            drivetrain);
     }
 
     public static PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
@@ -253,28 +304,6 @@ public class Autons {
             pathConstraints,
             new GoalEndState(0.0, finalPose.getRotation()));
     }
-
-
-    // public List<Pose2d> getWayPoints(int waypoint) {
-    //     List<Pose2d> points = new ArrayList<Pose2d>();
-
-    //     switch (waypoint) {
-    //         case wingNote1:
-    //             points.add(knownLocations.INTERMEDIARY_NOTE_TOP);
-    //             points.add(knownLocations.WING_NOTE_TOP);
-    //             return points;
-    //         case wingNote2:
-    //             points.add(knownLocations.INTERMEDIARY_NOTE_MIDDLE);
-    //             points.add(knownLocations.WING_NOTE_MIDDLE);
-    //             return points; 
-    //         case wingNote3:
-    //             points.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-    //             points.add(knownLocations.WING_NOTE_BOTTOM);
-    //             return points;
-    //     }
-
-    //     return points;
-    // }
 
     /**
      * Rebuilds the autonCommand when ONE of the following conditions changes:

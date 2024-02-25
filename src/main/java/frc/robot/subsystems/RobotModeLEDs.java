@@ -8,14 +8,14 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class GamePieceLEDs extends SubsystemBase {
+public class RobotModeLEDs extends SubsystemBase {
 
   private Spark blinkin;
-  private LEDState gamePieceState;
+  private LEDState robotMode;
   /** Creates a new GamePieceLEDs. */
-  public GamePieceLEDs() {
+  public RobotModeLEDs() {
     this.blinkin = new Spark(0);
-    gamePieceState = LEDState.OFF;
+    robotMode = LEDState.OFF;
 
   }
 
@@ -25,35 +25,39 @@ public class GamePieceLEDs extends SubsystemBase {
    * - sets the physical LED
   */
   public void lightUp(LEDState ledState) {
-   this.gamePieceState = ledState;
+   this.robotMode = ledState;
 
-   blinkin.set(gamePieceState.colorValue);
+   blinkin.set(robotMode.colorValue);
   }
 
-  public GamePiece getGameState() {
-    return this.gamePieceState.gamePiece;
+  public RobotMode getGameState() {
+    return this.robotMode.mode;
   }
 
   public enum LEDState {
-    OFF(0.99, GamePiece.NONE), YELLOW(0.69, GamePiece.CONE), PURPLE(0.89, GamePiece.CUBE), CELEBRATION(-0.87, GamePiece.NONE);
+    OFF(0.99, RobotMode.NONE), 
+    PICKUP(0.05, RobotMode.NOTE),
+    SHOOT(0.69, RobotMode.SHOOT); 
+    // CELEBRATION(0.05, GamePiece.NONE);
 
     public final double colorValue;
-    public final GamePiece gamePiece;
+    public final RobotMode mode;
 
-    LEDState(double colorValue, GamePiece gamePiece)  {
+    LEDState(double colorValue, RobotMode robotMode)  {
         this.colorValue = colorValue;
-        this.gamePiece = gamePiece;
+        this.mode = robotMode;
     }
   }
 
-  public enum GamePiece {
+  public enum RobotMode {
     NONE,
-    CUBE,
-    CONE
+    NOTE,
+    SHOOT,
+    DRIVE
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putString("LED Color", gamePieceState.toString());
+    SmartDashboard.putString("LED Color", robotMode.toString());
   }
 }

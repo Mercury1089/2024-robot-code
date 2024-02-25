@@ -25,8 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.BREAKBEAM;
 import frc.robot.Constants.CAN;
-import frc.robot.subsystems.GamePieceLEDs;
-import frc.robot.subsystems.GamePieceLEDs.GamePiece;
+import frc.robot.subsystems.RobotModeLEDs;
 
 public class Intake extends SubsystemBase {
 
@@ -79,7 +78,24 @@ public class Intake extends SubsystemBase {
     */
   }
 
-  public void setSpeed(double speed) {
-    intake.set(speed);
+  public boolean hasNote() {
+    return !intakeBreakBeam.get();
+  }
+
+  public void setSpeed(IntakeSpeed intakeSpeed) {
+    intake.set(intakeSpeed.speed);
+  }
+
+  public enum IntakeSpeed {
+    INTAKE(1.0),
+    OUTTAKE(-1.0),
+    SHOOT(1.0),
+    STOP(0.0);
+  
+    
+    public final double speed;
+      IntakeSpeed(double speed) {
+        this.speed = speed;
+      }
   }
 }

@@ -8,12 +8,14 @@ import frc.robot.Constants.DS_USB;
 import frc.robot.Constants.JOYSTICK_BUTTONS;
 import frc.robot.Constants.SWERVE;
 import frc.robot.auton.Autons;
-import frc.robot.subsystems.GamePieceLEDs;
-import frc.robot.subsystems.GamePieceLEDs.LEDState;
+import frc.robot.subsystems.RobotModeLEDs;
+import frc.robot.subsystems.RobotModeLEDs.LEDState;
+import frc.robot.subsystems.RobotModeLEDs.RobotMode;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Shooter;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.arm.Intake.IntakeSpeed;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 import frc.robot.util.MercMath;
@@ -29,6 +31,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
@@ -58,10 +62,11 @@ public class RobotContainer {
   gamepadStart, gamepadLeftStickButton, gamepadRightStickButton, gamepadLT, gamepadRT, gamepadPOVDown, gamepadPOVUpLeft, 
   gamepadPOVUp, gamepadPOVUpRight, gamepadPOVLeft, gamepadPOVRight, gamepadPOVDownRight, gamepadPOVDownLeft;
 
+  private GenericHID gamepadHID;
   private Supplier<Double> gamepadLeftX, gamepadLeftY, gamepadRightX, gamepadRightY, rightJoystickX, rightJoystickY, leftJoystickX, leftJoystickY;
 
   private Autons auton;
-  private GamePieceLEDs LEDs;
+  private RobotModeLEDs LEDs;
   private Arm arm;
   private Intake intake;
   private Drivetrain drivetrain;
@@ -75,8 +80,10 @@ public class RobotContainer {
     leftJoystick = new CommandJoystick(DS_USB.LEFT_STICK);
     rightJoystick = new CommandJoystick(DS_USB.RIGHT_STICK);
     gamepad = new CommandXboxController(DS_USB.GAMEPAD);
+    gamepadHID = new GenericHID(DS_USB.GAMEPAD);
     configureBindings();
 
+    LEDs = new RobotModeLEDs();
     drivetrain = new Drivetrain();
     drivetrain.setDefaultCommand(new RunCommand(
       () -> drivetrain.joyDrive(
@@ -86,73 +93,64 @@ public class RobotContainer {
     , drivetrain));
     drivetrain.resetGyro();
 
-    auton = new Autons(drivetrain);
+    auton = new Autons(drivetrain, intake, shooter, arm);
 
     // arm = new Arm(drivetrain);
     // arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
-    // gamepadPOVLeft.onTrue(new RunCommand(() -> arm.setPosition(90.0), arm));
-    // gamepadPOVUp.onTrue(new RunCommand(() -> arm.setPosition(180), arm));
-    // gamepadPOVRight.onTrue(new RunCommand(() -> arm.setPosition(350), arm));
 
     // intake = new Intake();
     // intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(0.0), intake));
     // gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(1.0), intake));
 
-    shooter = new Shooter(drivetrain);
+    // shooter = new Shooter(drivetrain);
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
 
-    // left9.onTrue(new SwerveOnGyro(drivetrain, -1.75));
-  
-    // in honor of resetTurret
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
 
-    gamepadB.onTrue(new PIDCommand(
-      drivetrain.getRotationalController(),
-      () -> drivetrain.getPose().getRotation().getDegrees(), 
-      () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
-      (angularSpeed) -> drivetrain.joyDrive(
-        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-       angularSpeed),
-      drivetrain));
+    Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && drivetrain.noteInRange());
+    noteInRange.onTrue(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 1.0)));
 
-    // gamepadY.onTrue(new PIDCommand(
-    //   drivetrain.getRotationalController(),
-    //   () -> drivetrain.getPose().getRotation().getDegrees(), 
-    //   () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.AMP), 
-    //   (angularSpeed) -> drivetrain.joyDrive(
-    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //    angularSpeed),
-    //   drivetrain));
+    gamepadA.and(noteInRange).onTrue(
+      new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
+
+
+    Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote());
+
+    setUpToShoot.onTrue(
+      new ParallelCommandGroup(
+        new PIDCommand(
+          drivetrain.getRotationalController(),
+          () -> drivetrain.getPose().getRotation().getDegrees(), 
+          () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
+          (angularSpeed) -> drivetrain.joyDrive(
+            -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+            -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+          angularSpeed),
+          drivetrain),
+        new RunCommand(() -> shooter.setVelocity(shooter.getVelocityToTarget()), shooter),
+        new RunCommand(() -> arm.setPosition(arm.getPosToTarget()), arm)
+      )
+    );
+    
+    Trigger shootTrigger = new Trigger(
+      () -> intake.hasNote() && 
+      drivetrain.isPointedAtTarget() && 
+      drivetrain.isNotMoving() &&
+      shooter.isAtTargetVelocity() &&
+      arm.isAtPosition(arm.getPosToTarget()) &&
+      drivetrain.inShootingRange());
+
+    shootTrigger.onTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE)));
 
     gamepadY.onTrue(new DeferredCommand(() -> drivetrain.goToAmp(), Set.of(drivetrain)));
 
-    // gamepadA.onTrue(new SequentialCommandGroup(
-    //   new PIDCommand(
-    //     drivetrain.getRotationalController(),
-    //     () -> drivetrain.getPose().getRotation().getDegrees(), 
-    //     () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees(), 
-    //     (angularSpeed) -> drivetrain.joyDrive(
-    //       -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //       -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //       angularSpeed),
-    //     drivetrain).until(
-    //       () -> Math.abs(drivetrain.getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees()) < 1.0),
-    //   new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain))));
-
-
-    gamepadA.onTrue(new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
-
     gamepadX.onTrue(drivetrain.getDefaultCommand());
+
+    gamepadB.onTrue(new RunCommand(() -> LEDs.lightUp(LEDState.PICKUP), LEDs));
+    gamepadY.onTrue(new RunCommand(() -> LEDs.lightUp(LEDState.SHOOT), LEDs));
     
-    //right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
-  
-    //gamepadPOVUp.onTrue(new RunCommand(() -> shooter.setVelocity(5600), shooter));
-    //gamepadY.onTrue(new RunCommand(() -> shooter.setVelocity(4500), shooter));
-    //gamepadA.onTrue(new RunCommand(() -> shooter.setVelocity(4000), shooter));
-    //gamepadB.onTrue(new RunCommand(() -> shooter.stopShooter(), shooter));
+    // right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   }
 
   /**

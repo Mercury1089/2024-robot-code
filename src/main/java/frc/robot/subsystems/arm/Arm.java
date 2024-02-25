@@ -91,8 +91,16 @@ public class Arm extends SubsystemBase {
     arm.set((speedSupplier.get() * 0.5));
   }
 
+  public void setPosition(ArmPosition pos) {
+    setPosition(pos.degreePos);
+  }
+
   public void setPosition(double pos) {
     armPIDController.setReference(pos, CANSparkMax.ControlType.kPosition);
+  }
+
+  public double getPosToTarget() {
+    return 0.0;
   }
 
   // public double getDistanceToSpeaker() {
@@ -107,8 +115,12 @@ public class Arm extends SubsystemBase {
     return getError() < THRESHOLD_DEGREES;
   }
 
+  public boolean isAtPosition(double pos) {
+    return Math.abs(getArmPosition() - pos) < THRESHOLD_DEGREES;
+  }
+
   public boolean isAtPosition(ArmPosition pos) {
-    return Math.abs(getArmPosition() - pos.degreePos) < THRESHOLD_DEGREES;
+    return isAtPosition(pos.degreePos);
   }
 
   public double getArmPosition() {
@@ -134,7 +146,6 @@ public class Arm extends SubsystemBase {
   
 
   public enum ArmPosition {
-    SPEAKER(90.0),
     AMP(0.0),
     PICKUP_FLOOR(0.0),
     PICKUP_SOURCE(0.0);
