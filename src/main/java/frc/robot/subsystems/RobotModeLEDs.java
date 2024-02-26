@@ -30,8 +30,14 @@ public class RobotModeLEDs extends SubsystemBase {
    blinkin.set(robotMode.colorValue);
   }
 
-  public RobotMode getGameState() {
-    return this.robotMode.mode;
+  public void enableAutoShoot() {
+    this.robotMode = LEDState.SHOOT;
+
+    blinkin.set(robotMode.colorValue);
+  }
+
+  public boolean isAutoShootEnabled() {
+    return this.robotMode.mode == RobotMode.SHOOT;
   }
 
   public enum LEDState {

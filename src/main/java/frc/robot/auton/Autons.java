@@ -246,32 +246,28 @@ public class Autons {
         Command thirdSwerveCommand = AutoBuilder.followPath(path3);
 
         return new SequentialCommandGroup(
-            setUpToShoot(),
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake),
+            setUpToShoot().until(() -> !shooter.hasNote()),
 
             firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().hasTargets()),
             new ParallelCommandGroup(
                 drivetrain.goToNote(),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
             ).until(() -> intake.hasNote()),
-            setUpToShoot(),
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake),
+            setUpToShoot().until(() -> !shooter.hasNote()),
 
             secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().hasTargets()),
             new ParallelCommandGroup(
                 drivetrain.goToNote(),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
             ).until(() -> intake.hasNote()),
-            setUpToShoot(),
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake),
+            setUpToShoot().until(() -> !shooter.hasNote()),
 
             thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().hasTargets()),
             new ParallelCommandGroup(
                 drivetrain.goToNote(),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
             ).until(() -> intake.hasNote()),
-            setUpToShoot(),
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
+            setUpToShoot().until(() -> !shooter.hasNote())
         );
     }
 

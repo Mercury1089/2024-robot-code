@@ -459,28 +459,14 @@ public class Drivetrain extends SubsystemBase {
     pathToAmp = Autons.generateSwerveTrajectory(getPose(), intermediaryAmpList, amp);
     setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToAmp");
 
-    SmartDashboard.putNumber("CurrentPose X", getPose().getX());
-    SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
-    SmartDashboard.putNumber("CurrentPose Rotation", getPose().getRotation().getDegrees());
-    SmartDashboard.putNumber("Drive Angle", getPigeonRotation().getDegrees());
-    SmartDashboard.putNumber("Drive Yaw", pigeon.getYaw());
-    SmartDashboard.putNumber("Drive Roll", getRoll());
-    SmartDashboard.putNumber("Drive Pitch", pigeon.getPitch());
-    // SmartDashboard.putNumber("Drive fused heading", pigeon.getFusedHeading());
-    // SmartDashboard.putNumber("Distance to speaker", getDistanceToSpeaker());
-    SmartDashboard.putNumber("Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));
-    SmartDashboard.putNumber("Angle Offset", 0);
-    // SmartDashboard.putNumber("Angle to speaker - AprilTag", getDegreesToSpeakerApriltag());
-    // SmartDashboard.putNumber("X to closest note", getClosestNoteX());
-    // SmartDashboard.putNumber("Y to closest note", getClosestNoteY());
-    // SmartDashboard.putNumber("Angle to closest note", objectDetectionCamera.getYaw());
-    SmartDashboard.putNumber("Distance to closest note", objectDetectionCam.getDistanceToTarget());
-    SmartDashboard.putNumber("getXSpeeds", getXSpeeds());
-    SmartDashboard.putNumber("getYSpeeds", getYSpeeds());
-    // SmartDashboard.putNumber("Target Heading to note", getTargetHeadingToClosestNote());
-    SmartDashboard.putNumber("Robot Angle", getPose().getRotation().getDegrees());
-    SmartDashboard.putNumber("Tag Pose Angle", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getRotation().getDegrees());
-    SmartDashboard.putNumber("Tag Pose X", photonCam.getTagPose(APRILTAGS.MIDDLE_BLUE_SPEAKER).get().toPose2d().getTranslation().getX());
+    SmartDashboard.putNumber("Drivetrain/CurrentPose X", getPose().getX());
+    SmartDashboard.putNumber("Drivetrain/CurrentPose Y", getPose().getY());
+    SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("Drivetrain/Drive Angle", getPigeonRotation().getDegrees());
+    SmartDashboard.putNumber("Drivetrain/Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));
+    SmartDashboard.putNumber("Drivetrain/New Func (angle to red)", TargetUtils.getTargetHeadingToAprilTag(photonCam, getPose(), APRILTAGS.MIDDLE_RED_SPEAKER));
+    SmartDashboard.putNumber("Drivetrain/Angle Offset", 0);
+    SmartDashboard.putNumber("Drivetrain/Distance to closest note", objectDetectionCam.getDistanceToTarget());
 
   }
 

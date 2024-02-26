@@ -37,7 +37,7 @@ public class TargetUtils {
         if (tagPose.isPresent()) {
             Translation2d tagPoint = tagPose.get().getTranslation().toTranslation2d();
             Rotation2d targetRotation = tagPoint.minus(robotPose.getTranslation()).getAngle();
-            heading = targetRotation.getDegrees();
+            heading = targetRotation.rotateBy(Rotation2d.fromDegrees(180.0)).getDegrees();
         }
         return heading;
     }
