@@ -29,6 +29,19 @@ public class TargetUtils {
         return distance;
     }
 
+    // TODO: Try this and compare getTargetHeadingToFieldPosition. targetRotation man need to be added to robotPose.getRoation()
+    // Following is based off https://www.chiefdelphi.com/t/is-there-a-builtin-function-to-find-the-angle-needed-to-get-one-pose2d-to-face-another-pose2d/455972
+    public static double getTargetHeadingToAprilTag(AprilTagCamera photonCam, Pose2d robotPose, int tagId) {
+        double heading = 0.0;
+        Optional<Pose3d> tagPose = photonCam.getTagPose(tagId);
+        if (tagPose.isPresent()) {
+            Translation2d tagPoint = tagPose.get().getTranslation().toTranslation2d();
+            Rotation2d targetRotation = tagPoint.minus(robotPose.getTranslation()).getAngle();
+            heading = targetRotation.getDegrees();
+        }
+        return heading;
+    }
+
     public static double getTargetHeadingToFieldPosition(AprilTagCamera photonCam, Pose2d robotPose, FieldPosition fieldPos) {
         Optional<Alliance> allianceColor = DriverStation.getAlliance();
         Optional<Pose3d> tagPose = Optional.empty();
