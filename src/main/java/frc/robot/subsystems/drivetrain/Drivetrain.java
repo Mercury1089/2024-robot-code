@@ -131,9 +131,9 @@ public class Drivetrain extends SubsystemBase {
 
     
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      amp = KnownLocations.PathPointInch(72.706, 304.638, -90.0);
+      amp = KnownLocations.PathPointInch(72.706, 304.638, 90.0);
     } else {
-      amp = KnownLocations.PathPointInch(578.919, 304.638, -90.0);
+      amp = KnownLocations.PathPointInch(578.919, 304.638, 90.0);
     }
 
     // wpilib convienence classes
@@ -456,7 +456,7 @@ public class Drivetrain extends SubsystemBase {
 
     // intermediaryAmpList.add(intermediaryAmp);
 
-    pathToAmp = Autons.generateSwerveTrajectory(getPose(), intermediaryAmpList, amp);
+    pathToAmp = Autons.generateSwerveTrajectory(getPose(), intermediaryAmpList, amp, Rotation2d.fromDegrees(-90.0));
     setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToAmp");
 
     SmartDashboard.putNumber("Drivetrain/CurrentPose X", getPose().getX());

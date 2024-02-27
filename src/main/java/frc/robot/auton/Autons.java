@@ -110,7 +110,7 @@ public class Autons {
                         new PIDConstants(ROTATION_P, 0.0, 0.0), // Rotation PID constants
                         SWERVE.MAX_SPEED_METERS_PER_SECOND, // Max module speed, in m/s
                         SWERVE.WHEEL_RADIUS, // Drive base radius in meters. Distance from robot center to furthest module.
-                        new ReplanningConfig() // Default path replanning config. See the API for the options here
+                        new ReplanningConfig(true, true) // Default path replanning config. See the API for the options here
                 ),
                 () -> { return false; }, // Never flip a path - all paths use absolute coordinates
                 drivetrain // Reference to this subsystem to set requirements
@@ -290,7 +290,7 @@ public class Autons {
             drivetrain);
     }
 
-    public static PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
+    public static PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose, Rotation2d endStateRotation) {
         List<Pose2d> poses = new ArrayList<Pose2d>();
         poses.add(initialPose); poses.addAll(waypoints); poses.add(finalPose);
 
@@ -298,7 +298,11 @@ public class Autons {
         return new PathPlannerPath(
             bezierPoints,
             pathConstraints,
-            new GoalEndState(0.0, finalPose.getRotation()));
+            new GoalEndState(0.0, endStateRotation));
+    }
+
+    public static PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
+        return generateSwerveTrajectory(initialPose, waypoints, finalPose, finalPose.getRotation());
     }
 
     /**
