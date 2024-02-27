@@ -131,9 +131,9 @@ public class Drivetrain extends SubsystemBase {
 
     
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      amp = KnownLocations.PathPointInch(72.706, 304.638, 90.0);
+      amp = KnownLocations.PathPointInch(72.706, 302.638, 90.0);
     } else {
-      amp = KnownLocations.PathPointInch(578.919, 304.638, 90.0);
+      amp = KnownLocations.PathPointInch(578.919, 298.638, 90.0);
     }
 
     // wpilib convienence classes
