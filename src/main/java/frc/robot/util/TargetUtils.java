@@ -50,22 +50,16 @@ public class TargetUtils {
             int apriltag = (allianceColor.get() == Alliance.Blue) ?
                 APRILTAGS.MIDDLE_BLUE_SPEAKER :
                 APRILTAGS.MIDDLE_RED_SPEAKER;
-            tagPose = photonCam.getTagPose(apriltag);
-            
-            return robotPose.getY() < tagPose.get().getTranslation().getY() ? 
-                -Math.acos((robotPose.getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToFieldPos(photonCam, robotPose, apriltag)) * (180 / Math.PI) :
-                Math.acos((robotPose.getTranslation().getX() - tagPose.get().getTranslation().getX()) / getDistanceToFieldPos(photonCam, robotPose, apriltag)) * (180 / Math.PI);
+            return getTargetHeadingToAprilTag(photonCam, robotPose, apriltag);
+
         } else if (fieldPos == FieldPosition.AMP) {
             int apriltag = (allianceColor.get() == Alliance.Blue) ?
                 APRILTAGS.BLUE_AMP :
                 APRILTAGS.RED_AMP;
             tagPose = photonCam.getTagPose(apriltag);
 
-            return robotPose.getX() < tagPose.get().getTranslation().getX() ? 
-                Math.asin((tagPose.get().getTranslation().getY() - robotPose.getTranslation().getY()) / getDistanceToFieldPos(photonCam, robotPose, apriltag)) * (180 / Math.PI) - 180 :
-                -Math.asin((tagPose.get().getTranslation().getY() - robotPose.getTranslation().getY()) / getDistanceToFieldPos(photonCam, robotPose, apriltag)) * (180 / Math.PI);
+            return getTargetHeadingToAprilTag(photonCam, robotPose, apriltag);       
         }
-
         //should never get here
         return 0.0;
     }

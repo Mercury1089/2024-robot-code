@@ -131,9 +131,9 @@ public class Drivetrain extends SubsystemBase {
 
     
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      amp = KnownLocations.PathPointInch(72.706, 302.638, 90.0);
+      amp = KnownLocations.PathPointInch(72.5, 303.0, 90.0);
     } else {
-      amp = KnownLocations.PathPointInch(578.919, 298.638, 90.0);
+      amp = KnownLocations.PathPointInch(578.77, 303.0, 90.0);
     }
 
     // wpilib convienence classes
@@ -407,6 +407,28 @@ public class Drivetrain extends SubsystemBase {
 
   //TODO: Put equation
   public boolean inShootingRange() {
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      return !inStageArea() && getPose().getX() < 230.0;
+    } else if (DriverStation.getAlliance().get() == Alliance.Red) {
+      return !inStageArea() && getPose().getX() > 420.0;
+    }
+
+    return false;
+  }
+
+  public boolean inStageArea() {
+    double x = getPose().getX();
+    double y = getPose().getY();
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      return (y > ((-0.57735 * x) + 227.16483)) &&
+        (y < ((0.57735 * x) - 96.85518)) &&
+        (x < 230.0);
+    } else if (DriverStation.getAlliance().get() == Alliance.Red) {
+      return (y < ((-0.57735 * x) + 473.10859)) &&
+        (y > ((0.57735 * x) - 149.10859)) &&
+        (x > 420.0);
+    }
+
     return false;
   }
 

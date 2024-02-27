@@ -108,7 +108,7 @@ public class Arm extends SubsystemBase {
   // }
   
   public double getError() {
-    return 0.0;
+    return Math.abs(getArmPosition() - getPosToTarget());
   }
 
   public boolean isFinishedMoving() {
