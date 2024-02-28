@@ -13,8 +13,8 @@
         "tiles": {
           "0,1": {
             "size": [
-              7,
-              4
+              8,
+              5
             ],
             "content": {
               "_type": "Field",
@@ -32,7 +32,7 @@
               "Colors/traj1": "#FFFFFFFF"
             }
           },
-          "1,0": {
+          "0,0": {
             "size": [
               2,
               1
@@ -45,7 +45,7 @@
               "_showGlyph": false
             }
           },
-          "4,5": {
+          "8,1": {
             "size": [
               2,
               1
@@ -58,7 +58,7 @@
               "_showGlyph": false
             }
           },
-          "3,0": {
+          "2,0": {
             "size": [
               2,
               1
@@ -71,7 +71,7 @@
               "_showGlyph": false
             }
           },
-          "5,0": {
+          "4,0": {
             "size": [
               2,
               1
@@ -84,67 +84,15 @@
               "_showGlyph": false
             }
           },
-          "7,5": {
+          "10,0": {
             "size": [
               1,
               1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Drive Angle",
-              "_title": "/SmartDashboard/Drive Angle",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "7,3": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Angle to speaker without AprilTag",
-              "_title": "/SmartDashboard/Angle to speaker without AprilTag",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "7,2": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Robot Angle",
               "_title": "/SmartDashboard/Robot Angle",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "7,1": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Angle to closest note",
-              "_title": "/SmartDashboard/Angle to closest note",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "9,1": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Target Heading to note",
-              "_title": "/SmartDashboard/Target Heading to note",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -162,19 +110,6 @@
               "_showGlyph": false
             }
           },
-          "7,4": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/arm encoder",
-              "_title": "/SmartDashboard/arm encoder",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "11,0": {
             "size": [
               2,
@@ -188,9 +123,9 @@
               "_showGlyph": false
             }
           },
-          "11,5": {
+          "10,1": {
             "size": [
-              2,
+              1,
               1
             ],
             "content": {
@@ -201,9 +136,9 @@
               "_showGlyph": false
             }
           },
-          "9,2": {
+          "8,2": {
             "size": [
-              4,
+              3,
               3
             ],
             "content": {
@@ -222,9 +157,9 @@
               "imageHeight": -1
             }
           },
-          "8,5": {
+          "6,0": {
             "size": [
-              1,
+              2,
               1
             ],
             "content": {
@@ -237,28 +172,73 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "7,0": {
+          "8,0": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Intake/hasNote",
+              "_title": "/SmartDashboard/Intake/hasNote",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "11,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drivetrain/inShootingRange",
+              "_title": "/SmartDashboard/Drivetrain/inShootingRange",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "11,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drivetrain/inStageArea",
+              "_title": "/SmartDashboard/Drivetrain/inStageArea",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "8,5": {
             "size": [
               2,
               1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/getXSpeeds",
-              "_title": "SmartDashboard/getXSpeeds",
+              "_source0": "network_table:///SmartDashboard/Drivetrain/CurrentPose X",
+              "_title": "/SmartDashboard/Drivetrain/CurrentPose X",
               "_glyph": 148,
               "_showGlyph": false
             }
           },
-          "9,0": {
+          "10,5": {
             "size": [
               2,
               1
             ],
             "content": {
               "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/getYSpeeds",
-              "_title": "SmartDashboard/getYSpeeds",
+              "_source0": "network_table:///SmartDashboard/Drivetrain/CurrentPose Y",
+              "_title": "SmartDashboard/Drivetrain/CurrentPose Y",
               "_glyph": 148,
               "_showGlyph": false
             }

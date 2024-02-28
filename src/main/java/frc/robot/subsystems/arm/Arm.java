@@ -88,7 +88,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void setSpeed(Supplier<Double> speedSupplier) {
-    arm.set((speedSupplier.get() * 0.5));
+    arm.set(-(speedSupplier.get() * 0.5));
   }
 
   public void setPosition(ArmPosition pos) {

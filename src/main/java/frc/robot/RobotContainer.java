@@ -86,19 +86,19 @@ public class RobotContainer {
 
     LEDs = new RobotModeLEDs();
     drivetrain = new Drivetrain();
-    drivetrain.setDefaultCommand(new RunCommand(
-      () -> drivetrain.joyDrive(
-        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-        -MercMath.sqaureInput(MathUtil.applyDeadband(rightJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)))
-    , drivetrain));
-    drivetrain.resetGyro();
+    // drivetrain.setDefaultCommand(new RunCommand(
+    //   () -> drivetrain.joyDrive(
+    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //     -MercMath.sqaureInput(MathUtil.applyDeadband(rightJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)))
+    // , drivetrain));
+    // drivetrain.resetGyro();
     LEDs.enableAutoShoot();
 
     auton = new Autons(drivetrain, intake, shooter, arm);
 
     arm = new Arm(drivetrain);
-    // arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
+    arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
 
     intake = new Intake();
     // intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
