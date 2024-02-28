@@ -408,17 +408,17 @@ public class Drivetrain extends SubsystemBase {
   //TODO: Put equation
   public boolean inShootingRange() {
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      return !inStageArea() && getPose().getX() < 230.0;
+      return !inStageArea() && Units.metersToInches(getPose().getX()) < 230.0;
     } else if (DriverStation.getAlliance().get() == Alliance.Red) {
-      return !inStageArea() && getPose().getX() > 420.0;
+      return !inStageArea() && Units.metersToInches(getPose().getX()) > 420.0;
     }
 
     return false;
   }
 
   public boolean inStageArea() {
-    double x = getPose().getX();
-    double y = getPose().getY();
+    double x = Units.metersToInches(getPose().getX());
+    double y = Units.metersToInches(getPose().getY());
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
       return (y > ((-0.57735 * x) + 227.16483)) &&
         (y < ((0.57735 * x) - 96.85518)) &&
@@ -483,6 +483,8 @@ public class Drivetrain extends SubsystemBase {
 
     SmartDashboard.putNumber("Drivetrain/CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Y", getPose().getY());
+    SmartDashboard.putBoolean("Drivetrain/inShootingRange", inShootingRange());
+    SmartDashboard.putBoolean("Drivetrain/inStageArea", inStageArea());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Drive Angle", getPigeonRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));

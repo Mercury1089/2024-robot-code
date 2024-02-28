@@ -98,4 +98,9 @@ public class Intake extends SubsystemBase {
         this.speed = speed;
       }
   }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putBoolean("Intake/hasNote", hasNote());
+  }
 }
