@@ -405,7 +405,7 @@ public class Drivetrain extends SubsystemBase {
     return getXSpeeds() < THRESHOLD_SPEED && getYSpeeds() < THRESHOLD_SPEED;
   }
 
-  //TODO: Put equation
+  
   public boolean inShootingRange() {
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
       return !inStageArea() && Units.metersToInches(getPose().getX()) < 230.0;
@@ -421,7 +421,7 @@ public class Drivetrain extends SubsystemBase {
     double y = Units.metersToInches(getPose().getY());
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
       return (y > ((-0.57735 * x) + 227.16483)) &&
-        (y < ((0.57735 * x) - 96.85518)) &&
+        (y < ((0.57735 * x) + 96.85518)) &&
         (x < 230.0);
     } else if (DriverStation.getAlliance().get() == Alliance.Red) {
       return (y < ((-0.57735 * x) + 473.10859)) &&

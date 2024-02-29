@@ -147,6 +147,7 @@ public class Arm extends SubsystemBase {
 
   public enum ArmPosition {
     AMP(0.0),
+    HOME(0.0),
     PICKUP_FLOOR(0.0),
     PICKUP_SOURCE(0.0);
   

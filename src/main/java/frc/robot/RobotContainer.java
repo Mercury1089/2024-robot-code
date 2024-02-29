@@ -86,75 +86,87 @@ public class RobotContainer {
 
     LEDs = new RobotModeLEDs();
     drivetrain = new Drivetrain();
-    // drivetrain.setDefaultCommand(new RunCommand(
-    //   () -> drivetrain.joyDrive(
-    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //     -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //     -MercMath.sqaureInput(MathUtil.applyDeadband(rightJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)))
-    // , drivetrain));
-    // drivetrain.resetGyro();
+    drivetrain.setDefaultCommand(new RunCommand(
+      () -> drivetrain.joyDrive(
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+        -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+        -MercMath.sqaureInput(MathUtil.applyDeadband(rightJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)))
+    , drivetrain));
+    drivetrain.resetGyro();
     LEDs.enableAutoShoot();
 
-    auton = new Autons(drivetrain, intake, shooter, arm);
-
     arm = new Arm(drivetrain);
-    arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
+    // arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
 
     intake = new Intake();
-    // intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
-    // // gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(1.0), intake));
+    intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
+    gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake));
 
     shooter = new Shooter(drivetrain);
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
+    // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
+    gamepadB.onTrue(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
+    auton = new Autons(drivetrain, intake, shooter, arm);
 
+    Trigger intakeHasNote = new Trigger(() -> intake.hasNote());
+    // intakeHasNote.onTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
+    
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
 
-    // Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && drivetrain.noteInRange());
-    // noteInRange.onTrue(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 1.0)));
+    Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && drivetrain.noteInRange());
+    noteInRange.onTrue(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 1.0)));
 
-    // gamepadA.and(noteInRange).onTrue(
-    //   new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)));
+    gamepadA.and(noteInRange).onTrue(new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new DeferredCommand(() -> drivetrain.goToNote(), Set.of(drivetrain)),
+        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+      ).until(() -> intake.hasNote()),
+      new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+    ));
 
 
-    // Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote());
+    Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote());
 
-    // setUpToShoot.onTrue(
-    //   new ParallelCommandGroup(
-    //     new PIDCommand(
-    //       drivetrain.getRotationalController(),
-    //       () -> drivetrain.getPose().getRotation().getDegrees(), 
-    //       () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
-    //       (angularSpeed) -> drivetrain.joyDrive(
-    //         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-    //       angularSpeed),
-    //       drivetrain),
-    //     new RunCommand(() -> shooter.setVelocity(shooter.getVelocityToTarget()), shooter),
-    //     new RunCommand(() -> arm.setPosition(arm.getPosToTarget()), arm)
-    //   )
-    // );
+    setUpToShoot.onTrue(
+      new ParallelCommandGroup(
+        new PIDCommand(
+          drivetrain.getRotationalController(),
+          () -> drivetrain.getPose().getRotation().getDegrees(), 
+          () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
+          (angularSpeed) -> drivetrain.joyDrive(
+            -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+            -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+          angularSpeed),
+          drivetrain),
+        new RunCommand(() -> shooter.setVelocity(shooter.getVelocityToTarget()), shooter),
+        new RunCommand(() -> arm.setPosition(arm.getPosToTarget()), arm)
+      )
+    );
     
-    // Trigger shootTrigger = new Trigger(
-    //   () -> intake.hasNote() && 
-    //   drivetrain.isPointedAtTarget() && 
-    //   drivetrain.isNotMoving() &&
-    //   shooter.isAtTargetVelocity() &&
-    //   arm.isFinishedMoving() &&
-    //   drivetrain.inShootingRange() &&
-    //   LEDs.isAutoShootEnabled());
+    Trigger shootTrigger = new Trigger(
+      () -> intake.hasNote() && 
+      drivetrain.isPointedAtTarget() && 
+      drivetrain.isNotMoving() &&
+      shooter.isAtTargetVelocity() &&
+      arm.isFinishedMoving() &&
+      drivetrain.inShootingRange() &&
+      LEDs.isAutoShootEnabled());
 
-    // shootTrigger.onTrue(new SequentialCommandGroup(
-    //   new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT)).until(() -> !shooter.hasNote()),
-    //   new RunCommand(() -> LEDs.lightUp(LEDState.PICKUP), LEDs)
-    // ));
+    shootTrigger.onTrue(new SequentialCommandGroup(
+      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT)).until(() -> !shooter.hasNote() && !intake.hasNote()),
+      new ParallelCommandGroup(
+        new RunCommand(() -> LEDs.lightUp(LEDState.PICKUP), LEDs),
+        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+      )
+    ));
 
     gamepadA.onTrue(new DeferredCommand(() -> drivetrain.goToAmp(), Set.of(drivetrain)));
 
     gamepadX.onTrue(drivetrain.getDefaultCommand());
 
-    gamepadB.onTrue(new RunCommand(() -> LEDs.lightUp(LEDState.PICKUP), LEDs));
-    gamepadY.onTrue(new RunCommand(() -> LEDs.enableAutoShoot(), LEDs));
+    // gamepadB.onTrue(new RunCommand(() -> LEDs.lightUp(LEDState.PICKUP), LEDs));
+    // gamepadY.onTrue(new RunCommand(() -> LEDs.enableAutoShoot(), LEDs));
     
     // right11.onTrue(new InstantCommand(() -> drivetrain.joyDrive(0.0, 0.0, 0.0), drivetrain));
   }

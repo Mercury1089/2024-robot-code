@@ -63,7 +63,7 @@ public class Shooter extends SubsystemBase {
     shooterFront.setIdleMode(IdleMode.kCoast);
     
     // TODO: Double check these with final mechanism
-    shooterFront.setInverted(true);
+    shooterFront.setInverted(false);
 
     stopShooter();
     targetVelocity = 0.0;
@@ -101,7 +101,6 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Velocity", this.getVelocity());
     SmartDashboard.putBoolean("Shooter/hasNote", hasNote());
   }
-
 
   /**
    * Get the target velocity for the shooter based on a distance
