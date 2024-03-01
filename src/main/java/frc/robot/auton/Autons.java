@@ -245,29 +245,35 @@ public class Autons {
         Command secondSwerveCommand = AutoBuilder.followPath(path2);
         Command thirdSwerveCommand = AutoBuilder.followPath(path3);
 
+        // return new SequentialCommandGroup(
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
+
+        //     firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
+        //     new ParallelCommandGroup(
+        //         drivetrain.goToNote(),
+        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+        //     ).until(() -> intake.hasNote()),
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
+
+        //     secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
+        //     new ParallelCommandGroup(
+        //         drivetrain.goToNote(),
+        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+        //     ).until(() -> intake.hasNote()),
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
+
+        //     thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
+        //     new ParallelCommandGroup(
+        //         drivetrain.goToNote(),
+        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+        //     ).until(() -> intake.hasNote()),
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote())
+        // );
+
         return new SequentialCommandGroup(
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-            firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-            new ParallelCommandGroup(
-                drivetrain.goToNote(),
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-            ).until(() -> intake.hasNote()),
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-            secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-            new ParallelCommandGroup(
-                drivetrain.goToNote(),
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-            ).until(() -> intake.hasNote()),
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-            thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-            new ParallelCommandGroup(
-                drivetrain.goToNote(),
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-            ).until(() -> intake.hasNote()),
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote())
+            firstSwerveCommand,
+            secondSwerveCommand,
+            thirdSwerveCommand
         );
     }
 

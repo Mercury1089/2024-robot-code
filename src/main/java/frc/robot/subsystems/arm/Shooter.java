@@ -27,7 +27,7 @@ import frc.robot.util.PIDGain;
 public class Shooter extends SubsystemBase {
 
   public static final double NOMINAL_OUT = 0.0, PEAK_OUT = 1.0;
-  public static final double MAX_RPM = 7000.0, STEADY_RPM = 4000.0, LOW_RPM = 1000.0, NULL_RPM = -1.0;
+  public static final double MAX_RPM = 7000.0, SPEAKER_RPM = 4000.0, AMP_RPM = 1000.0, NULL_RPM = -1.0;
   public static final double MIN_DISTANCE = 6.7, MAX_DISTANCE = 17.0;
   //public static final double MIN_DISTANCE = 2.0, MAX_DISTANCE = 20.0;
   public final int SHOOTER_BREAKBEAM = BREAKBEAM.SHOOTER_BREAKBEAM;
@@ -131,8 +131,7 @@ public class Shooter extends SubsystemBase {
    * @return true if at target velocity, false otherwise
    */
   public boolean isAtTargetVelocity() {
-   // return Math.abs(getVelocity() - targetVelocity) <= 0.02 * targetVelocity;
-      return Math.abs(getVelocity() - targetVelocity) <= TARGET_VELOCITY_THRESHOLD;
+    return Math.abs(getVelocity() - SPEAKER_RPM) <= TARGET_VELOCITY_THRESHOLD;
   }
 
   public boolean isReadyToShoot() {
@@ -145,7 +144,7 @@ public class Shooter extends SubsystemBase {
       // Record the target velocity for atTargetRPM()
       targetVelocity = velocity;
       // If the target velocity is outside the valid range, run at steady rate.
-      double setVelocity = velocity != NULL_RPM && velocity <= MAX_RPM ? velocity : STEADY_RPM;
+      double setVelocity = velocity != NULL_RPM && velocity <= MAX_RPM ? velocity : SPEAKER_RPM;
       shooterFront.getPIDController().setReference(setVelocity, ControlType.kVelocity);
     }
   }

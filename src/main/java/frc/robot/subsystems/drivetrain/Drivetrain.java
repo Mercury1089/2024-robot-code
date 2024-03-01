@@ -76,8 +76,8 @@ public class Drivetrain extends SubsystemBase {
   private ObjectDetectionCamera objectDetectionCam;
   private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
-  private final double THRESHOLD_DEGREES = 1.0;
-  private final double THRESHOLD_SPEED = 0.001;
+  private final double THRESHOLD_DEGREES = 5.0;
+  private final double THRESHOLD_SPEED = 1.0;
     
   // 2024 robot
   private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)

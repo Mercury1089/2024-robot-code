@@ -29,6 +29,14 @@ public class TargetUtils {
         return distance;
     }
 
+    public static double getDistanceToSpeaker(AprilTagCamera photonCam, Pose2d robotPose) {
+        if (DriverStation.getAlliance().get() == Alliance.Blue) {
+            return getDistanceToFieldPos(photonCam, robotPose, APRILTAGS.MIDDLE_BLUE_SPEAKER);
+        } else {
+            return getDistanceToFieldPos(photonCam, robotPose, APRILTAGS.MIDDLE_RED_SPEAKER);
+        }
+    }
+
     // TODO: Try this and compare getTargetHeadingToFieldPosition. targetRotation man need to be added to robotPose.getRoation()
     // Following is based off https://www.chiefdelphi.com/t/is-there-a-builtin-function-to-find-the-angle-needed-to-get-one-pose2d-to-face-another-pose2d/455972
     public static double getTargetHeadingToAprilTag(AprilTagCamera photonCam, Pose2d robotPose, int tagId) {

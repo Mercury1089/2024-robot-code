@@ -131,7 +131,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getDistanceToSpeaker() {
-    return Units.metersToInches(TargetUtils.getDistanceToFieldPos(drivetrain.getAprilTagCamera(), drivetrain.getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER));
+    return Units.metersToInches(TargetUtils.getDistanceToSpeaker(drivetrain.getAprilTagCamera(), drivetrain.getPose()));
   }
   
   public double getError() {
@@ -174,10 +174,9 @@ public class Arm extends SubsystemBase {
   
 
   public enum ArmPosition {
-    AMP(0.0),
-    HOME(0.0),
-    PICKUP_FLOOR(0.0),
-    PICKUP_SOURCE(0.0);
+    AMP(ARM_SOFT_LIMIT_FWD),
+    HOME(ARM_SOFT_LIMIT_BKW),
+    PICKUP_FLOOR(ARM_SOFT_LIMIT_BKW),;
   
     
     public final double degreePos;
