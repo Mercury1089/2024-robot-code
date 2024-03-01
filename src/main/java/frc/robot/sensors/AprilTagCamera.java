@@ -29,12 +29,12 @@ public class AprilTagCamera extends PhotonCamera {
     // AprilTagCamera 3d Pose on robot
     // Uses coordinates described here: https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/coordinate-systems.html#camera-coordinate-frame
     private static final String DEFAULT_CAM_NAME = "AprilTagCamera";
-    private static final double DEFAULT_CAM_X = Units.inchesToMeters(14.75); // 14.75in behind center - TODO: NEGATE THIS??
+    private static final double DEFAULT_CAM_X = Units.inchesToMeters(14.75); // 14.75in behind center
     private static final double DEFAULT_CAM_Y = 0.0; // centered in robot Y
     private static final double DEFAULT_CAM_Z = Units.inchesToMeters(21.25); // 21.25in up from center
 
     private static final double DEFAULT_CAM_ROTATION = Rotation2d.fromDegrees(180).getRadians(); // rotation relative to robot front (radians)
-    private static final double DEFAULT_CAM_TILT = Rotation2d.fromDegrees(20).getRadians(); // tilt relative to floor (raians) - TODO: NEGATE THIS??
+    private static final double DEFAULT_CAM_TILT = Rotation2d.fromDegrees(20).getRadians(); // tilt relative to floor (raians)
 
     private static final double TARGET_HEIGHT = 0.36; // may need to change - DO WE NEED THIS?
     private static final double CAMERA_HEIGHT = DEFAULT_CAM_Z; // height on robot (meters) - DO WE NEED THIS?
