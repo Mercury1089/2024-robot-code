@@ -42,8 +42,12 @@ public class RobotModeLEDs extends SubsystemBase {
 
   public enum LEDState {
     OFF(0.99, RobotMode.NONE), 
-    PICKUP(0.05, RobotMode.NOTE),
-    SHOOT(0.69, RobotMode.SHOOT); 
+    PICKUP(0.05, RobotMode.NOTE), // intake wants note
+    DRIVEWITHNOTE(0.99, RobotMode.DRIVEWITHNOTE), // intake has note
+    CLIMB(0.99, RobotMode.CLIMB),
+    AMP(0.99, RobotMode.AMP),
+    SHOOT(0.99, RobotMode.SHOOT),
+    READYTOSHOOT(0.69, RobotMode.READYTOSHOOT);
     // CELEBRATION(0.05, GamePiece.NONE);
 
     public final double colorValue;
@@ -58,8 +62,11 @@ public class RobotModeLEDs extends SubsystemBase {
   public enum RobotMode {
     NONE,
     NOTE,
+    CLIMB,
+    AMP,
     SHOOT,
-    DRIVE
+    READYTOSHOOT,
+    DRIVEWITHNOTE
   }
 
   @Override

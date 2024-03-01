@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
+import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.RobotModeLEDs;
 // import frc.robot.subsystems.arm.Arm;
@@ -248,21 +248,21 @@ public class Autons {
         return new SequentialCommandGroup(
             setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
 
-            firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
+            firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
             new ParallelCommandGroup(
                 drivetrain.goToNote(),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
             ).until(() -> intake.hasNote()),
             setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
 
-            secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
+            secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
             new ParallelCommandGroup(
                 drivetrain.goToNote(),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
             ).until(() -> intake.hasNote()),
             setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
 
-            thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
+            thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
             new ParallelCommandGroup(
                 drivetrain.goToNote(),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
@@ -273,7 +273,7 @@ public class Autons {
 
     public Command setUpToShoot() {
         return new ParallelCommandGroup(
-          new RunCommand(() -> arm.setPosition(arm.getPosToTarget()), arm),
+          new RunCommand(() -> arm.setPosition(arm.getPosToTarget(TargetUtils.getDistanceToFieldPos(drivetrain.getAprilTagCamera(), drivetrain.getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER))), arm),
           new RunCommand(() -> shooter.setVelocity(shooter.getVelocityToTarget()), shooter),
           rotateToTarget()
         );

@@ -20,6 +20,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -32,9 +33,9 @@ public class AprilTagCamera extends PhotonCamera {
 
     //TODO: UPDATE CAM SETTINGS FOR NEW ROBOT
     private static final String DEFAULT_CAM_NAME = "AprilTagCamera";
-    private static final double DEFAULT_CAM_X = Units.inchesToMeters(10.5); // .5m forward of center
+    private static final double DEFAULT_CAM_X = Units.inchesToMeters(14.75); // .5m forward of center
     private static final double DEFAULT_CAM_Y = 0.0; // centered in robot Y
-    private static final double DEFAULT_CAM_Z = Units.inchesToMeters(52.25); // 52in up from center
+    private static final double DEFAULT_CAM_Z = Units.inchesToMeters(21.25); // 52in up from center
     private final double CAMERA_HEIGHT = DEFAULT_CAM_Z; // height on robot (meters)
     private final double TARGET_HEIGHT = 0.36; // may need to change 
     private final int CAMERA_PITCH = 0; // tilt of our camera (radians)
@@ -50,7 +51,7 @@ public class AprilTagCamera extends PhotonCamera {
             fieldLayout = null;
         }
         Transform3d robotToCam = new Transform3d(
-            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0, Math.PI, 0)
+            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(Rotation2d.fromDegrees(20).getRadians(), Math.PI, 0)
         );
         // Uncomment the following to silence missing camera errors
         // PhotonCamera.setVersionCheckEnabled(false);

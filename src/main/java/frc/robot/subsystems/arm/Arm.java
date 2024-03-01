@@ -15,6 +15,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -26,15 +28,18 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
+import frc.robot.util.TargetUtils;
 
 
 public class Arm extends SubsystemBase {
@@ -43,9 +48,13 @@ public class Arm extends SubsystemBase {
     ARM_PID_SLOT = 0;
 
   private static final double 
-    ARM_NORMAL_P_VAL = 1.0 / 180.0,
+    ARM_NORMAL_P_VAL = 1.0 / 25.0,
     ARM_NORMAL_I_VAL = 0.0,
     ARM_NORMAL_D_VAL = 0.0;
+
+  private static final float ARM_SOFT_LIMIT_FWD = (float) 146;
+
+  private static final float ARM_SOFT_LIMIT_BKW = (float) 48.5;
 
   private final double 
     NOMINAL_OUTPUT_FORWARD = 0.01, //0.02,
@@ -65,7 +74,8 @@ public class Arm extends SubsystemBase {
   public Arm(Drivetrain drivetrain) {
     arm = new CANSparkFlex(CAN.ARM_SPARKMAX, MotorType.kBrushless);
     arm.restoreFactoryDefaults();
-    arm.setInverted(true);
+    arm.setInverted(false);
+    arm.setIdleMode(IdleMode.kBrake);
     armPIDController = arm.getPIDController();
     // armRelativeEncoder = arm.getEncoder();
     armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
@@ -78,9 +88,16 @@ public class Arm extends SubsystemBase {
     armPIDController.setPositionPIDWrappingEnabled(false);
     // armPIDController.setOutputRange(NOMINAL_OUTPUT_FORWARD, PEAK_OUTPUT_FORWARD);
 
+    arm.enableSoftLimit(SoftLimitDirection.kForward, true);
+    arm.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    arm.setSoftLimit(SoftLimitDirection.kForward, ARM_SOFT_LIMIT_FWD);
+    arm.setSoftLimit(SoftLimitDirection.kReverse, ARM_SOFT_LIMIT_BKW);
+
     armPIDController.setP(ARM_NORMAL_P_VAL);
     armPIDController.setI(ARM_NORMAL_I_VAL);
     armPIDController.setD(ARM_NORMAL_D_VAL);
+
+    SmartDashboard.putNumber("Arm/Position", getArmPosition());
   }
   
   public void resetEncoders() {
@@ -88,27 +105,37 @@ public class Arm extends SubsystemBase {
   }
 
   public void setSpeed(Supplier<Double> speedSupplier) {
-    arm.set(-(speedSupplier.get() * 0.5));
+    arm.set((speedSupplier.get() * 0.5));
   }
 
   public void setPosition(ArmPosition pos) {
     setPosition(pos.degreePos);
   }
 
+  public void changePos() {
+    setPosition(SmartDashboard.getNumber("Arm/Position", 110.0));
+  }
+
   public void setPosition(double pos) {
+    if (pos > ARM_SOFT_LIMIT_FWD) {
+      pos = ARM_SOFT_LIMIT_FWD;
+    } else if (pos < ARM_SOFT_LIMIT_BKW) {
+      pos = ARM_SOFT_LIMIT_BKW;
+    }
+
     armPIDController.setReference(pos, CANSparkMax.ControlType.kPosition);
   }
 
-  public double getPosToTarget() {
-    return 0.0;
+  public double getPosToTarget(double distance) {
+    return 37.1 + (0.633 * distance) - (0.00207 * (distance * distance));
   }
 
-  // public double getDistanceToSpeaker() {
-  //   return drivetrain.getDistanceToFieldPos(FieldPosition.SPEAKER);
-  // }
+  public double getDistanceToSpeaker() {
+    return Units.metersToInches(TargetUtils.getDistanceToFieldPos(drivetrain.getAprilTagCamera(), drivetrain.getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER));
+  }
   
   public double getError() {
-    return Math.abs(getArmPosition() - getPosToTarget());
+    return Math.abs(getArmPosition() - getPosToTarget(getDistanceToSpeaker()));
   }
 
   public boolean isFinishedMoving() {
@@ -133,6 +160,7 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("arm encoder", getArmPosition());
     SmartDashboard.putNumber("arm error", getError());
     SmartDashboard.putBoolean("arm isFinished", isFinishedMoving());
+    SmartDashboard.putNumber("getPos", getPosToTarget(getDistanceToSpeaker()));
 
     // configPID(
     //   SmartDashboard.getNumber("ARM P", ARM_LOWER_LIMIT),

@@ -79,13 +79,13 @@ public class Drivetrain extends SubsystemBase {
   private final double THRESHOLD_DEGREES = 1.0;
   private final double THRESHOLD_SPEED = 0.001;
     
-  //2024 robot
-  // private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
-  // private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
+  // 2024 robot
+  private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
+  private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
 
-  // bolt
-  private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
-  private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
+  // // bolt
+  // private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
+  // private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
 
   public final double ROLL_WHEN_LEVEL = -1.75;
 
@@ -446,6 +446,10 @@ public class Drivetrain extends SubsystemBase {
     
     Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
     if (result.isPresent()) {
+      Pose3d estimatedPose = result.get().estimatedPose;
+      SmartDashboard.putNumber("Cam/Yaw", estimatedPose.getRotation().getZ());
+      SmartDashboard.putNumber("Cam/Pitch", estimatedPose.getRotation().getY());
+      SmartDashboard.putNumber("Cam/Roll", estimatedPose.getRotation().getX());
       odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
     }
   
@@ -488,6 +492,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Drive Angle", getPigeonRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));
+    SmartDashboard.putNumber("Drivetrain/distanceToSpeaker", Units.metersToInches(TargetUtils.getDistanceToFieldPos(photonCam, getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER)));
     SmartDashboard.putNumber("Drivetrain/New Func (angle to red)", TargetUtils.getTargetHeadingToAprilTag(photonCam, getPose(), APRILTAGS.MIDDLE_RED_SPEAKER));
     SmartDashboard.putNumber("Drivetrain/Angle Offset", 0);
     SmartDashboard.putNumber("Drivetrain/Distance to closest note", objectDetectionCam.getDistanceToTarget());
