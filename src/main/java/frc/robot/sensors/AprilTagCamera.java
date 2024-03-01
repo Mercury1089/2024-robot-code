@@ -26,6 +26,8 @@ import edu.wpi.first.math.util.Units;
 /** Wrapper for PhotonCamera class */
 public class AprilTagCamera extends PhotonCamera {
 
+    // AprilTagCamera 3d Pose on robot
+    // Uses coordinates described here: https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/coordinate-systems.html#camera-coordinate-frame
     private static final String DEFAULT_CAM_NAME = "AprilTagCamera";
     private static final double DEFAULT_CAM_X = Units.inchesToMeters(14.75); // 14.75in behind center - TODO: NEGATE THIS??
     private static final double DEFAULT_CAM_Y = 0.0; // centered in robot Y
