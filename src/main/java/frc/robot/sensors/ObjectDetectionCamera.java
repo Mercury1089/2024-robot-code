@@ -7,16 +7,19 @@ package frc.robot.sensors;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /** Wrapper for PhotonCamera class */
 public class ObjectDetectionCamera extends PhotonCamera {
 
-    //TODO: UPDATE CAM SETTINGS FOR NEW ROBOT
+    // Camera angles for calculating target distance.
+    // Used for https://javadocs.photonvision.org/org/photonvision/PhotonUtils.html#calculateDistanceToTargetMeters(double,double,double,double)
     private static final String DEFAULT_CAM_NAME = "ObjectDetectionCam";
-    private final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(18.0); // height on robot (meters)
+    private final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(18.0); // height on robot (meters) TODO: CHECK THIS
+    private final double CAMERA_PITCH_RADIANS = Rotation2d.fromDegrees(-25.0).getRadians(); // tilt of our camera (radians)
     private final double TARGET_HEIGHT_METERS = 0.0; // may need to change 
-    private final double CAMERA_PITCH_RADIANS = -45.0 * (Math.PI / 180.0); // tilt of our camera (radians)
 
     public ObjectDetectionCamera() {
         super(DEFAULT_CAM_NAME);

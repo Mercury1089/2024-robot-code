@@ -144,6 +144,17 @@ public class RobotContainer {
     //   )
     // ));
 
+    // gamepadLT.onTrue(
+    //   new PIDCommand(
+    //       drivetrain.getRotationalController(),
+    //       () -> drivetrain.getPose().getRotation().getDegrees(), 
+    //       () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()), 
+    //       (angularSpeed) -> drivetrain.joyDrive(
+    //         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //         -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
+    //       angularSpeed)
+    // ));
+
 
     Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote());
 
