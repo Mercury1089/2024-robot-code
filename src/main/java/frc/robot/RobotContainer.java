@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.DS_USB;
 import frc.robot.Constants.JOYSTICK_BUTTONS;
 import frc.robot.Constants.SWERVE;
 import frc.robot.auton.Autons;
 import frc.robot.subsystems.RobotModeLEDs;
-import frc.robot.subsystems.RobotModeLEDs.LEDState;
-import frc.robot.subsystems.RobotModeLEDs.RobotMode;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Shooter;
@@ -25,16 +22,9 @@ import frc.robot.util.TargetUtils;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import javax.swing.text.DefaultFormatterFactory;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;

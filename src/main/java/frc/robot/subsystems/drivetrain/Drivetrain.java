@@ -4,33 +4,23 @@
 
 package frc.robot.subsystems.drivetrain;
 
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
-import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -44,8 +34,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
@@ -53,7 +41,6 @@ import frc.robot.Constants.SWERVE;
 import frc.robot.auton.Autons;
 import frc.robot.auton.KnownLocations;
 import frc.robot.sensors.AprilTagCamera;
-import frc.robot.sensors.Limelight;
 import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.util.PathUtils;
 import frc.robot.util.SwerveUtils;
@@ -62,8 +49,7 @@ import frc.robot.util.TargetUtils;
 public class Drivetrain extends SubsystemBase {
 
   private SwerveModule frontLeftModule, frontRightModule, backLeftModule, backRightModule;
-  private WPI_PigeonIMU pigeon;
-  // private WPI_Pigeon2 pigeon;
+  private Pigeon2 pigeon;
   private SwerveDrivePoseEstimator odometry;
   private SwerveDriveKinematics swerveKinematics;
   private AprilTagCamera photonCam;
@@ -109,10 +95,9 @@ public class Drivetrain extends SubsystemBase {
     backRightModule = new SwerveModule(CAN.DRIVING_BACK_RIGHT, CAN.TURNING_BACK_RIGHT, Math.PI / 2);
 
     //configure gyro
-    pigeon = new WPI_PigeonIMU(CAN.PIGEON_DRIVETRAIN);
-    // pigeon = new WPI_Pigeon2(CAN.PIGEON_DRIVETRAIN);
-    pigeon.configFactoryDefault();
-    pigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
+    pigeon = new Pigeon2(CAN.PIGEON_DRIVETRAIN);
+    pigeon.getConfigurator().apply(new Pigeon2Configuration());
+    pigeon.getYaw().setUpdateFrequency(10);
 
     rotationPIDController = new PIDController(P, I, D);
     rotationPIDController.enableContinuousInput(-180, 180);
@@ -177,15 +162,6 @@ public class Drivetrain extends SubsystemBase {
 
   public void resetYaw() {
     pigeon.setYaw(0);
-  }
-
-  //TODO: UPDATE IF NEEDED
-  // public void calibratePigeon() {
-  //   pigeon.enterCalibrationMode(PigeonIMU.CalibrationMode.BootTareGyroAccel);
-  // }
-
-  public double getRoll() {
-    return pigeon.getRoll();
   }
 
   public Pose2d getInitialPose() {
