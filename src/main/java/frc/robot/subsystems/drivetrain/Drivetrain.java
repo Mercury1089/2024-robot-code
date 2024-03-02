@@ -402,7 +402,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isNotMoving() {
-    return getXSpeeds() < THRESHOLD_SPEED && getYSpeeds() < THRESHOLD_SPEED;
+    return Math.abs(getXSpeeds()) < THRESHOLD_SPEED && Math.abs(getYSpeeds()) < THRESHOLD_SPEED;
   }
 
   

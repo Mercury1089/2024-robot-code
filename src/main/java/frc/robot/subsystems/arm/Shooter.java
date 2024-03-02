@@ -27,7 +27,7 @@ import frc.robot.util.PIDGain;
 public class Shooter extends SubsystemBase {
 
   public static final double NOMINAL_OUT = 0.0, PEAK_OUT = 1.0;
-  public static final double MAX_RPM = 7000.0, SPEAKER_RPM = 4000.0, AMP_RPM = 1000.0, NULL_RPM = -1.0;
+  public static final double MAX_RPM = 7000.0, SPEAKER_RPM = 4000.0, STEADY_RPM = 500.0, AMP_RPM = 1000.0, NULL_RPM = -1.0;
   public static final double MIN_DISTANCE = 6.7, MAX_DISTANCE = 17.0;
   //public static final double MIN_DISTANCE = 2.0, MAX_DISTANCE = 20.0;
   public final int SHOOTER_BREAKBEAM = BREAKBEAM.SHOOTER_BREAKBEAM;
