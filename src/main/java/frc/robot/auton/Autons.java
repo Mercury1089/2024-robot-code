@@ -1,9 +1,11 @@
 package frc.robot.auton;
 
+import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.ctre.phoenix6.signals.Led1OffColorValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -78,12 +80,13 @@ public class Autons {
     /**
      * made by rohan no thanks to owen :(
      */
-    public Autons(Drivetrain drivetrain, Intake intake, Shooter shooter, Arm arm) {
+    public Autons(Drivetrain drivetrain, Intake intake, Shooter shooter, Arm arm, RobotModeLEDs leds) {
 
         this.drivetrain = drivetrain;
         this.arm = arm;
         this.intake = intake;
         this.shooter = shooter;
+        this.LEDs = leds;
 
         Optional<Alliance> allianceColor = DriverStation.getAlliance();
         this.allianceColor = allianceColor.isPresent() ? allianceColor.get() : Alliance.Blue;
@@ -204,7 +207,8 @@ public class Autons {
             finalPose = knownLocations.WING_NOTE_BOTTOM;
         }
 
-        path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+        // path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
+        path1 = generateSwerveTrajectory(currentSelectedPose, new ArrayList<>(), knownLocations.LEAVE);
 
         secondPathPose = finalPose == knownLocations.WING_NOTE_TOP ? knownLocations.WING_NOTE_TOP : knownLocations.WING_NOTE_BOTTOM;
         waypoints = new ArrayList<Pose2d>();
@@ -239,51 +243,80 @@ public class Autons {
         path3 = generateSwerveTrajectory(thirdPathPose, waypoints, finalPose);
         
         drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path1.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
-        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path2.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj2");
-        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path3.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj3");
+        // drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path2.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj2");
+        // drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path3.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj3");
         Command firstSwerveCommand = AutoBuilder.followPath(path1);
-        Command secondSwerveCommand = AutoBuilder.followPath(path2);
-        Command thirdSwerveCommand = AutoBuilder.followPath(path3);
-
-        return new SequentialCommandGroup(
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-            firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-            new ParallelCommandGroup(
-                drivetrain.goToNote(),
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-            ).until(() -> intake.hasNote()),
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-            secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-            new ParallelCommandGroup(
-                drivetrain.goToNote(),
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-            ).until(() -> intake.hasNote()),
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-            thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-            new ParallelCommandGroup(
-                drivetrain.goToNote(),
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-            ).until(() -> intake.hasNote()),
-            setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote())
-        );
+        // Command secondSwerveCommand = AutoBuilder.followPath(path2);
+        // Command thirdSwerveCommand = AutoBuilder.followPath(path3);
 
         // return new SequentialCommandGroup(
-        //     firstSwerveCommand,
-        //     secondSwerveCommand,
-        //     thirdSwerveCommand
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
+
+        //     firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
+        //     new ParallelCommandGroup(
+        //         drivetrain.goToNote(),
+        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+        //     ).until(() -> intake.hasNote()),
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
+
+        //     secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
+        //     new ParallelCommandGroup(
+        //         drivetrain.goToNote(),
+        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+        //     ).until(() -> intake.hasNote()),
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
+
+        //     thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
+        //     new ParallelCommandGroup(
+        //         drivetrain.goToNote(),
+        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+        //     ).until(() -> intake.hasNote()),
+        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote())
         // );
+        
+        return new SequentialCommandGroup(
+            setUpToShoot().until(() -> isReadyToShoot()),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
+            new SequentialCommandGroup(
+                new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm).until(() -> arm.isAtPosition(ArmPosition.HOME)),
+                firstSwerveCommand // .until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
+                // new ParallelCommandGroup(
+                //     drivetrain.goToNote(),
+                //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+                // ).until(() -> intake.hasNote())
+            )
+            //setUpToShoot().until(() -> isReadyToShoot()),
+            // new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote())  
+        );
+    }
+
+    public boolean isReadyToShoot() {
+        return intake.hasNote() && 
+        drivetrain.isPointedAtTarget() && 
+        drivetrain.isNotMoving() &&
+        shooter.isAtTargetVelocity() &&
+        arm.isFinishedMoving() &&
+        drivetrain.inShootingRange() &&
+        LEDs.isAutoShootEnabled();
     }
 
     public Command setUpToShoot() {
         return new ParallelCommandGroup(
-          new RunCommand(() -> arm.setPosition(arm.getPosToTarget(TargetUtils.getDistanceToFieldPos(drivetrain.getAprilTagCamera(), drivetrain.getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER))), arm),
-          new RunCommand(() -> shooter.setVelocity(shooter.getVelocityToTarget()), shooter),
-          rotateToTarget()
-        );
+            new RunCommand(() -> LEDs.enableAutoShoot(), LEDs),
+            new PIDCommand(
+              drivetrain.getRotationalController(),
+              () -> drivetrain.getPose().getRotation().getDegrees(), 
+              () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
+              (angularSpeed) -> drivetrain.joyDrive(
+                0.0,
+                0.0,
+              angularSpeed),
+              drivetrain),
+            new RunCommand(() -> shooter.setVelocity(Shooter.SPEAKER_RPM), shooter),
+            new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+          );
     }
+
     public PIDCommand rotateToTarget() {
         return new PIDCommand(
             drivetrain.getRotationalController(),

@@ -59,7 +59,7 @@ public class Arm extends SubsystemBase {
     PEAK_OUTPUT_REVERSE = -0.6;
 
   public final double GEAR_RATIO = 125.0 / 1.0;
-  public final double THRESHOLD_DEGREES = 2.0;
+  public final double THRESHOLD_DEGREES = 1.0;
 
   
   private CANSparkFlex arm;

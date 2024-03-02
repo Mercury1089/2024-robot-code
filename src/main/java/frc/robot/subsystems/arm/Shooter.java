@@ -28,10 +28,11 @@ public class Shooter extends SubsystemBase {
 
   public static final double NOMINAL_OUT = 0.0, PEAK_OUT = 1.0;
   public static final double MAX_RPM = 7000.0, SPEAKER_RPM = 4000.0, STEADY_RPM = 500.0, AMP_RPM = 1000.0, NULL_RPM = -1.0;
+  public static final double K_P = 0.00024, K_I = 0.00000001, K_D = 0.01, K_F = 0.0001625;
   public static final double MIN_DISTANCE = 6.7, MAX_DISTANCE = 17.0;
   //public static final double MIN_DISTANCE = 2.0, MAX_DISTANCE = 20.0;
   public final int SHOOTER_BREAKBEAM = BREAKBEAM.SHOOTER_BREAKBEAM;
-  private final double TARGET_VELOCITY_THRESHOLD = 50.0; // within a +- 50 rpm range to shoot
+  private final double TARGET_VELOCITY_THRESHOLD = 100.0; // within a +- 50 rpm range to shoot
   private final double MAX_VOLTAGE = 11.5;
 
   private CANSparkFlex shooterFront;
@@ -41,7 +42,7 @@ public class Shooter extends SubsystemBase {
   private boolean autoShootEnable;
   private double smartDashboardTargetVelocity = 0.0;
   private boolean useSpeed, setPID;
-  private double smartdashkP = 0.00024, smartdashkF = 0.0002016, smartdashkI = 0.00000001, smartDashkD = 0.01;
+  private double smartdashkP = K_P, smartdashkF = K_F, smartdashkI = K_I, smartDashkD = K_D;
   private int shootCount = 0;
   private Drivetrain drivetrain;
   
@@ -68,7 +69,7 @@ public class Shooter extends SubsystemBase {
     stopShooter();
     targetVelocity = 0.0;
     // velocityGains = new PIDGain(1e-5, 2e-7, 1e-5, 2.6e-4);
-    velocityGains = new PIDGain(0.00024, 0.00000001, 0.01, 0.0002016);
+    velocityGains = new PIDGain(K_P, K_I, K_D, K_F);
   
     setPIDGain(SHOOTER_PID_SLOTS.VELOCITY_GAINS.getValue(), velocityGains);
 
@@ -100,6 +101,7 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Shooter/Velocity", this.getVelocity());
     SmartDashboard.putBoolean("Shooter/hasNote", hasNote());
+    SmartDashboard.putBoolean("Shooter/isAtVelocity", isAtTargetVelocity());
   }
 
   /**

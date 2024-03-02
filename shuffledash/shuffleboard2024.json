@@ -45,19 +45,6 @@
               "_showGlyph": false
             }
           },
-          "8,1": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/arm rev limit",
-              "_title": "/SmartDashboard/arm rev limit",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "2,0": {
             "size": [
               2,
@@ -84,59 +71,7 @@
               "_showGlyph": false
             }
           },
-          "10,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Robot Angle",
-              "_title": "/SmartDashboard/Robot Angle",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,1": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Angle to note",
-              "_title": "/SmartDashboard/Angle to note",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,0": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Distance to closest note",
-              "_title": "SmartDashboard/Distance to closest note",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "10,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///photonvision/ObjectDetectionCam/targetYaw",
-              "_title": "/photonvision/ObjectDetectionCam/targetYaw",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "8,2": {
+          "8,3": {
             "size": [
               3,
               3
@@ -159,22 +94,7 @@
           },
           "6,0": {
             "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Shooter/hasNote",
-              "_title": "/SmartDashboard/Shooter/hasNote",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "8,0": {
-            "size": [
-              2,
+              1,
               1
             ],
             "content": {
@@ -187,9 +107,9 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "11,2": {
+          "7,0": {
             "size": [
-              2,
+              1,
               1
             ],
             "content": {
@@ -217,7 +137,7 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "8,5": {
+          "11,5": {
             "size": [
               2,
               1
@@ -230,7 +150,7 @@
               "_showGlyph": false
             }
           },
-          "10,5": {
+          "11,4": {
             "size": [
               2,
               1
@@ -241,6 +161,94 @@
               "_title": "SmartDashboard/Drivetrain/CurrentPose Y",
               "_glyph": 148,
               "_showGlyph": false
+            }
+          },
+          "8,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Shooter/isAtVelocity",
+              "_title": "/SmartDashboard/Shooter/isAtVelocity",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "9,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drivetrain/isNotMoving",
+              "_title": "/SmartDashboard/Drivetrain/isNotMoving",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "10,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drivetrain/pointedAtTarget",
+              "_title": "/SmartDashboard/Drivetrain/pointedAtTarget",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "11,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Shooter/Velocity",
+              "_title": "/SmartDashboard/Shooter/Velocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Shooter/hasNote",
+              "_title": "/SmartDashboard/Shooter/hasNote",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "8,1": {
+            "size": [
+              5,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/LEDs/enableAutoShoot",
+              "_title": "/SmartDashboard/LEDs/enableAutoShoot",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           }
         }

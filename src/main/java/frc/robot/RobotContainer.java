@@ -9,6 +9,7 @@ import frc.robot.Constants.JOYSTICK_BUTTONS;
 import frc.robot.Constants.SWERVE;
 import frc.robot.auton.Autons;
 import frc.robot.subsystems.RobotModeLEDs;
+import frc.robot.subsystems.RobotModeLEDs.LEDState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Shooter;
@@ -19,10 +20,16 @@ import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 import frc.robot.util.MercMath;
 import frc.robot.util.TargetUtils;
 
+import java.sql.Driver;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import javax.swing.text.AbstractDocument.LeafElement;
+
+import com.ctre.phoenix6.signals.Led1OffColorValue;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
@@ -75,7 +82,7 @@ public class RobotContainer {
     gamepadHID = new GenericHID(DS_USB.GAMEPAD);
     configureBindings();
 
-    // LEDs = new RobotModeLEDs();
+    LEDs = new RobotModeLEDs();
     drivetrain = new Drivetrain();
     drivetrain.setDefaultCommand(new RunCommand(
       () -> drivetrain.joyDrive(
@@ -85,6 +92,8 @@ public class RobotContainer {
     , drivetrain));
     drivetrain.resetGyro();
     // LEDs.enableAutoShoot();
+    //LEDs.lightUp(LEDState.OFF);
+    LEDs.disableAutoShoot();
 
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
@@ -96,20 +105,24 @@ public class RobotContainer {
     shooter = new Shooter(drivetrain);
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
-    shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(0.0), shooter));
+    shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
     
-    auton = new Autons(drivetrain, intake, shooter, arm);
+    auton = new Autons(drivetrain, intake, shooter, arm, LEDs);
 
     Trigger intakeHasNote = new Trigger(() -> intake.hasNote());
-    intakeHasNote.onTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
+    intakeHasNote.onTrue(new ParallelCommandGroup(
+      new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
+      // new RunCommand(() -> LEDs.lightUp(LEDState.HASNOTE), LEDs)
+    ));
 
-    Trigger noNotePresent = new Trigger(() -> !intake.hasNote() && !shooter.hasNote());
+    Trigger noNotePresent = new Trigger(() -> !intake.hasNote() && !shooter.hasNote() && DriverStation.isTeleop());
     
     noNotePresent.onTrue(
       new ParallelCommandGroup(
         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
+        new RunCommand(() -> shooter.stopShooter(), shooter)
+        // new RunCommand(() -> LEDs.lightUp(LEDState.OFF), LEDs)
       )
     );
 
@@ -149,7 +162,7 @@ public class RobotContainer {
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
 
-    Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && arm.isAtPosition(ArmPosition.PICKUP_FLOOR));
+    Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && arm.isAtPosition(ArmPosition.PICKUP_FLOOR) && DriverStation.isTeleop());
     noteInRange.onTrue(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 1.0)));
     noteInRange.onFalse(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 0.0)));
 
@@ -175,15 +188,16 @@ public class RobotContainer {
           (angularSpeed) -> drivetrain.joyDrive(
             -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
             -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),
-          angularSpeed,
-          false),
+          angularSpeed),
           drivetrain),
         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
       )
     );
 
+    left3.onTrue(new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs));
+    right3.onTrue(new InstantCommand(() -> LEDs.disableAutoShoot(), LEDs));
 
-    Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote());
+    Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote() && LEDs.isAutoShootEnabled() && DriverStation.isTeleop());
 
     setUpToShoot.whileTrue(
       new ParallelCommandGroup(
@@ -212,16 +226,11 @@ public class RobotContainer {
 
     
     Trigger shootTrigger = new Trigger(
-      () -> intake.hasNote() && 
-      drivetrain.isPointedAtTarget() && 
-      drivetrain.isNotMoving() &&
-      shooter.isAtTargetVelocity() &&
-      arm.isFinishedMoving() &&
-      drivetrain.inShootingRange());
-      // LEDs.isAutoShootEnabled());
+      () -> auton.isReadyToShoot() && 
+      DriverStation.isTeleop());
 
     shootTrigger.onTrue(new SequentialCommandGroup(
-      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT)).until(() -> !shooter.hasNote() && !intake.hasNote()),
+      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
       new ParallelCommandGroup(
         // new RunCommand(() -> LEDs.lightUp(LEDState.PICKUP), LEDs),
         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)

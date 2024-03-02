@@ -63,7 +63,7 @@ public class Drivetrain extends SubsystemBase {
   private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
   private final double THRESHOLD_DEGREES = 5.0;
-  private final double THRESHOLD_SPEED = 1.0;
+  private final double THRESHOLD_SPEED = 0.5;
     
   // 2024 robot
   private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
@@ -465,6 +465,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drivetrain/CurrentPose Y", getPose().getY());
     SmartDashboard.putBoolean("Drivetrain/inShootingRange", inShootingRange());
     SmartDashboard.putBoolean("Drivetrain/inStageArea", inStageArea());
+    SmartDashboard.putBoolean("Drivetrain/pointedAtTarget", isPointedAtTarget());
+    SmartDashboard.putBoolean("Drivetrain/isNotMoving", isNotMoving());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Drive Angle", getPigeonRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));

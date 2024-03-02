@@ -43,7 +43,8 @@ public class KnownLocations {
         CENTER_NOTE_2,
         CENTER_NOTE_3,
         CENTER_NOTE_4,
-        CENTER_NOTE_5;
+        CENTER_NOTE_5,
+        LEAVE;
     
     // //field -> SUBWOOFER_1 points w/NOTE_WING_1
     // public final Pose2d
@@ -60,6 +61,8 @@ public class KnownLocations {
             WING_NOTE_TOP = PathPointInch(114.261, 276, 0);
             WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
             WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
+
+            LEAVE = PathPointInch(114.261, 162 - 50, 0);
                                     
             INTERMEDIARY_NOTE_TOP = PathPointInch(84.261, 276, 0);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261, 219, 0);
@@ -81,6 +84,8 @@ public class KnownLocations {
             WING_NOTE_TOP = PathPointInch(537.464, 276, 180);
             WING_NOTE_MIDDLE = PathPointInch(537.464, 219, 180);
             WING_NOTE_BOTTOM = PathPointInch(537.464, 162, 180);
+
+            LEAVE = PathPointInch(537.464, 162 - 50, 180);
 
             INTERMEDIARY_NOTE_TOP = PathPointInch(567.464, 276, 180);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(567.464, 219, 180);

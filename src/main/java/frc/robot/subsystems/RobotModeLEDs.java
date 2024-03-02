@@ -47,7 +47,8 @@ public class RobotModeLEDs extends SubsystemBase {
     CLIMB(0.99, RobotMode.CLIMB),
     AMP(0.99, RobotMode.AMP),
     SHOOT(0.99, RobotMode.SHOOT),
-    READYTOSHOOT(0.69, RobotMode.READYTOSHOOT);
+    READYTOSHOOT(0.69, RobotMode.READYTOSHOOT),
+    HASNOTE(0.77, RobotMode.SHOOT);
     // CELEBRATION(0.05, GamePiece.NONE);
 
     public final double colorValue;
@@ -72,5 +73,12 @@ public class RobotModeLEDs extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putString("LED Color", robotMode.toString());
+    SmartDashboard.putBoolean("LEDs/enableAutoShoot", isAutoShootEnabled());
+  }
+
+  public void disableAutoShoot() {
+    this.robotMode = LEDState.OFF;
+
+    blinkin.set(robotMode.colorValue);
   }
 }
