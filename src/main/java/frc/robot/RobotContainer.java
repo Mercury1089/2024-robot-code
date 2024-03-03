@@ -82,7 +82,6 @@ public class RobotContainer {
     gamepadHID = new GenericHID(DS_USB.GAMEPAD);
     configureBindings();
 
-    LEDs = new RobotModeLEDs();
     drivetrain = new Drivetrain();
     drivetrain.setDefaultCommand(new RunCommand(
       () -> drivetrain.joyDrive(
@@ -101,6 +100,7 @@ public class RobotContainer {
     intake = new Intake();
     intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
     
+    LEDs = new RobotModeLEDs(intake);
 
     shooter = new Shooter(drivetrain);
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
@@ -179,7 +179,7 @@ public class RobotContainer {
     ));
 
     // MAKE SURE THIS WORKS
-    gamepadLT.whileTrue(
+    gamepadLT.and(noNotePresent).whileTrue(
       new ParallelCommandGroup(
         new PIDCommand(
           drivetrain.getRotationalController(),

@@ -7,16 +7,18 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.arm.Intake;
 
 public class RobotModeLEDs extends SubsystemBase {
 
   private Spark blinkin;
-  private LEDState robotMode;
+  private RobotMode robotMode;
+  private Intake intake;
   /** Creates a new GamePieceLEDs. */
-  public RobotModeLEDs() {
+  public RobotModeLEDs(Intake intake) {
     this.blinkin = new Spark(0);
-    robotMode = LEDState.OFF;
-
+    this.intake = intake;
+    robotMode = RobotMode.AUTOSHOOTENABLED;
   }
 
   /** set by the buttons
@@ -24,61 +26,52 @@ public class RobotModeLEDs extends SubsystemBase {
    * - sets the SD boolean box to color
    * - sets the physical LED
   */
-  public void lightUp(LEDState ledState) {
-   this.robotMode = ledState;
-
-   blinkin.set(robotMode.colorValue);
-  }
 
   public void enableAutoShoot() {
-    this.robotMode = LEDState.SHOOT;
+    this.robotMode = RobotMode.AUTOSHOOTENABLED;
+  }
 
-    blinkin.set(robotMode.colorValue);
+  public void disableAutoShoot() {
+    this.robotMode = RobotMode.AUTOSHOOTDISABLED;
   }
 
   public boolean isAutoShootEnabled() {
-    return this.robotMode.mode == RobotMode.SHOOT;
+    return this.robotMode == RobotMode.AUTOSHOOTENABLED;
   }
 
   public enum LEDState {
-    OFF(0.99, RobotMode.NONE), 
-    PICKUP(0.05, RobotMode.NOTE), // intake wants note
-    DRIVEWITHNOTE(0.99, RobotMode.DRIVEWITHNOTE), // intake has note
-    CLIMB(0.99, RobotMode.CLIMB),
-    AMP(0.99, RobotMode.AMP),
-    SHOOT(0.99, RobotMode.SHOOT),
-    READYTOSHOOT(0.69, RobotMode.READYTOSHOOT),
-    HASNOTE(0.77, RobotMode.SHOOT);
-    // CELEBRATION(0.05, GamePiece.NONE);
+    OFF(0.99),
+    HASNOTE(0.77),
+    AUTOSHOOTENABLED(0.65),
+    AUTOSHOOTDISABLED(0.61);
 
     public final double colorValue;
-    public final RobotMode mode;
 
-    LEDState(double colorValue, RobotMode robotMode)  {
+    LEDState(double colorValue)  {
         this.colorValue = colorValue;
-        this.mode = robotMode;
     }
   }
 
   public enum RobotMode {
-    NONE,
-    NOTE,
-    CLIMB,
-    AMP,
-    SHOOT,
-    READYTOSHOOT,
-    DRIVEWITHNOTE
+    AUTOSHOOTENABLED,
+    AUTOSHOOTDISABLED
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putString("LED Color", robotMode.toString());
     SmartDashboard.putBoolean("LEDs/enableAutoShoot", isAutoShootEnabled());
+
+    if (intake.hasNote()) {
+      blinkin.set(LEDState.HASNOTE.colorValue);
+    } else if (robotMode == RobotMode.AUTOSHOOTENABLED) {
+      blinkin.set(LEDState.AUTOSHOOTENABLED.colorValue);
+    } else if (robotMode == RobotMode.AUTOSHOOTDISABLED) {
+      blinkin.set(LEDState.AUTOSHOOTDISABLED.colorValue);
+    } else {
+      blinkin.set(LEDState.OFF.colorValue);
+    }
   }
 
-  public void disableAutoShoot() {
-    this.robotMode = LEDState.OFF;
-
-    blinkin.set(robotMode.colorValue);
-  }
+  
 }

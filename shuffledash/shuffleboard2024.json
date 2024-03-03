@@ -13,8 +13,8 @@
         "tiles": {
           "0,1": {
             "size": [
-              8,
-              5
+              4,
+              3
             ],
             "content": {
               "_type": "Field",
@@ -92,10 +92,10 @@
               "imageHeight": -1
             }
           },
-          "6,0": {
+          "4,1": {
             "size": [
-              1,
-              1
+              4,
+              3
             ],
             "content": {
               "_type": "Boolean Box",
