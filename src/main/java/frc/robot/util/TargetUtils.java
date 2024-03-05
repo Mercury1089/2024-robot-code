@@ -9,18 +9,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.APRILTAGS;
+import frc.robot.auton.KnownLocations;
 import frc.robot.sensors.AprilTagCamera;
 import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 
 public class TargetUtils {
 
-    public static double getDistanceToFieldPos(AprilTagCamera photonCam, Pose2d robotPose, int apriltag) {
+    public static double getDistanceToFieldPos(Pose2d robotPose, int apriltag) {
         double distance = 0.0;
-        Optional<Pose3d> tagPose = photonCam.getTagPose(apriltag);
+        Optional<Pose3d> tagPose = KnownLocations.getFieldLayout().getTagPose(apriltag);
 
         if (tagPose.isPresent()) {
             distance = robotPose.getTranslation().getDistance(tagPose.get().toPose2d().getTranslation());
@@ -29,19 +31,19 @@ public class TargetUtils {
         return distance;
     }
 
-    public static double getDistanceToSpeaker(AprilTagCamera photonCam, Pose2d robotPose) {
-        if (DriverStation.getAlliance().get() == Alliance.Blue) {
-            return getDistanceToFieldPos(photonCam, robotPose, APRILTAGS.MIDDLE_BLUE_SPEAKER);
+    public static double getDistanceToSpeaker(Pose2d robotPose) {
+        Alliance alliance = KnownLocations.getKnownLocations().alliance;
+        if (alliance == Alliance.Blue) {
+            return getDistanceToFieldPos(robotPose, APRILTAGS.MIDDLE_BLUE_SPEAKER);
         } else {
-            return getDistanceToFieldPos(photonCam, robotPose, APRILTAGS.MIDDLE_RED_SPEAKER);
+            return getDistanceToFieldPos(robotPose, APRILTAGS.MIDDLE_RED_SPEAKER);
         }
     }
 
-    // TODO: Try this and compare getTargetHeadingToFieldPosition. targetRotation man need to be added to robotPose.getRoation()
     // Following is based off https://www.chiefdelphi.com/t/is-there-a-builtin-function-to-find-the-angle-needed-to-get-one-pose2d-to-face-another-pose2d/455972
-    public static double getTargetHeadingToAprilTag(AprilTagCamera photonCam, Pose2d robotPose, int tagId) {
+    public static double getTargetHeadingToAprilTag(Pose2d robotPose, int tagId) {
         double heading = 0.0;
-        Optional<Pose3d> tagPose = photonCam.getTagPose(tagId);
+        Optional<Pose3d> tagPose = KnownLocations.getFieldLayout().getTagPose(tagId);
         if (tagPose.isPresent()) {
             Translation2d tagPoint = tagPose.get().getTranslation().toTranslation2d();
             Rotation2d targetRotation = tagPoint.minus(robotPose.getTranslation()).getAngle();
@@ -50,26 +52,23 @@ public class TargetUtils {
         return heading;
     }
 
-    public static double getTargetHeadingToFieldPosition(AprilTagCamera photonCam, Pose2d robotPose, FieldPosition fieldPos) {
-        Optional<Alliance> allianceColor = DriverStation.getAlliance();
-        Optional<Pose3d> tagPose = Optional.empty();
+    public static double getTargetHeadingToFieldPosition(Pose2d robotPose, FieldPosition fieldPos) {
+        double heading = 0.0;
+        Alliance alliance = KnownLocations.getKnownLocations().alliance;
         
         if (fieldPos == FieldPosition.SPEAKER) {
-            int apriltag = (allianceColor.get() == Alliance.Blue) ?
+            int apriltag = (alliance == Alliance.Blue) ?
                 APRILTAGS.MIDDLE_BLUE_SPEAKER :
                 APRILTAGS.MIDDLE_RED_SPEAKER;
-            return getTargetHeadingToAprilTag(photonCam, robotPose, apriltag);
-
+            heading = getTargetHeadingToAprilTag(robotPose, apriltag);
         } else if (fieldPos == FieldPosition.AMP) {
-            int apriltag = (allianceColor.get() == Alliance.Blue) ?
+            int apriltag = (alliance == Alliance.Blue) ?
                 APRILTAGS.BLUE_AMP :
                 APRILTAGS.RED_AMP;
-            tagPose = photonCam.getTagPose(apriltag);
-
-            return getTargetHeadingToAprilTag(photonCam, robotPose, apriltag);       
+            heading = getTargetHeadingToAprilTag(robotPose, apriltag);       
         }
         //should never get here
-        return 0.0;
+        return heading;
     }
 
     public static Rotation2d getTargetHeadingToClosestNote(ObjectDetectionCamera objCam, Pose2d robotPose) {
@@ -82,4 +81,40 @@ public class TargetUtils {
    public static Translation2d getNoteTranslation(ObjectDetectionCamera objCam, Pose2d robotPose, double distance) {
         return new Translation2d(distance, getTargetHeadingToClosestNote(objCam, robotPose)).plus(robotPose.getTranslation());
    }
+   
+   // TODO: Create KnownLocations for the X values in this method
+   public static boolean isInShootingZone(Pose2d pose) {
+       boolean inShootingZone = false;
+       Alliance alliance = KnownLocations.getKnownLocations().alliance;
+
+       if (!isInStageArea(pose)) {
+           if (alliance == Alliance.Blue) {
+               inShootingZone = Units.metersToInches(pose.getX()) < 230.0;
+           } else if (alliance == Alliance.Red) {
+               inShootingZone = Units.metersToInches(pose.getX()) > 420.0;
+           }
+       }
+       return inShootingZone;
+   }
+
+   // TODO: Create KnownLocations for the X/Y values in this method
+   public static boolean isInStageArea(Pose2d pose) {
+       boolean inStageArea = false;
+       Alliance alliance = KnownLocations.getKnownLocations().alliance;
+
+       double x = Units.metersToInches(pose.getX());
+       double y = Units.metersToInches(pose.getY());
+       if (alliance == Alliance.Blue) {
+           inStageArea = (y > ((-0.57735 * x) + 227.16483)) &&
+                   (y < ((0.57735 * x) + 96.85518)) &&
+                   (x < 230.0);
+       } else if (alliance == Alliance.Red) {
+           inStageArea = (y < ((-0.57735 * x) + 473.10859)) &&
+                   (y > ((0.57735 * x) - 149.10859)) &&
+                   (x > 420.0);
+       }
+
+       return inStageArea;
+   }
+
 }

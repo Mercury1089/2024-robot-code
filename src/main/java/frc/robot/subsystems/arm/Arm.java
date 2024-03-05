@@ -127,7 +127,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getDistanceToSpeaker() {
-    return Units.metersToInches(TargetUtils.getDistanceToSpeaker(drivetrain.getAprilTagCamera(), drivetrain.getPose()));
+    return Units.metersToInches(TargetUtils.getDistanceToSpeaker(drivetrain.getPose()));
   }
   
   public double getError() {
