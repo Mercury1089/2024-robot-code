@@ -4,23 +4,14 @@
 
 package frc.robot.subsystems.arm;
 
-import java.util.function.Supplier;
-
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.EncoderType;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.BREAKBEAM;
 import frc.robot.Constants.CAN;
-import frc.robot.subsystems.RobotModeLEDs;
 
 public class Intake extends SubsystemBase {
 

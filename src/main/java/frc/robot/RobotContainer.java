@@ -9,7 +9,6 @@ import frc.robot.Constants.JOYSTICK_BUTTONS;
 import frc.robot.Constants.SWERVE;
 import frc.robot.auton.Autons;
 import frc.robot.subsystems.RobotModeLEDs;
-import frc.robot.subsystems.RobotModeLEDs.LEDState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Shooter;
@@ -20,13 +19,8 @@ import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 import frc.robot.util.MercMath;
 import frc.robot.util.TargetUtils;
 
-import java.sql.Driver;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import javax.swing.text.AbstractDocument.LeafElement;
-
-import com.ctre.phoenix6.signals.Led1OffColorValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -102,7 +96,7 @@ public class RobotContainer {
     LEDs = new RobotModeLEDs(intake);
     LEDs.disableAutoShoot();
 
-    shooter = new Shooter(drivetrain);
+    shooter = new Shooter();
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
     shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
