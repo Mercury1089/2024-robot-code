@@ -58,7 +58,7 @@ public class KnownLocations {
 
         if (allianceColor.isPresent() && allianceColor.get() == Alliance.Blue) {
 
-            WING_NOTE_TOP = PathPointInch(114.261, 276, 0);
+            WING_NOTE_TOP = PathPointInch(114.261 - 18.0, 276, 0);
             WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
             WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
 

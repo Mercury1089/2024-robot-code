@@ -87,6 +87,7 @@ public class Intake extends SubsystemBase {
     INTAKE(1.0),
     OUTTAKE(-1.0),
     SHOOT(1.0),
+    AMP(0.75),
     STOP(0.0);
   
     

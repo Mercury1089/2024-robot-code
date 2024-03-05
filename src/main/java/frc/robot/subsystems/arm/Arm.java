@@ -50,7 +50,9 @@ public class Arm extends SubsystemBase {
 
   private static final float ARM_SOFT_LIMIT_FWD = (float) 146;
 
-  private static final float ARM_SOFT_LIMIT_BKW = (float) 48.5;
+  private static final float ARM_SOFT_LIMIT_BKW = (float) 46.6;
+
+  private static final double ANGLE_OFFSET = -2.0;
 
   private final double 
     NOMINAL_OUTPUT_FORWARD = 0.01, //0.02,
@@ -70,7 +72,7 @@ public class Arm extends SubsystemBase {
   public Arm(Drivetrain drivetrain) {
     arm = new CANSparkFlex(CAN.ARM_SPARKMAX, MotorType.kBrushless);
     arm.restoreFactoryDefaults();
-    arm.setInverted(false);
+    arm.setInverted(true);
     arm.setIdleMode(IdleMode.kBrake);
     armPIDController = arm.getPIDController();
     // armRelativeEncoder = arm.getEncoder();
@@ -123,7 +125,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosToTarget(double distance) {
-    return 37.1 + (0.633 * distance) - (0.00207 * (distance * distance));
+    return (37.1 + (0.633 * distance) - (0.00207 * (distance * distance))) + ANGLE_OFFSET;
   }
 
   public double getDistanceToSpeaker() {

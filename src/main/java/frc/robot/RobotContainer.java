@@ -92,7 +92,6 @@ public class RobotContainer {
     drivetrain.resetGyro();
     // LEDs.enableAutoShoot();
     //LEDs.lightUp(LEDState.OFF);
-    LEDs.disableAutoShoot();
 
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
@@ -101,6 +100,7 @@ public class RobotContainer {
     intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
     
     LEDs = new RobotModeLEDs(intake);
+    LEDs.disableAutoShoot();
 
     shooter = new Shooter(drivetrain);
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
@@ -127,11 +127,11 @@ public class RobotContainer {
     );
 
     // for endgame
-    left1.onTrue(
+    gamepadPOVUp.onTrue(
       new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm)
     );
 
-    right1.onTrue(
+    gamepadPOVDown.onTrue(
       new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
     );
 
@@ -145,12 +145,14 @@ public class RobotContainer {
 
     // THIS CAN BE MANUALLY DONE
     gamepadA.onTrue(new SequentialCommandGroup(
-      new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm),
-      new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), intake)
+      new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter).until(() -> shooter.isAtAmpVelocity()),
+      new RunCommand(() -> intake.setSpeed(IntakeSpeed.AMP), intake)
     ));
 
-    // gamepadPOVUp.onTrue(new RunCommand(() -> arm.changePos(), arm));
-    // gamepadPOVDown.onTrue(new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm));
+    gamepadX.onTrue(new SequentialCommandGroup(
+      new RunCommand(() -> shooter.setVelocity(Shooter.SPEAKER_RPM), shooter).until(() -> shooter.isAtTargetVelocity()),
+      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
+    ));
 
     // gamepadX.onTrue(drivetrain.getDefaultCommand());
 
@@ -179,7 +181,7 @@ public class RobotContainer {
     ));
 
     // MAKE SURE THIS WORKS
-    gamepadLT.and(noNotePresent).whileTrue(
+    right1.and(noNotePresent).whileTrue(
       new ParallelCommandGroup(
         new PIDCommand(
           drivetrain.getRotationalController(),
@@ -194,8 +196,8 @@ public class RobotContainer {
       )
     );
 
-    left3.onTrue(new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs));
-    right3.onTrue(new InstantCommand(() -> LEDs.disableAutoShoot(), LEDs));
+    gamepadLB.onTrue(new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs));
+    gamepadRB.onTrue(new InstantCommand(() -> LEDs.disableAutoShoot(), LEDs));
 
     Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote() && LEDs.isAutoShootEnabled() && DriverStation.isTeleop());
 

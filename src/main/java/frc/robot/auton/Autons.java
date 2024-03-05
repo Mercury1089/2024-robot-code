@@ -125,9 +125,9 @@ public class Autons {
         // select the ELEMENT to visit during auton (or DO NOTHING)
         firstElementChooser = new SendableChooser<Pose2d>();
         firstElementChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        firstElementChooser.addOption("NOTE 1", knownLocations.WING_NOTE_TOP);
-        firstElementChooser.addOption("NOTE 2", knownLocations.WING_NOTE_MIDDLE);
-        firstElementChooser.addOption("NOTE 3", knownLocations.WING_NOTE_BOTTOM);
+        firstElementChooser.addOption("NOTE TOP", knownLocations.WING_NOTE_TOP);
+        firstElementChooser.addOption("NOTE MIDDLE", knownLocations.WING_NOTE_MIDDLE);
+        firstElementChooser.addOption("NOTE BOTTOM", knownLocations.WING_NOTE_BOTTOM);
         SmartDashboard.putData("Auton Element Chooser", firstElementChooser);
         SmartDashboard.putString("Auton Selected: ", this.firstElement.toString());
 
@@ -142,9 +142,9 @@ public class Autons {
         // select the MANUAL STARTING POSITION of the robot
         this.startingPoseChooser = new SendableChooser<Pose2d>();
         this.startingPoseChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        this.startingPoseChooser.addOption("START LEFT NOTE", knownLocations.START_TOPMOST);
-        this.startingPoseChooser.addOption("START MIDDLE NOTE", knownLocations.START_MIDDLE);
-        this.startingPoseChooser.addOption("START RIGHT NOTE", knownLocations.START_BOTTOMMOST);
+        this.startingPoseChooser.addOption("START TOP MOST", knownLocations.START_TOPMOST);
+        this.startingPoseChooser.addOption("START MIDDLE", knownLocations.START_MIDDLE);
+        this.startingPoseChooser.addOption("START BOTTOM MOST", knownLocations.START_BOTTOMMOST);
         SmartDashboard.putData("Manual Starting Pose", startingPoseChooser);
 
         // select whether to visit charging station or score 2nd piece (or leave community)
@@ -209,6 +209,7 @@ public class Autons {
 
         // path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
         path1 = generateSwerveTrajectory(currentSelectedPose, new ArrayList<>(), knownLocations.LEAVE);
+        
 
         secondPathPose = finalPose == knownLocations.WING_NOTE_TOP ? knownLocations.WING_NOTE_TOP : knownLocations.WING_NOTE_BOTTOM;
         waypoints = new ArrayList<Pose2d>();

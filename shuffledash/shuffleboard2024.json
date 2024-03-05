@@ -250,6 +250,32 @@
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
+          },
+          "6,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Arm/Position",
+              "_title": "/SmartDashboard/Arm/Position",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "5,4": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/arm encoder",
+              "_title": "/SmartDashboard/arm encoder",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }

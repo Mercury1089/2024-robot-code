@@ -192,6 +192,10 @@ public class Shooter extends SubsystemBase {
     return smartDashboardTargetVelocity;
   }
 
+  public boolean isAtAmpVelocity() {
+    return Math.abs(getVelocity() - AMP_RPM) <= TARGET_VELOCITY_THRESHOLD;
+  }
+
   public void setTargetVelocity(double velocity) {
     smartDashboardTargetVelocity = velocity;
     
