@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
@@ -50,13 +49,13 @@ public class Arm extends SubsystemBase {
   public final double THRESHOLD_DEGREES = 1.0;
 
   
-  private CANSparkFlex arm;
+  private CANSparkMax arm;
   private SparkPIDController armPIDController;
   private AbsoluteEncoder armAbsoluteEncoder;
   private Drivetrain drivetrain;
 
   public Arm(Drivetrain drivetrain) {
-    arm = new CANSparkFlex(CAN.ARM_SPARKMAX, MotorType.kBrushless);
+    arm = new CANSparkMax(CAN.ARM, MotorType.kBrushless);
     arm.restoreFactoryDefaults();
     arm.setInverted(true);
     arm.setIdleMode(IdleMode.kBrake);
@@ -141,19 +140,8 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("arm encoder", getArmPosition());
-    SmartDashboard.putNumber("arm error", getError());
-    SmartDashboard.putBoolean("arm isFinished", isFinishedMoving());
-    SmartDashboard.putNumber("getPos", getPosToTarget(getDistanceToSpeaker()));
-
-    // configPID(
-    //   SmartDashboard.getNumber("ARM P", ARM_LOWER_LIMIT),
-    //   SmartDashboard.getNumber("ARM I", ARM_LOWER_LIMIT),
-    //   SmartDashboard.getNumber("ARM D", ARM_LOWER_LIMIT),
-    //   SmartDashboard.getNumber("ARM MIN REV", ARM_LOWER_LIMIT),
-    //   SmartDashboard.getNumber("ARM MIN FWD", ARM_LOWER_LIMIT)
-    // );
-
+    SmartDashboard.putNumber("Arm/Encoder", getArmPosition());
+    SmartDashboard.putNumber("Arm/PosToTarget", getPosToTarget(getDistanceToSpeaker()));
   }
   
 

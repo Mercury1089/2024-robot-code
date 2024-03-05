@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
-import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -32,14 +32,14 @@ public class Intake extends SubsystemBase {
   private double maxCurrent = 0.0;
   private int maxCurrentCtr = 0;
 
-  private CANSparkFlex intake;
+  private CANSparkMax intake;
   private final int INTAKE_BREAKBEAM = BREAKBEAM.INTAKE_BREAKBEAM;
   private DigitalInput intakeBreakBeam;
 
   /** Creates a new intake. */
   public Intake() {
 
-    intake = new CANSparkFlex(CAN.INTAKE_SPARKFLEX, MotorType.kBrushless);
+    intake = new CANSparkMax(CAN.INTAKE, MotorType.kBrushless);
 
     intake.restoreFactoryDefaults();
 

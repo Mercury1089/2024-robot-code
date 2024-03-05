@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public Shooter() {
-    shooterFront = new CANSparkFlex(CAN.SHOOTER_SPARKFLEX, CANSparkLowLevel.MotorType.kBrushless);
+    shooterFront = new CANSparkFlex(CAN.SHOOTER, CANSparkLowLevel.MotorType.kBrushless);
 
     shooterFront.restoreFactoryDefaults();
     
