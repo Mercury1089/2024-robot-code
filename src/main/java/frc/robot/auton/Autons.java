@@ -1,11 +1,7 @@
 package frc.robot.auton;
 
-import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import com.ctre.phoenix6.signals.Led1OffColorValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -20,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.RobotModeLEDs;
 // import frc.robot.subsystems.arm.Arm;
@@ -63,9 +57,8 @@ public class Autons {
     );
 
     private Command autonCommand;
-    private KnownLocations knownLocations;
 
-    private Alliance allianceColor;
+    private Alliance alliance;
 
     private final double ROTATION_P = 5.0;
     private final double TRANSLATION_P = 5.0;
@@ -88,14 +81,12 @@ public class Autons {
         this.shooter = shooter;
         this.LEDs = leds;
 
-        Optional<Alliance> allianceColor = DriverStation.getAlliance();
-        this.allianceColor = allianceColor.isPresent() ? allianceColor.get() : Alliance.Blue;
+        KnownLocations knownLocations = KnownLocations.getKnownLocations();
+        this.alliance = knownLocations.alliance;
 
-        this.knownLocations = new KnownLocations();
-
-        this.firstElement = KnownLocations.DO_NOTHING;
-        this.currentSelectedPose = KnownLocations.DO_NOTHING;
-        setChoosers();
+        this.firstElement = knownLocations.DO_NOTHING;
+        this.currentSelectedPose = knownLocations.DO_NOTHING;
+        setChoosers(knownLocations);
         this.firstElement = firstElementChooser.getSelected();
         this.currentSelectedPose = startingPoseChooser.getSelected();
         // this.firstElementType = autonTypeChooser.getSelected();
@@ -120,11 +111,11 @@ public class Autons {
         );
     }
 
-    public void setChoosers() {
+    public void setChoosers(KnownLocations knownLocations) {
 
         // select the ELEMENT to visit during auton (or DO NOTHING)
         firstElementChooser = new SendableChooser<Pose2d>();
-        firstElementChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
+        firstElementChooser.setDefaultOption("DO NOTHING", knownLocations.DO_NOTHING);
         firstElementChooser.addOption("NOTE TOP", knownLocations.WING_NOTE_TOP);
         firstElementChooser.addOption("NOTE MIDDLE", knownLocations.WING_NOTE_MIDDLE);
         firstElementChooser.addOption("NOTE BOTTOM", knownLocations.WING_NOTE_BOTTOM);
@@ -141,7 +132,7 @@ public class Autons {
 
         // select the MANUAL STARTING POSITION of the robot
         this.startingPoseChooser = new SendableChooser<Pose2d>();
-        this.startingPoseChooser.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
+        this.startingPoseChooser.setDefaultOption("DO NOTHING", knownLocations.DO_NOTHING);
         this.startingPoseChooser.addOption("START TOP MOST", knownLocations.START_TOPMOST);
         this.startingPoseChooser.addOption("START MIDDLE", knownLocations.START_MIDDLE);
         this.startingPoseChooser.addOption("START BOTTOM MOST", knownLocations.START_BOTTOMMOST);
@@ -158,11 +149,11 @@ public class Autons {
         return this.autonCommand;
     }
 
-    public Command buildAutonCommand() {        
+    public Command buildAutonCommand(KnownLocations knownLocations) {        
         // SET OUR INITIAL POST
         drivetrain.setManualPose(currentSelectedPose);
         
-        if (firstElement == KnownLocations.DO_NOTHING) {
+        if (firstElement == knownLocations.DO_NOTHING) {
             SmartDashboard.putBoolean("isDoNothing", true);
             drivetrain.setTrajectorySmartdash(new Trajectory(), "traj1");
             drivetrain.setTrajectorySmartdash(new Trajectory(), "traj2");
@@ -307,7 +298,7 @@ public class Autons {
             new PIDCommand(
               drivetrain.getRotationalController(),
               () -> drivetrain.getPose().getRotation().getDegrees(), 
-              () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
+              () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getPose(), FieldPosition.SPEAKER), 
               (angularSpeed) -> drivetrain.joyDrive(
                 0.0,
                 0.0,
@@ -322,7 +313,7 @@ public class Autons {
         return new PIDCommand(
             drivetrain.getRotationalController(),
             () -> drivetrain.getPose().getRotation().getDegrees(), 
-            () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
+            () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getPose(), FieldPosition.SPEAKER), 
             (angularSpeed) -> drivetrain.joyDrive(
                 -MercMath.sqaureInput(MathUtil.applyDeadband(0.0, SWERVE.JOYSTICK_DEADBAND)),
                 -MercMath.sqaureInput(MathUtil.applyDeadband(0.0, SWERVE.JOYSTICK_DEADBAND)),
@@ -357,14 +348,12 @@ public class Autons {
     
         boolean rebuildAutonCommand = false;
         
-        Optional<Alliance> allianceColor = DriverStation.getAlliance();
-        Alliance color = allianceColor.isPresent() ? allianceColor.get() : Alliance.Blue;
+        KnownLocations knownLocations = KnownLocations.getKnownLocations();
 
-        if (color != this.allianceColor) {
-            this.allianceColor = color;
-            this.knownLocations = new KnownLocations();
-            SmartDashboard.putString("alliance color!", this.allianceColor.toString());
-            setChoosers();
+        if (knownLocations.alliance != this.alliance) {
+            this.alliance = knownLocations.alliance;
+            SmartDashboard.putString("alliance color!", this.alliance.toString());
+            setChoosers(knownLocations);
             rebuildAutonCommand = true;
         }
 
@@ -390,7 +379,7 @@ public class Autons {
         }
 
         if (rebuildAutonCommand) {
-            this.autonCommand = buildAutonCommand();
+            this.autonCommand = buildAutonCommand(knownLocations);
         }
     }
     

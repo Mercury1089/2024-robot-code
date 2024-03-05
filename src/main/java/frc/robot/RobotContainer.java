@@ -206,7 +206,7 @@ public class RobotContainer {
         new PIDCommand(
           drivetrain.getRotationalController(),
           () -> drivetrain.getPose().getRotation().getDegrees(), 
-          () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getAprilTagCamera(), drivetrain.getPose(), FieldPosition.SPEAKER), 
+          () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getPose(), FieldPosition.SPEAKER), 
           (angularSpeed) -> drivetrain.joyDrive(
             -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickY.get(), SWERVE.JOYSTICK_DEADBAND)),
             -MercMath.sqaureInput(MathUtil.applyDeadband(leftJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)),

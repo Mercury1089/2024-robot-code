@@ -29,8 +29,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -58,9 +56,8 @@ public class Drivetrain extends SubsystemBase {
   private final String fieldWidgetType = "Odometry";
   private PIDController rotationPIDController;
   private PathPlannerPath pathToNote, pathToAmp;
-  private Pose2d amp;
+
   private ObjectDetectionCamera objectDetectionCam;
-  private Command goToNote;
   private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
   private final double THRESHOLD_DEGREES = 5.0;
   private final double THRESHOLD_SPEED = 0.5;
@@ -114,13 +111,6 @@ public class Drivetrain extends SubsystemBase {
     // testInitialPose = new Pose2d(Units.inchesToMeters(54.93), Units.inchesToMeters(199.65), getPigeonRotation());
     testInitialPose = new Pose2d(0, 0, getPigeonRotation()); //  will be reset by setManualPose()
 
-    
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      amp = KnownLocations.PathPointInch(72.5, 303.0, 90.0);
-    } else {
-      amp = KnownLocations.PathPointInch(578.77, 303.0, 90.0);
-    }
-
     // wpilib convienence classes
     /*
     * swerve modules relative to robot center --> kinematics object --> odometry object 
@@ -146,10 +136,6 @@ public class Drivetrain extends SubsystemBase {
       },
       getInitialPose()
     );
-
-    goToNote = new Command() {
-      
-    };
 
     SmartDashboard.putNumber("CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
@@ -374,38 +360,15 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isPointedAtTarget() {
-    return Math.abs(getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToFieldPosition(getAprilTagCamera(), getPose(), FieldPosition.SPEAKER)) < THRESHOLD_DEGREES;
+    return Math.abs(getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToFieldPosition(getPose(), FieldPosition.SPEAKER)) < THRESHOLD_DEGREES;
   }
 
   public boolean isNotMoving() {
     return Math.abs(getXSpeeds()) < THRESHOLD_SPEED && Math.abs(getYSpeeds()) < THRESHOLD_SPEED;
   }
 
-  
   public boolean inShootingRange() {
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      return !inStageArea() && Units.metersToInches(getPose().getX()) < 230.0;
-    } else if (DriverStation.getAlliance().get() == Alliance.Red) {
-      return !inStageArea() && Units.metersToInches(getPose().getX()) > 420.0;
-    }
-
-    return false;
-  }
-
-  public boolean inStageArea() {
-    double x = Units.metersToInches(getPose().getX());
-    double y = Units.metersToInches(getPose().getY());
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      return (y > ((-0.57735 * x) + 227.16483)) &&
-        (y < ((0.57735 * x) + 96.85518)) &&
-        (x < 230.0);
-    } else if (DriverStation.getAlliance().get() == Alliance.Red) {
-      return (y < ((-0.57735 * x) + 473.10859)) &&
-        (y > ((0.57735 * x) - 149.10859)) &&
-        (x > 420.0);
-    }
-
-    return false;
+    return TargetUtils.isInShootingZone(getPose());
   }
 
   @Override
@@ -451,27 +414,27 @@ public class Drivetrain extends SubsystemBase {
     setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToNote");
 
 
-
+    KnownLocations knownLocations = KnownLocations.getKnownLocations();
     // Pose2d intermediaryAmp = new Pose2d(amp.getX(), Units.inchesToMeters(Units.metersToInches(amp.getY()) - 15.0), amp.getRotation());
 
     List<Pose2d> intermediaryAmpList = new ArrayList<>();
 
     // intermediaryAmpList.add(intermediaryAmp);
 
-    pathToAmp = Autons.generateSwerveTrajectory(getPose(), intermediaryAmpList, amp, Rotation2d.fromDegrees(-90.0));
+    pathToAmp = Autons.generateSwerveTrajectory(getPose(), intermediaryAmpList, knownLocations.AMP, Rotation2d.fromDegrees(-90.0));
     setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToAmp");
 
     SmartDashboard.putNumber("Drivetrain/CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Y", getPose().getY());
     SmartDashboard.putBoolean("Drivetrain/inShootingRange", inShootingRange());
-    SmartDashboard.putBoolean("Drivetrain/inStageArea", inStageArea());
+    SmartDashboard.putBoolean("Drivetrain/inStageArea", TargetUtils.isInStageArea(getPose()));
     SmartDashboard.putBoolean("Drivetrain/pointedAtTarget", isPointedAtTarget());
     SmartDashboard.putBoolean("Drivetrain/isNotMoving", isNotMoving());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Drive Angle", getPigeonRotation().getDegrees());
-    SmartDashboard.putNumber("Drivetrain/Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(photonCam, getPose(), FieldPosition.SPEAKER));
-    SmartDashboard.putNumber("Drivetrain/distanceToSpeaker", Units.metersToInches(TargetUtils.getDistanceToFieldPos(photonCam, getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER)));
-    SmartDashboard.putNumber("Drivetrain/New Func (angle to red)", TargetUtils.getTargetHeadingToAprilTag(photonCam, getPose(), APRILTAGS.MIDDLE_RED_SPEAKER));
+    SmartDashboard.putNumber("Drivetrain/Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(getPose(), FieldPosition.SPEAKER));
+    SmartDashboard.putNumber("Drivetrain/distanceToSpeaker", Units.metersToInches(TargetUtils.getDistanceToFieldPos(getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER)));
+    SmartDashboard.putNumber("Drivetrain/New Func (angle to red)", TargetUtils.getTargetHeadingToAprilTag(getPose(), APRILTAGS.MIDDLE_RED_SPEAKER));
     SmartDashboard.putNumber("Drivetrain/Angle Offset", 0);
     SmartDashboard.putNumber("Drivetrain/Distance to closest note", objectDetectionCam.getDistanceToTarget());
 

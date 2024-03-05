@@ -4,9 +4,11 @@
 
 package frc.robot.auton;
 
-import java.nio.file.Path;
-import java.util.Optional;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,8 +22,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public class KnownLocations {
 
+    // The KnownLocations singleton instance returned by getKnownLocaitons()
+    private static KnownLocations knownLocations = null;
+    private static AprilTagFieldLayout fieldLayout = null;
+
+    // The alliance of the current KnownLocations
+    public final Alliance alliance;
+
     // do nothing auton
-    public static final Pose2d
+    public final Pose2d
         DO_NOTHING = PathPointInch(0, 0, 0);
 
     // looking from its alliance side
@@ -44,25 +53,50 @@ public class KnownLocations {
         CENTER_NOTE_3,
         CENTER_NOTE_4,
         CENTER_NOTE_5,
-        LEAVE;
+        LEAVE,
+        AMP;
+
     
-    // //field -> SUBWOOFER_1 points w/NOTE_WING_1
-    // public final Pose2d
-    //     // AMP
-        
-    public Optional<Alliance> allianceColor = DriverStation.getAlliance();
+    synchronized public static AprilTagFieldLayout getFieldLayout() {
+        if (fieldLayout == null) {
+            try {
+                fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+            } catch (UncheckedIOException e) {
+                DriverStation.reportWarning("Failed to load AprilTagFieldLayout: " + e.getMessage(), true);
+                fieldLayout = null;
+            }
+        }
+        return fieldLayout;
+    }
+    /**
+     * Get an updated KnownLocations based on the current alliance.
+     * 
+     * <p>
+     * This will generate a new KnownLocations instance based on the current alliance.
+     * Do not save the returned instance. Always call this method to get the latest copy.
+     * 
+     * @return The current KnownLocations instance. Never save this instance as it can change.
+     */
+    synchronized public static KnownLocations getKnownLocations() {
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+        if (knownLocations == null || knownLocations.alliance != alliance) {
+            knownLocations = new KnownLocations(alliance);
+        }
+        return knownLocations;
+    }    
 
-    public KnownLocations() {
+    private KnownLocations(Alliance alliance) {
+        this.alliance = alliance;
 
-        allianceColor = DriverStation.getAlliance();
-
-        if (allianceColor.isPresent() && allianceColor.get() == Alliance.Blue) {
+        if (alliance == Alliance.Blue) {
 
             WING_NOTE_TOP = PathPointInch(114.261 - 18.0, 276, 0);
             WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
             WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
 
             LEAVE = PathPointInch(114.261, 162 - 50, 0);
+
+            AMP = PathPointInch(72.5, 303.0, 90.0);
                                     
             INTERMEDIARY_NOTE_TOP = PathPointInch(84.261, 276, 0);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261, 219, 0);
@@ -77,7 +111,6 @@ public class KnownLocations {
             START_TOPMOST = PathPointInch(24.741, 268.182, 60);
             START_MIDDLE = PathPointInch(55.43, 218.777885, 0);
             START_BOTTOMMOST = PathPointInch(24.741, 169.374, -60); 
-            
 
         } else {
 
@@ -86,6 +119,8 @@ public class KnownLocations {
             WING_NOTE_BOTTOM = PathPointInch(537.464, 162, 180);
 
             LEAVE = PathPointInch(537.464, 162 - 50, 180);
+
+            AMP = PathPointInch(578.77, 303.0, 90.0);
 
             INTERMEDIARY_NOTE_TOP = PathPointInch(567.464, 276, 180);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(567.464, 219, 180);
@@ -101,20 +136,11 @@ public class KnownLocations {
             START_MIDDLE = PathPointInch(596.295, 218.777, 0);
             START_BOTTOMMOST = PathPointInch(623.735, 169.372, -120);
 
-
         }
     }
 
     /** Convenience method to create PathPoint from inches */
-    public static Pose2d PathPointInch(double xInches, double yInches, double headingDegrees) {
+    private static Pose2d PathPointInch(double xInches, double yInches, double headingDegrees) {
         return new Pose2d(new Translation2d(Units.inchesToMeters(xInches), Units.inchesToMeters(yInches)), Rotation2d.fromDegrees(headingDegrees));
     }
-
-    /** Convenience method to create waypoint excluding holonomic rotation */
-    public static Pose2d PathWayPoint(double xInches, double yInches, double headingDegrees) {
-        return new Pose2d(new Translation2d(Units.inchesToMeters(xInches), Units.inchesToMeters(yInches)), Rotation2d.fromDegrees(headingDegrees));
-    }
-
-
-
 }
