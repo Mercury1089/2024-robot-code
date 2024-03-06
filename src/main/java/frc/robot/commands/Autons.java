@@ -1,10 +1,6 @@
 package frc.robot.commands;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -12,9 +8,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,10 +18,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
 import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.RobotModeLEDs;
-// import frc.robot.subsystems.arm.Arm;
-// import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.Intake.IntakeSpeed;
@@ -47,13 +39,6 @@ public class Autons {
     private SendableChooser<AutonTypes> autonTypeChooser;
     private Pose2d startingPose;
     private AutonTypes autonType, multiNoteType;
-    private static PathConstraints pathConstraints = new PathConstraints(
-        SWERVE.MAX_SPEED_METERS_PER_SECOND,
-        SWERVE.MAX_ACCELERATION,
-        SWERVE.MAX_ROTATIONAL_SPEED,
-        SWERVE.MAX_ANGULAR_SPEED
-    );
-
     private Command autonCommand;
 
     private Alliance alliance;
@@ -161,14 +146,14 @@ public class Autons {
             case DO_NOT_MOVE:
                 break;
             case LEAVE_STARTING_ZONE:
-                path = generateSwerveTrajectory(startingPose, new ArrayList<>(), knownLocations.LEAVE);
-                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path.getTrajectory(new ChassisSpeeds(), startingPose.getRotation())), "traj" + pathIndex);
+                path = PathUtils.generatePath(startingPose, knownLocations.LEAVE);
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(AutoBuilder.followPath(path));
                 break;
             case SCORE_2ND_NOTE:
-                path = generateSwerveTrajectory(startingPose, new ArrayList<>(), knownLocations.INTERMEDIARY_NOTE_TOP);
-                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path.getTrajectory(new ChassisSpeeds(), startingPose.getRotation())), "traj" + pathIndex);
+                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP);
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(AutoBuilder.followPath(path));
                 break;
@@ -216,21 +201,6 @@ public class Autons {
                 -MercMath.sqaureInput(MathUtil.applyDeadband(0.0, SWERVE.JOYSTICK_DEADBAND)),
             angularSpeed),
             drivetrain);
-    }
-
-    public static PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose, Rotation2d endStateRotation) {
-        List<Pose2d> poses = new ArrayList<Pose2d>();
-        poses.add(initialPose); poses.addAll(waypoints); poses.add(finalPose);
-
-        List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(poses);
-        return new PathPlannerPath(
-            bezierPoints,
-            pathConstraints,
-            new GoalEndState(0.0, endStateRotation));
-    }
-
-    public static PathPlannerPath generateSwerveTrajectory(Pose2d initialPose, List<Pose2d> waypoints, Pose2d finalPose) {
-        return generateSwerveTrajectory(initialPose, waypoints, finalPose, finalPose.getRotation());
     }
 
     /**

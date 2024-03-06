@@ -84,8 +84,6 @@ public class RobotContainer {
         -MercMath.sqaureInput(MathUtil.applyDeadband(rightJoystickX.get(), SWERVE.JOYSTICK_DEADBAND)))
     , drivetrain));
     drivetrain.resetGyro();
-    // LEDs.enableAutoShoot();
-    //LEDs.lightUp(LEDState.OFF);
 
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));

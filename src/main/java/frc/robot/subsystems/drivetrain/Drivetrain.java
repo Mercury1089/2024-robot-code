@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.drivetrain;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -19,7 +17,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -33,10 +30,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
-import frc.robot.commands.Autons;
 import frc.robot.sensors.AprilTagCamera;
 import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.util.KnownLocations;
@@ -53,7 +50,6 @@ public class Drivetrain extends SubsystemBase {
   private AprilTagCamera photonCam;
   // private Limelight limelight;
   private Field2d smartdashField;
-  private final String fieldWidgetType = "Odometry";
   private PIDController rotationPIDController;
   private PathPlannerPath pathToNote, pathToAmp;
 
@@ -350,13 +346,12 @@ public class Drivetrain extends SubsystemBase {
   public Command goToNote() {
     return AutoBuilder.followPath(pathToNote);
   }
+  public Command goToAmp() {
+    return AutoBuilder.followPath(pathToAmp);
+  }
 
   public boolean noteInRange() {
     return objectDetectionCam.getDistanceToTarget() > 0.0 && objectDetectionCam.getDistanceToTarget() < 1.65;
-  }
-
-  public Command goToAmp() {
-    return AutoBuilder.followPath(pathToAmp);
   }
 
   public boolean isPointedAtTarget() {
@@ -385,44 +380,24 @@ public class Drivetrain extends SubsystemBase {
     
     Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
     if (result.isPresent()) {
-      Pose3d estimatedPose = result.get().estimatedPose;
-      SmartDashboard.putNumber("Cam/Yaw", estimatedPose.getRotation().getZ());
-      SmartDashboard.putNumber("Cam/Pitch", estimatedPose.getRotation().getY());
-      SmartDashboard.putNumber("Cam/Roll", estimatedPose.getRotation().getX());
+      // Uncomment the following to check camera position on robot
+      // Pose3d estimatedPose = result.get().estimatedPose;
+      // SmartDashboard.putNumber("Cam/Yaw", estimatedPose.getRotation().getZ());
+      // SmartDashboard.putNumber("Cam/Pitch", estimatedPose.getRotation().getY());
+      // SmartDashboard.putNumber("Cam/Roll", estimatedPose.getRotation().getX());
       odometry.addVisionMeasurement(result.get().estimatedPose.toPose2d(), result.get().timestampSeconds);
     }
+    smartdashField.setRobotPose(getPose());
   
-    if (fieldWidgetType.equals("Odometry")) {
-      smartdashField.setRobotPose(getPose());
-    } else if (fieldWidgetType.equals("photonvision")) {
-      smartdashField.setRobotPose(getInitialPose());
-    }
-
     Pose2d notePose = new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget()), TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()));
 
     setPoseSmartdash(notePose, "notepose");
-    List<Pose2d> intermediaryNotePose = new ArrayList<>();
-    
-    //rotating in place
-    // intermediaryNotePose.add(new Pose2d(getPose().getTranslation(), new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getDegrees())));
-
-    // check mid way
-    // intermediaryNotePose.add(new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget() * 0.7), 
-    //  new Rotation2d(TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()).getRadians())));
-
-    pathToNote = Autons.generateSwerveTrajectory(getPose(), intermediaryNotePose, notePose);
-    setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToNote");
-
+    pathToNote = PathUtils.generatePath(getPose(), notePose);
+    setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote), "pathToNote");
 
     KnownLocations knownLocations = KnownLocations.getKnownLocations();
-    // Pose2d intermediaryAmp = new Pose2d(amp.getX(), Units.inchesToMeters(Units.metersToInches(amp.getY()) - 15.0), amp.getRotation());
-
-    List<Pose2d> intermediaryAmpList = new ArrayList<>();
-
-    // intermediaryAmpList.add(intermediaryAmp);
-
-    pathToAmp = Autons.generateSwerveTrajectory(getPose(), intermediaryAmpList, knownLocations.AMP, Rotation2d.fromDegrees(-90.0));
-    setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp.getTrajectory(new ChassisSpeeds(), getPose().getRotation())), "pathToAmp");
+    pathToAmp = PathUtils.generatePath(Rotation2d.fromDegrees(-90.0), getPose(), knownLocations.AMP);
+    setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp), "pathToAmp");
 
     SmartDashboard.putNumber("Drivetrain/CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Y", getPose().getY());
