@@ -166,8 +166,12 @@ public class Autons {
                 pathIndex++;
                 autonCommand.addCommands(AutoBuilder.followPath(path));
                 break;
-            // LEAVE_STARTING_ZONE,
-            // SCORE_2ND_NOTE, 
+            case SCORE_2ND_NOTE:
+                path = generateSwerveTrajectory(startingPose, new ArrayList<>(), knownLocations.INTERMEDIARY_NOTE_TOP);
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path.getTrajectory(new ChassisSpeeds(), startingPose.getRotation())), "traj" + pathIndex);
+                pathIndex++;
+                autonCommand.addCommands(AutoBuilder.followPath(path));
+                break;
             // MULTI_NOTE_SCORE,
             // WING_NOTES, 
             // CENTER_LINE_NOTES

@@ -98,8 +98,8 @@ public class RobotContainer {
 
     shooter = new Shooter();
     // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(gamepadRightY.get()), shooter));
-    // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
-    shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
+    shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
+    //shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
     
     auton = new Autons(drivetrain, intake, shooter, arm, LEDs);
 
@@ -115,7 +115,8 @@ public class RobotContainer {
       new ParallelCommandGroup(
         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-        new RunCommand(() -> shooter.stopShooter(), shooter)
+//        new RunCommand(() -> shooter.stopShooter(), shooter)
+        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
         // new RunCommand(() -> LEDs.lightUp(LEDState.OFF), LEDs)
       )
     );

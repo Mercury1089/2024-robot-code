@@ -46,7 +46,7 @@ public class Arm extends SubsystemBase {
     PEAK_OUTPUT_REVERSE = -0.6;
 
   public final double GEAR_RATIO = 125.0 / 1.0;
-  public final double THRESHOLD_DEGREES = 1.0;
+  public final double THRESHOLD_DEGREES = 0.5;
 
   
   private CANSparkMax arm;
@@ -142,6 +142,7 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm/Encoder", getArmPosition());
     SmartDashboard.putNumber("Arm/PosToTarget", getPosToTarget(getDistanceToSpeaker()));
+    SmartDashboard.putBoolean("Arm/isFinishedMoving", isFinishedMoving());
   }
   
 
