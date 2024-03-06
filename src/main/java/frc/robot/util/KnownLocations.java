@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.auton;
+package frc.robot.util;
 
 import java.io.UncheckedIOException;
 
@@ -54,6 +54,15 @@ public class KnownLocations {
             LEAVE,
             AMP;
 
+    /**
+     * Load the field layout for the current year (currently CRESCENDO).
+     * 
+     * <p>
+     * This is a singleton instance of the field layout for any class that needs it.
+     * 
+     * @return The current AprilTagFieldLayout or null if there is an UncheckedIOException loading the file.
+     *         A warning is reported on the Driver Station if an exception is encountered
+     */
     synchronized public static AprilTagFieldLayout getFieldLayout() {
         if (fieldLayout == null) {
             try {

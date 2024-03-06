@@ -1,6 +1,5 @@
-package frc.robot.auton;
+package frc.robot.commands;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -35,6 +34,7 @@ import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.Intake.IntakeSpeed;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
+import frc.robot.util.KnownLocations;
 import frc.robot.util.MercMath;
 import frc.robot.util.PathUtils;
 import frc.robot.util.TargetUtils;
@@ -235,10 +235,10 @@ public class Autons {
 
     /**
      * Rebuilds the autonCommand when ONE of the following conditions changes:
-     * - Starting Pose
      * - Alliance Color
-     * - Desired Element
+     * - Starting Pose
      * - Auton Type
+     * - Multi Note Type
      */
 
     public void updateDash() {

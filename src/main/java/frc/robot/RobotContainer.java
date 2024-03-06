@@ -7,7 +7,7 @@ package frc.robot;
 import frc.robot.Constants.DS_USB;
 import frc.robot.Constants.JOYSTICK_BUTTONS;
 import frc.robot.Constants.SWERVE;
-import frc.robot.auton.Autons;
+import frc.robot.commands.Autons;
 import frc.robot.subsystems.RobotModeLEDs;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Intake;

@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.APRILTAGS;
-import frc.robot.auton.KnownLocations;
 import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 
