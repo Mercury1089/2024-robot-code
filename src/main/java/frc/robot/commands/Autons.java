@@ -79,7 +79,7 @@ public class Autons {
                 () -> drivetrain.getPose(), // Robot pose supplier
                 (pose) -> drivetrain.setManualPose(pose), // Method to reset odometry (will be called if your auto has a starting pose)
                 () -> drivetrain.getFieldRelativSpeeds(), // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (chassisSpeeds) -> drivetrain.driveFieldRelative(chassisSpeeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+                (chassisSpeeds) -> drivetrain.drive(chassisSpeeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                         new PIDConstants(TRANSLATION_P, 0.0, 0.0), // Translation PID constants
                         new PIDConstants(ROTATION_P, 0.0, 0.0), // Rotation PID constants
@@ -152,7 +152,7 @@ public class Autons {
                 autonCommand.addCommands(AutoBuilder.followPath(path));
                 break;
             case SCORE_2ND_NOTE:
-                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP);
+                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP, knownLocations.WING_NOTE_TOP);
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(AutoBuilder.followPath(path));
@@ -175,32 +175,7 @@ public class Autons {
     }
 
     public Command setUpToShoot() {
-        return new ParallelCommandGroup(
-            new RunCommand(() -> LEDs.enableAutoShoot(), LEDs),
-            new PIDCommand(
-              drivetrain.getRotationalController(),
-              () -> drivetrain.getPose().getRotation().getDegrees(), 
-              () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getPose(), FieldPosition.SPEAKER), 
-              (angularSpeed) -> drivetrain.joyDrive(
-                0.0,
-                0.0,
-              angularSpeed),
-              drivetrain),
-            new RunCommand(() -> shooter.setVelocity(Shooter.SPEAKER_RPM), shooter),
-            new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
-          );
-    }
-
-    public PIDCommand rotateToTarget() {
-        return new PIDCommand(
-            drivetrain.getRotationalController(),
-            () -> drivetrain.getPose().getRotation().getDegrees(), 
-            () -> TargetUtils.getTargetHeadingToFieldPosition(drivetrain.getPose(), FieldPosition.SPEAKER), 
-            (angularSpeed) -> drivetrain.joyDrive(
-                -MercMath.sqaureInput(MathUtil.applyDeadband(0.0, SWERVE.JOYSTICK_DEADBAND)),
-                -MercMath.sqaureInput(MathUtil.applyDeadband(0.0, SWERVE.JOYSTICK_DEADBAND)),
-            angularSpeed),
-            drivetrain);
+        return DriveCommands.prepareToShoot(MercMath.zeroSupplier, MercMath.zeroSupplier, shooter, arm, drivetrain);
     }
 
     /**

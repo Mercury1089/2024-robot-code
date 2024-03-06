@@ -48,7 +48,6 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDrivePoseEstimator odometry;
   private SwerveDriveKinematics swerveKinematics;
   private AprilTagCamera photonCam;
-  // private Limelight limelight;
   private Field2d smartdashField;
   private PIDController rotationPIDController;
   private PathPlannerPath pathToNote, pathToAmp;
@@ -77,8 +76,6 @@ public class Drivetrain extends SubsystemBase {
   private SlewRateLimiter angularSpeedLimiter = new SlewRateLimiter(SWERVE.ROTATIONAL_SLEW_RATE);
   private double prevTime = WPIUtilJNI.now() * 1e-6;
 
-  private Pose2d testInitialPose; 
-
   /** Creates a new Drivetrain. */
   public Drivetrain() {
     // configure swerve modules
@@ -104,10 +101,6 @@ public class Drivetrain extends SubsystemBase {
     smartdashField = new Field2d();
     SmartDashboard.putData("Swerve Odometry", smartdashField);
 
-    // testInitialPose = new Pose2d(Units.inchesToMeters(54.93), Units.inchesToMeters(199.65), getPigeonRotation());
-    testInitialPose = new Pose2d(0, 0, getPigeonRotation()); //  will be reset by setManualPose()
-
-    // wpilib convienence classes
     /*
     * swerve modules relative to robot center --> kinematics object --> odometry object 
     */
@@ -121,21 +114,20 @@ public class Drivetrain extends SubsystemBase {
       new Translation2d(-lengthFromCenter, widthFromCenter),
       new Translation2d(-lengthFromCenter, -widthFromCenter)
     );
+
+    // Initialize the robot odometry to the the field origin.
+    // This will be updated by the selected Auton and DriveTrain.periodic()
     odometry = new SwerveDrivePoseEstimator(
       swerveKinematics, 
-      getPigeonRotation(),
+      getRotation(),
       new SwerveModulePosition[] {
         frontLeftModule.getPosition(),
         frontRightModule.getPosition(),
         backLeftModule.getPosition(),
         backRightModule.getPosition()
       },
-      getInitialPose()
+      new Pose2d(0, 0, getRotation())
     );
-
-    SmartDashboard.putNumber("CurrentPose X", getPose().getX());
-    SmartDashboard.putNumber("CurrentPose Y", getPose().getY());
-    SmartDashboard.putNumber("CurrentPose Rotation", getPose().getRotation().getDegrees());
   }
 
   public PIDController getRotationalController() {
@@ -144,36 +136,6 @@ public class Drivetrain extends SubsystemBase {
 
   public void resetYaw() {
     pigeon.setYaw(0);
-  }
-
-  public Pose2d getInitialPose() {
-    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
-    if (result.isPresent()) {
-      return result.get().estimatedPose.toPose2d();
-    }
-    return testInitialPose;
-  }
-
-  public boolean isTargetPresent() {
-    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
-    return result.isPresent();
-  }
-
-  public void lockSwerve() {
-    // set wheels into X formation
-    frontLeftModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(Math.PI / 4)));
-    frontRightModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(-Math.PI / 4)));
-    backLeftModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(- Math.PI / 4)));
-    backRightModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(Math.PI / 4)));
-  }
-
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, SWERVE.MAX_DIRECTION_SPEED);
-    frontLeftModule.setDesiredState(desiredStates[0]);
-    frontRightModule.setDesiredState(desiredStates[1]);
-    backLeftModule.setDesiredState(desiredStates[2]);
-    backRightModule.setDesiredState(desiredStates[3]);
   }
 
   /**
@@ -196,7 +158,15 @@ public class Drivetrain extends SubsystemBase {
     pigeon.reset();
   }
 
-  public void joyDrive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative, boolean rateLimit) {
+  public void drive(double xSpeed, double ySpeed, double angularSpeed) {
+    drive(xSpeed, ySpeed, angularSpeed, true);
+  }
+
+  public void drive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative) {
+    drive(xSpeed, ySpeed, angularSpeed, fieldRelative, false);
+  }
+
+  public void drive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative, boolean rateLimit) {
     double xSpeedCommanded;
     double ySpeedCommanded;
 
@@ -254,27 +224,36 @@ public class Drivetrain extends SubsystemBase {
     ChassisSpeeds fieldRelativeSpeeds;
 
     if (fieldRelative) {
-      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered, getPigeonRotation());
+      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered, getRotation());
     } else {
       fieldRelativeSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered);
     }
     
-    driveFieldRelative(fieldRelativeSpeeds);
+    drive(fieldRelativeSpeeds);
   }
 
-  public void joyDrive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative) {
-    joyDrive(xSpeed, ySpeed, angularSpeed, fieldRelative, false);
-  }
-
-  public void joyDrive(double xSpeed, double ySpeed, double angularSpeed) {
-    joyDrive(xSpeed, ySpeed, angularSpeed, true);
-  }
-
-  public void driveFieldRelative(ChassisSpeeds fieldRelativeSpeeds) {
+  public void drive(ChassisSpeeds fieldRelativeSpeeds) {
     // general swerve speeds --> speed per module
     SwerveModuleState[] moduleStates = swerveKinematics.toSwerveModuleStates(fieldRelativeSpeeds);
 
     setModuleStates(moduleStates);
+  }
+
+  public void setModuleStates(SwerveModuleState[] desiredStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        desiredStates, SWERVE.MAX_DIRECTION_SPEED);
+    frontLeftModule.setDesiredState(desiredStates[0]);
+    frontRightModule.setDesiredState(desiredStates[1]);
+    backLeftModule.setDesiredState(desiredStates[2]);
+    backRightModule.setDesiredState(desiredStates[3]);
+  }
+
+  public void lockSwerve() {
+    // set wheels into X formation
+    frontLeftModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(Math.PI / 4)));
+    frontRightModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(-Math.PI / 4)));
+    backLeftModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(- Math.PI / 4)));
+    backRightModule.setDesiredState(new SwerveModuleState(0, Rotation2d.fromRadians(Math.PI / 4)));
   }
 
   /** update smartdash with trajectory */
@@ -293,7 +272,7 @@ public class Drivetrain extends SubsystemBase {
    */
   public void setManualPose(Pose2d pose) {
     odometry.resetPosition(
-    getPigeonRotation(), 
+    getRotation(), 
     new SwerveModulePosition[] {
       frontLeftModule.getPosition(),
       frontRightModule.getPosition(),
@@ -302,10 +281,6 @@ public class Drivetrain extends SubsystemBase {
       },
     pose
     );
-  }
-
-  public SwerveDriveKinematics getKinematics() {
-    return swerveKinematics;
   }
 
   public ChassisSpeeds getFieldRelativSpeeds() {
@@ -328,7 +303,7 @@ public class Drivetrain extends SubsystemBase {
     return getFieldRelativSpeeds().vyMetersPerSecond;
   }
 
-  public Rotation2d getPigeonRotation() {
+  public Rotation2d getRotation() {
     /* return the pigeon's yaw as Rotation2d object */
 
     // Yaw is negated for field-centric in order to ensure 'true' forward of robot
@@ -343,15 +318,20 @@ public class Drivetrain extends SubsystemBase {
     return this.objectDetectionCam;
   }
 
-  public Command goToNote() {
-    return AutoBuilder.followPath(pathToNote);
+  public PathPlannerPath getPathToNote() {
+    return pathToNote;
   }
-  public Command goToAmp() {
-    return AutoBuilder.followPath(pathToAmp);
+  public PathPlannerPath getPathToAmp() {
+    return pathToAmp;
   }
 
   public boolean noteInRange() {
     return objectDetectionCam.getDistanceToTarget() > 0.0 && objectDetectionCam.getDistanceToTarget() < 1.65;
+  }
+
+  public boolean isTargetPresent() {
+    Optional<EstimatedRobotPose> result = photonCam.getGlobalPose();
+    return result.isPresent();
   }
 
   public boolean isPointedAtTarget() {
@@ -370,7 +350,7 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     odometry.update(
-      getPigeonRotation(),
+      getRotation(),
       new SwerveModulePosition[] {
         frontLeftModule.getPosition(),
         frontRightModule.getPosition(),
@@ -406,7 +386,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putBoolean("Drivetrain/pointedAtTarget", isPointedAtTarget());
     SmartDashboard.putBoolean("Drivetrain/isNotMoving", isNotMoving());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());
-    SmartDashboard.putNumber("Drivetrain/Drive Angle", getPigeonRotation().getDegrees());
+    SmartDashboard.putNumber("Drivetrain/Drive Angle", getRotation().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Angle to speaker without AprilTag", TargetUtils.getTargetHeadingToFieldPosition(getPose(), FieldPosition.SPEAKER));
     SmartDashboard.putNumber("Drivetrain/distanceToSpeaker", Units.metersToInches(TargetUtils.getDistanceToFieldPos(getPose(), APRILTAGS.MIDDLE_BLUE_SPEAKER)));
     SmartDashboard.putNumber("Drivetrain/New Func (angle to red)", TargetUtils.getTargetHeadingToAprilTag(getPose(), APRILTAGS.MIDDLE_RED_SPEAKER));
