@@ -32,13 +32,15 @@ public class KnownLocations {
     public final Pose2d DO_NOTHING = PathPointInch(0, 0, 0);
 
     // looking from its alliance side
-    public final Pose2d START_TOPMOST,
+    public final Pose2d
+            START_TOPMOST,
             START_MIDDLE,
             START_BOTTOMMOST;
 
     // notes -> NOTE_WING_1 lines up w/NOTE_CENTER_1 from the top
     // starting positions are looking from blue side of field
-    public final Pose2d WING_NOTE_TOP,
+    public final Pose2d
+            WING_NOTE_TOP,
             WING_NOTE_MIDDLE,
             WING_NOTE_BOTTOM,
             INTERMEDIARY_NOTE_TOP,

@@ -1,5 +1,6 @@
 package frc.robot.auton;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -41,14 +42,11 @@ import frc.robot.util.TargetUtils;
 
 public class Autons {
 
-    private SendableChooser<Pose2d> firstElementChooser;
     private SendableChooser<Pose2d> startingPoseChooser;
+    private SendableChooser<AutonTypes> multiNoteChooser;
     private SendableChooser<AutonTypes> autonTypeChooser;
-    private Pose2d firstElement;
-    private Pose2d currentSelectedPose;
-    private Pose2d thirdPathPose;
-    private Pose2d secondPathPose;
-    private AutonTypes firstElementType;
+    private Pose2d startingPose;
+    private AutonTypes autonType, multiNoteType;
     private static PathConstraints pathConstraints = new PathConstraints(
         SWERVE.MAX_SPEED_METERS_PER_SECOND,
         SWERVE.MAX_ACCELERATION,
@@ -84,14 +82,12 @@ public class Autons {
         KnownLocations knownLocations = KnownLocations.getKnownLocations();
         this.alliance = knownLocations.alliance;
 
-        this.firstElement = knownLocations.DO_NOTHING;
-        this.currentSelectedPose = knownLocations.DO_NOTHING;
-        setChoosers(knownLocations);
-        this.firstElement = firstElementChooser.getSelected();
-        this.currentSelectedPose = startingPoseChooser.getSelected();
-        // this.firstElementType = autonTypeChooser.getSelected();
-        this.autonCommand = DO_NOTHING;
-        
+        // Starting config for Auton Choosers
+        this.startingPose = knownLocations.DO_NOTHING;
+        this.autonType = AutonTypes.DO_NOT_MOVE;
+        this.multiNoteType = AutonTypes.DO_NOT_MOVE;
+
+        setChoosers(knownLocations);       
 
         // Configure AutoBuilder last
         AutoBuilder.configureHolonomic(
@@ -112,37 +108,28 @@ public class Autons {
     }
 
     public void setChoosers(KnownLocations knownLocations) {
-
-        // select the ELEMENT to visit during auton (or DO NOTHING)
-        firstElementChooser = new SendableChooser<Pose2d>();
-        firstElementChooser.setDefaultOption("DO NOTHING", knownLocations.DO_NOTHING);
-        firstElementChooser.addOption("NOTE TOP", knownLocations.WING_NOTE_TOP);
-        firstElementChooser.addOption("NOTE MIDDLE", knownLocations.WING_NOTE_MIDDLE);
-        firstElementChooser.addOption("NOTE BOTTOM", knownLocations.WING_NOTE_BOTTOM);
-        SmartDashboard.putData("Auton Element Chooser", firstElementChooser);
-        SmartDashboard.putString("Auton Selected: ", this.firstElement.toString());
-
-        // secondElement = new SendableChooser<Pose2d>();
-        // secondElement.setDefaultOption("DO NOTHING", KnownLocations.DO_NOTHING);
-        // secondElement.addOption("NOTE 1", knownLocations.WING_NOTE_TOP);
-        // secondElement.addOption("NOTE 2", knownLocations.WING_NOTE_MIDDLE);
-        // secondElement.addOption("NOTE 3", knownLocations.WING_NOTE_BOTTOM);
-        // secondElement.putData("Auton Element Chooser", firstElementChooser);
-        // secondElement.putString("Auton Selected: ", this.secondElement.toString());
-
         // select the MANUAL STARTING POSITION of the robot
         this.startingPoseChooser = new SendableChooser<Pose2d>();
         this.startingPoseChooser.setDefaultOption("DO NOTHING", knownLocations.DO_NOTHING);
         this.startingPoseChooser.addOption("START TOP MOST", knownLocations.START_TOPMOST);
         this.startingPoseChooser.addOption("START MIDDLE", knownLocations.START_MIDDLE);
         this.startingPoseChooser.addOption("START BOTTOM MOST", knownLocations.START_BOTTOMMOST);
-        SmartDashboard.putData("Manual Starting Pose", startingPoseChooser);
+        SmartDashboard.putData("Starting Pose", startingPoseChooser);
+
 
         // select whether to visit charging station or score 2nd piece (or leave community)
         this.autonTypeChooser = new SendableChooser<AutonTypes>();
         autonTypeChooser.setDefaultOption("LEAVE STARTING ZONE", AutonTypes.LEAVE_STARTING_ZONE);
-        autonTypeChooser.addOption("2ND PIECE SCORE", AutonTypes.SCORE_2ND_PIECE);
+        autonTypeChooser.addOption("2ND NOTE SCORE", AutonTypes.SCORE_2ND_NOTE);
+        autonTypeChooser.addOption("MULTI NOTE SCORE", AutonTypes.MULTI_NOTE_SCORE);
         SmartDashboard.putData("Auton Type", autonTypeChooser);
+
+        // select the ELEMENT to visit during auton (or DO NOTHING)
+        multiNoteChooser = new SendableChooser<AutonTypes>();
+        multiNoteChooser.setDefaultOption("DO NOTHING", AutonTypes.MULTI_NOTE_SCORE);
+        multiNoteChooser.addOption("WING NOTES", AutonTypes.WING_NOTES);
+        multiNoteChooser.addOption("CENTER LINE NOTES", AutonTypes.CENTER_LINE_NOTES);
+        SmartDashboard.putData("Auton Element Chooser", multiNoteChooser);
     }
     
     public Command getAutonCommand() {
@@ -150,136 +137,42 @@ public class Autons {
     }
 
     public Command buildAutonCommand(KnownLocations knownLocations) {        
-        // SET OUR INITIAL POST
-        drivetrain.setManualPose(currentSelectedPose);
+        // SET OUR INITIAL POSE
+        drivetrain.setManualPose(startingPose);
         
-        if (firstElement == knownLocations.DO_NOTHING) {
+        if (startingPose == knownLocations.DO_NOTHING) {
             SmartDashboard.putBoolean("isDoNothing", true);
             drivetrain.setTrajectorySmartdash(new Trajectory(), "traj1");
             drivetrain.setTrajectorySmartdash(new Trajectory(), "traj2");
             return DO_NOTHING;
         }
-        
+        SequentialCommandGroup autonCommand = new SequentialCommandGroup();
 
-        Pose2d finalPose = knownLocations.WING_NOTE_TOP;
-        List<Pose2d> waypoints = new ArrayList<Pose2d>();
-        waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
-
-        // if (firstElement == knownLocations.WING_NOTE_TOP) {
-        //     waypoints = new ArrayList<Pose2d>();
-        //     waypoints.add(knownLocations.WING_NOTE_TOP);
-        // } else if (firstElement == knownLocations.WING_NOTE_MIDDLE) {
-        //     waypoints = new ArrayList<Pose2d>();
-        //     waypoints.add(knownLocations.WING_NOTE_MIDDLE);
-        // } else if (firstElement == knownLocations.WING_NOTE_BOTTOM) {
-        //     waypoints = new ArrayList<Pose2d>();
-        //     waypoints.add(knownLocations.WING_NOTE_BOTTOM);
-        // }
-
-        PathPlannerPath path1, path2, path3;
-        
-        if (currentSelectedPose == knownLocations.START_TOPMOST) {
-            waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
-            finalPose = knownLocations.WING_NOTE_TOP;
-        } else if (currentSelectedPose == knownLocations.START_MIDDLE) {
-            if (firstElement == knownLocations.WING_NOTE_TOP) {
-                waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
-                finalPose = knownLocations.WING_NOTE_TOP;
-            } else if (firstElement == knownLocations.WING_NOTE_BOTTOM) {
-                waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-                finalPose = knownLocations.WING_NOTE_BOTTOM;
-            }
-        } else if (currentSelectedPose == knownLocations.START_BOTTOMMOST) {
-            waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-            finalPose = knownLocations.WING_NOTE_BOTTOM;
-        }
-
-        // path1 = generateSwerveTrajectory(currentSelectedPose, waypoints, finalPose);
-        path1 = generateSwerveTrajectory(currentSelectedPose, new ArrayList<>(), knownLocations.LEAVE);
-        
-
-        secondPathPose = finalPose == knownLocations.WING_NOTE_TOP ? knownLocations.WING_NOTE_TOP : knownLocations.WING_NOTE_BOTTOM;
-        waypoints = new ArrayList<Pose2d>();
-        waypoints.add(knownLocations.INTERMEDIARY_NOTE_MIDDLE);
-        finalPose = knownLocations.WING_NOTE_MIDDLE;
-
-        path2 = generateSwerveTrajectory(secondPathPose, waypoints, finalPose);
-
-        thirdPathPose = finalPose;
-        waypoints = new ArrayList<Pose2d>();
-
-        if (currentSelectedPose == knownLocations.START_TOPMOST) {
-            waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-            finalPose = knownLocations.WING_NOTE_BOTTOM;
-        } else if (currentSelectedPose == knownLocations.START_MIDDLE) {
-            if (firstElement == knownLocations.WING_NOTE_TOP) {
-                waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-                finalPose = knownLocations.WING_NOTE_BOTTOM;
-            } else if (firstElement == knownLocations.WING_NOTE_BOTTOM) {
-                waypoints = new ArrayList<Pose2d>();
-                waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
-                finalPose = knownLocations.WING_NOTE_TOP;
-            }
-        } else if (currentSelectedPose == knownLocations.START_BOTTOMMOST) {
-            waypoints = new ArrayList<Pose2d>();
-            waypoints.add(knownLocations.INTERMEDIARY_NOTE_TOP);
-            finalPose = knownLocations.WING_NOTE_TOP;
-        }
-
-        path3 = generateSwerveTrajectory(thirdPathPose, waypoints, finalPose);
-        
-        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path1.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj1");
-        // drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path2.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj2");
-        // drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path3.getTrajectory(new ChassisSpeeds(), currentSelectedPose.getRotation())), "traj3");
-        Command firstSwerveCommand = AutoBuilder.followPath(path1);
-        // Command secondSwerveCommand = AutoBuilder.followPath(path2);
-        // Command thirdSwerveCommand = AutoBuilder.followPath(path3);
-
-        // return new SequentialCommandGroup(
-        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-        //     firstSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-        //     new ParallelCommandGroup(
-        //         drivetrain.goToNote(),
-        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-        //     ).until(() -> intake.hasNote()),
-        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-        //     secondSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-        //     new ParallelCommandGroup(
-        //         drivetrain.goToNote(),
-        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-        //     ).until(() -> intake.hasNote()),
-        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote()),
-
-        //     thirdSwerveCommand.until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-        //     new ParallelCommandGroup(
-        //         drivetrain.goToNote(),
-        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-        //     ).until(() -> intake.hasNote()),
-        //     setUpToShoot().until(() -> !shooter.hasNote() && !intake.hasNote())
-        // );
-        
-        return new SequentialCommandGroup(
+        // First, always score the preloaded NOTE
+        autonCommand.addCommands(
             setUpToShoot().until(() -> isReadyToShoot()),
             new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
-            new SequentialCommandGroup(
-                new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm).until(() -> arm.isAtPosition(ArmPosition.HOME)),
-                firstSwerveCommand // .until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && arm.isAtPosition(ArmPosition.HOME)),
-                // new ParallelCommandGroup(
-                //     drivetrain.goToNote(),
-                //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-                // ).until(() -> intake.hasNote())
-            )
-            //setUpToShoot().until(() -> isReadyToShoot()),
-            // new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote())  
-        );
+            new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm).until(() -> arm.isAtPosition(ArmPosition.HOME))
+        );      
+        PathPlannerPath path;
+        int pathIndex = 1;
+
+        switch(autonType) {
+            case DO_NOT_MOVE:
+                break;
+            case LEAVE_STARTING_ZONE:
+                path = generateSwerveTrajectory(startingPose, new ArrayList<>(), knownLocations.LEAVE);
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path.getTrajectory(new ChassisSpeeds(), startingPose.getRotation())), "traj" + pathIndex);
+                pathIndex++;
+                autonCommand.addCommands(AutoBuilder.followPath(path));
+                break;
+            // LEAVE_STARTING_ZONE,
+            // SCORE_2ND_NOTE, 
+            // MULTI_NOTE_SCORE,
+            // WING_NOTES, 
+            // CENTER_LINE_NOTES
+        }
+        return autonCommand;
     }
 
     public boolean isReadyToShoot() {
@@ -357,24 +250,22 @@ public class Autons {
             rebuildAutonCommand = true;
         }
 
-        // runs constantly when disabled
-        Pose2d currAuton = firstElementChooser.getSelected();
-        Pose2d currPose = startingPoseChooser.getSelected();
-        AutonTypes currAutonType = autonTypeChooser.getSelected();
-        
-        if (currAuton != this.firstElement) {
-            this.firstElement = currAuton;
-            // SmartDashboard.putString("Auton Selected: ", this.firstElement.toString());
+        Pose2d startingPose = startingPoseChooser.getSelected();
+        AutonTypes autonType = autonTypeChooser.getSelected();
+        AutonTypes multiNoteType = multiNoteChooser.getSelected();
+
+        if (startingPose != this.startingPose) {
+            this.startingPose = startingPose;
             rebuildAutonCommand = true;
         }
 
-        if (currPose != this.currentSelectedPose) {
-            this.currentSelectedPose = currPose;
+        if (autonType != this.autonType) {
+            this.autonType = autonType;
             rebuildAutonCommand = true;
         }
 
-        if (currAutonType != this.firstElementType) {
-            this.firstElementType = currAutonType;
+        if (multiNoteType != this.multiNoteType) {
+            this.multiNoteType = multiNoteType;
             rebuildAutonCommand = true;
         }
 
@@ -384,14 +275,14 @@ public class Autons {
     }
     
     /**
-     * Determines what we do with our 2nd path
-     * 
-     * LEAVE COMMUNITY - no 2nd path
-     * SCORE_2ND_PIECE - return to appropriate node
-     * CHARGING_STATION - center onto the charging station
+     * Determines what we after scoring initial note
      */
-    public enum AutonTypes { 
-        LEAVE_STARTING_ZONE,
-        SCORE_2ND_PIECE
+    public enum AutonTypes {
+        DO_NOT_MOVE,         // Do nothing after scoring first note
+        LEAVE_STARTING_ZONE,// Leave the starting area after scoring first note
+        SCORE_2ND_NOTE,    // Score a second NOTE
+        MULTI_NOTE_SCORE,    // Score multiple NOTES
+        WING_NOTES,         // Score additional WING NOTES
+        CENTER_LINE_NOTES   // Score CENTER LINE NOTES
     }
 }
