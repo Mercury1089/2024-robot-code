@@ -21,8 +21,8 @@ public class PathUtils {
      * 
      */
     public static final PathConstraints pathConstraints = new PathConstraints(
-        SWERVE.MAX_SPEED_METERS_PER_SECOND,
-        SWERVE.MAX_ACCELERATION,
+        SWERVE.MAX_SPEED_METERS_PER_SECOND * 0.25,
+        SWERVE.MAX_ACCELERATION * 0.25,
         SWERVE.MAX_ROTATIONAL_SPEED,
         SWERVE.MAX_ANGULAR_SPEED
     );
@@ -55,7 +55,7 @@ public class PathUtils {
         return new PathPlannerPath(
             bezierPoints,
             PathUtils.pathConstraints,
-            new GoalEndState(0.0, endStateRotation));
+            new GoalEndState(0.0, endStateRotation, true));
     }
 
     /**

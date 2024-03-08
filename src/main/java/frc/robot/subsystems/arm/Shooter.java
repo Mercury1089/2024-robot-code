@@ -24,12 +24,13 @@ public class Shooter extends SubsystemBase {
 
   public static final double NOMINAL_OUT = 0.0, PEAK_OUT = 1.0;
   public static final double MAX_RPM = 7000.0, SPEAKER_RPM = 3500.0, STEADY_RPM = 3500.0, AMP_RPM = 1000.0, NULL_RPM = -1.0;
-  public static final double K_P = 0.00024, K_I = 0.00000001, K_D = 0.01, K_F = 0.0001625;
+  public static final double K_P = 0.00024, K_I = 0.00000001, K_D = 0.01, K_F = 0.0001778;
+  // public static final double K_P = 0.000, K_I = 0.0000000, K_D = 0.0, K_F = 0.0001778;
   public static final double MIN_DISTANCE = 6.7, MAX_DISTANCE = 17.0;
   //public static final double MIN_DISTANCE = 2.0, MAX_DISTANCE = 20.0;
   public final int SHOOTER_BREAKBEAM = BREAKBEAM.SHOOTER_BREAKBEAM;
   private final double TARGET_VELOCITY_THRESHOLD = 100.0; // within a +- 50 rpm range to shoot
-  private final double MAX_VOLTAGE = 11.5;
+  private final double MAX_VOLTAGE = 10.5;
 
   private CANSparkFlex shooterFront;
   private double targetVelocity;
@@ -68,6 +69,8 @@ public class Shooter extends SubsystemBase {
     setPIDGain(SHOOTER_PID_SLOTS.VELOCITY_GAINS.getValue(), velocityGains);
 
     this.shooterBreakBeam = new DigitalInput(SHOOTER_BREAKBEAM);
+
+    // SmartDashboard.putNumber("Shooter/kF", K_F);
   }
 
   public void stopShooter() {
@@ -95,6 +98,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Velocity", this.getVelocity());
     SmartDashboard.putBoolean("Shooter/hasNote", hasNote());
     SmartDashboard.putBoolean("Shooter/isAtVelocity", isAtTargetVelocity());
+    // shooterFront.getPIDController().setFF(SmartDashboard.getNumber("Shooter/kF", K_F), SHOOTER_PID_SLOTS.VELOCITY_GAINS.getValue());
   }
 
   /**

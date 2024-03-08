@@ -91,12 +91,12 @@ public class RobotContainer {
     LEDs.disableAutoShoot();
 
     shooter = new Shooter();
-    shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
-    //shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
+    // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
+    shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
     
     auton = new Autons(drivetrain, intake, shooter, arm, LEDs);
 
-    Trigger intakeHasNote = new Trigger(() -> intake.hasNote());
+    Trigger intakeHasNote = new Trigger(() -> intake.hasNote() && DriverStation.isTeleop());
     intakeHasNote.onTrue(new ParallelCommandGroup(
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
     ));
@@ -143,20 +143,17 @@ public class RobotContainer {
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
 
     Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && arm.isAtPosition(ArmPosition.PICKUP_FLOOR) && DriverStation.isTeleop());
-    noteInRange.onTrue(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 1.0)));
-    noteInRange.onFalse(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 0.0)));
+    // noteInRange.onTrue(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 1.0)));
+    // noteInRange.onFalse(new RunCommand(() -> gamepadHID.setRumble(RumbleType.kBothRumble, 0.0)));
 
-    gamepadRT.and(noteInRange).onTrue(new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        DriveCommands.followPath(() -> drivetrain.getPathToNote(), drivetrain),
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-      ).until(() -> intake.hasNote()),
-      new ParallelCommandGroup(
-        // new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
-        // new RunCommand(() -> LEDs.lightUp(LEDState.DRIVEWITHNOTE), LEDs)
-      )
-    ));
+    // gamepadRT.and(noteInRange).onTrue(new SequentialCommandGroup(
+    //   new ParallelCommandGroup(
+    //     DriveCommands.followPath(() -> drivetrain.getPathToNote(), drivetrain),
+    //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+    //   ).until(() -> intake.hasNote())
+    // ));
+
+
 
     // MAKE SURE THIS WORKS
     right1.and(noNotePresent).whileTrue(
@@ -164,8 +161,8 @@ public class RobotContainer {
         DriveCommands.targetDrive(
           leftJoystickY, leftJoystickX,
           () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees(),
-          drivetrain),
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+          drivetrain)
+        // new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
       )
     );
 

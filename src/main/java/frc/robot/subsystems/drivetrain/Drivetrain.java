@@ -375,9 +375,9 @@ public class Drivetrain extends SubsystemBase {
     pathToNote = PathUtils.generatePath(getPose(), notePose);
     setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToNote), "pathToNote");
 
-    KnownLocations knownLocations = KnownLocations.getKnownLocations();
-    pathToAmp = PathUtils.generatePath(Rotation2d.fromDegrees(-90.0), getPose(), knownLocations.AMP);
-    setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp), "pathToAmp");
+    // KnownLocations knownLocations = KnownLocations.getKnownLocations();
+    // pathToAmp = PathUtils.generatePath(Rotation2d.fromDegrees(-90.0), getPose(), knownLocations.AMP);
+    // setTrajectorySmartdash(PathUtils.TrajectoryFromPath(pathToAmp), "pathToAmp");
 
     SmartDashboard.putNumber("Drivetrain/CurrentPose X", getPose().getX());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Y", getPose().getY());

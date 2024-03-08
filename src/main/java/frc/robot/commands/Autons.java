@@ -1,5 +1,8 @@
 package frc.robot.commands;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.swing.text.html.ParagraphView;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -13,12 +16,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
+import frc.robot.Robot;
 import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.RobotModeLEDs;
 import frc.robot.subsystems.arm.*;
@@ -43,7 +47,7 @@ public class Autons {
 
     private Alliance alliance;
 
-    private final double ROTATION_P = 5.0;
+    private final double ROTATION_P = 3.0;
     private final double TRANSLATION_P = 5.0;
 
     private final Command DO_NOTHING = new PrintCommand("Do Nothing Auton");
@@ -53,9 +57,6 @@ public class Autons {
     private RobotModeLEDs LEDs;
     private Shooter shooter;
 
-    /**
-     * made by rohan no thanks to owen :(
-     */
     public Autons(Drivetrain drivetrain, Intake intake, Shooter shooter, Arm arm, RobotModeLEDs leds) {
 
         this.drivetrain = drivetrain;
@@ -133,14 +134,38 @@ public class Autons {
         }
         SequentialCommandGroup autonCommand = new SequentialCommandGroup();
 
-        // First, always score the preloaded NOTE
-        autonCommand.addCommands(
-            setUpToShoot().until(() -> isReadyToShoot()),
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
-            new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm).until(() -> arm.isAtPosition(ArmPosition.HOME))
-        );      
         PathPlannerPath path;
         int pathIndex = 1;
+        
+
+        if (autonType == autonType.SCORE_2ND_NOTE) {
+            path = PathUtils.generatePath(startingPose, knownLocations.WING_NOTE_TOP);
+            drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+            pathIndex++;
+            autonCommand.addCommands(
+                new InstantCommand(() -> LEDs.disableAutoShoot(), LEDs),
+                AutoBuilder.followPath(path).until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
+                new ParallelCommandGroup(
+                    drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+                ).until(() -> intake.hasNote()),
+                new ParallelCommandGroup(
+                    new InstantCommand(() -> drivetrain.drive(0.0, 0.0, 0.0), drivetrain),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
+                )
+            );
+            return autonCommand;
+        }
+        // First, always score the preloaded NOTE
+        autonCommand.addCommands(
+            new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs),
+            setUpToShoot().until(() -> isReadyToShoot()),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
+            new ParallelCommandGroup(
+                new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
+                new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm))
+                .until(() -> arm.isAtPosition(ArmPosition.HOME))
+        );      
 
         switch(autonType) {
             case DO_NOT_MOVE:
@@ -152,10 +177,22 @@ public class Autons {
                 autonCommand.addCommands(AutoBuilder.followPath(path));
                 break;
             case SCORE_2ND_NOTE:
-                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP, knownLocations.WING_NOTE_TOP);
+                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP);
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
-                autonCommand.addCommands(AutoBuilder.followPath(path));
+                autonCommand.addCommands(
+                    AutoBuilder.followPath(path).until(() -> drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
+                    new ParallelCommandGroup(
+                        drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+                    ).until(() -> intake.hasNote()),
+                    // new ParallelCommandGroup(
+                    //     DriveCommands.joyStickDrive(() -> 0.5, () -> 0.0, () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees(), false, drivetrain),
+                    //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+                    // ).until(() -> intake.hasNote()),
+                    setUpToShoot().until(() -> isReadyToShoot()),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
+                    new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm).until(() -> arm.isAtPosition(ArmPosition.HOME)));
                 break;
             // MULTI_NOTE_SCORE,
             // WING_NOTES, 
