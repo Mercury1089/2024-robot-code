@@ -91,8 +91,8 @@ public class RobotContainer {
     LEDs.disableAutoShoot();
 
     shooter = new Shooter();
-    // shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
-    shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
+    shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
+    // shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
     
     auton = new Autons(drivetrain, intake, shooter, arm, LEDs);
 

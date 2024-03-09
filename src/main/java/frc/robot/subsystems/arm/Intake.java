@@ -45,6 +45,8 @@ public class Intake extends SubsystemBase {
 
     intake.setInverted(true);
 
+    intake.burnFlash();
+
     intakeBreakBeam = new DigitalInput(INTAKE_BREAKBEAM);
 
     /* 

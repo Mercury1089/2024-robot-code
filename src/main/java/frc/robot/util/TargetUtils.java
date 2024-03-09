@@ -10,6 +10,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.sensors.ObjectDetectionCamera;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Intake;
+import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 
 public class TargetUtils {
@@ -66,14 +70,14 @@ public class TargetUtils {
     }
 
     public static Rotation2d getTargetHeadingToClosestNote(ObjectDetectionCamera objCam, Pose2d robotPose) {
-        Rotation2d targetRotation = Rotation2d.fromDegrees(-objCam.getYaw());
+        Rotation2d targetRotation = Rotation2d.fromDegrees(-objCam.getYaw() + 2.0);
         return objCam.getYaw() != 0.0 ?
             robotPose.rotateBy(targetRotation).getRotation() :
             robotPose.getRotation();
     }
 
    public static Translation2d getNoteTranslation(ObjectDetectionCamera objCam, Pose2d robotPose, double distance) {
-        return new Translation2d(distance, getTargetHeadingToClosestNote(objCam, robotPose)).plus(robotPose.getTranslation());
+        return new Translation2d(distance + Units.inchesToMeters(5.0), getTargetHeadingToClosestNote(objCam, robotPose)).plus(robotPose.getTranslation());
    }
    
    // TODO: Create KnownLocations for the X values in this method
@@ -110,5 +114,19 @@ public class TargetUtils {
 
        return inStageArea;
    }
+
+   public static Optional<Rotation2d> getRotationTargetOverride(Drivetrain drivetrain, Intake intake, Arm arm){
+    // Some condition that should decide if we want to override rotation
+    var result = drivetrain.getObjCam().getLatestResult();
+    if(result.hasTargets() && !intake.hasNote() && arm.isAtPosition(ArmPosition.HOME)) {
+        // Return an optional containing the rotation override (this should be a field relative rotation)
+        return Optional.of(getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()));
+    } else if (intake.hasNote()) {
+        // return an empty optional when we don't want to override the path's rotation
+        return Optional.of(Rotation2d.fromDegrees(getTargetHeadingToFieldPosition(drivetrain.getPose(), FieldPosition.SPEAKER)));
+    } else {
+        return Optional.empty();
+    }
+}
 
 }

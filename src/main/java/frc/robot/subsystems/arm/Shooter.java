@@ -113,7 +113,7 @@ public class Shooter extends SubsystemBase {
    * @return true if at target velocity, false otherwise
    */
   public boolean isAtTargetVelocity() {
-    return Math.abs(getVelocity() - SPEAKER_RPM) <= TARGET_VELOCITY_THRESHOLD;
+    return getVelocity() > 3400.0;
   }
 
   public boolean isReadyToShoot() {

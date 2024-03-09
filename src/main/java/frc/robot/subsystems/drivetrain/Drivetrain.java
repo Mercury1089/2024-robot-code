@@ -346,6 +346,10 @@ public class Drivetrain extends SubsystemBase {
     return TargetUtils.isInShootingZone(getPose());
   }
 
+  public boolean objCamHasTargets() {
+    return objectDetectionCam.getLatestResult().hasTargets();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

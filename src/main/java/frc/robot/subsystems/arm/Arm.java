@@ -35,7 +35,7 @@ public class Arm extends SubsystemBase {
 
   private static final float ARM_SOFT_LIMIT_FWD = (float) 146;
 
-  private static final float ARM_SOFT_LIMIT_BKW = (float) 46.6;
+  private static final float ARM_SOFT_LIMIT_BKW = (float) 45.3;
 
   private static final double ANGLE_OFFSET = -2.0;
 
@@ -54,6 +54,7 @@ public class Arm extends SubsystemBase {
   private SparkPIDController armPIDController;
   private AbsoluteEncoder armAbsoluteEncoder;
   private Drivetrain drivetrain;
+  private double setPosition;
 
   public Arm(Drivetrain drivetrain) {
     armLeft = new CANSparkMax(CAN.ARM_LEFT, MotorType.kBrushless);
@@ -87,6 +88,8 @@ public class Arm extends SubsystemBase {
     armPIDController.setI(ARM_NORMAL_I_VAL);
     armPIDController.setD(ARM_NORMAL_D_VAL);
 
+    setPosition = getArmPosition();
+
     SmartDashboard.putNumber("Arm/Position", getArmPosition());
   }
   
@@ -113,6 +116,8 @@ public class Arm extends SubsystemBase {
       pos = ARM_SOFT_LIMIT_BKW;
     }
 
+    setPosition = pos;
+
     armPIDController.setReference(pos, CANSparkMax.ControlType.kPosition);
   }
 
@@ -125,7 +130,7 @@ public class Arm extends SubsystemBase {
   }
   
   public double getError() {
-    return Math.abs(getArmPosition() - getPosToTarget(getDistanceToSpeaker()));
+    return Math.abs(getArmPosition() - setPosition);
   }
 
   public boolean isFinishedMoving() {
