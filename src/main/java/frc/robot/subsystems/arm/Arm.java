@@ -49,32 +49,39 @@ public class Arm extends SubsystemBase {
   public final double THRESHOLD_DEGREES = 0.5;
 
   
-  private CANSparkMax arm;
+  private CANSparkMax armLeft;
+  private CANSparkMax armRight;
   private SparkPIDController armPIDController;
   private AbsoluteEncoder armAbsoluteEncoder;
   private Drivetrain drivetrain;
 
   public Arm(Drivetrain drivetrain) {
-    arm = new CANSparkMax(CAN.ARM, MotorType.kBrushless);
-    arm.restoreFactoryDefaults();
-    arm.setInverted(true);
-    arm.setIdleMode(IdleMode.kBrake);
-    armPIDController = arm.getPIDController();
-    // armRelativeEncoder = arm.getEncoder();
-    armAbsoluteEncoder = arm.getAbsoluteEncoder(Type.kDutyCycle);
+    armLeft = new CANSparkMax(CAN.ARM_LEFT, MotorType.kBrushless);
+    armRight = new CANSparkMax(CAN.ARM_RIGHT, MotorType.kBrushless);
 
-    // armRelativeEncoder.setInverted(true);
+    armLeft.restoreFactoryDefaults();
+    armRight.restoreFactoryDefaults();
+
+    armLeft.setIdleMode(IdleMode.kBrake);
+    armRight.setIdleMode(IdleMode.kBrake);
+
+    armLeft.setInverted(false);
+    armRight.follow(armLeft, true);
+
+    armPIDController = armLeft.getPIDController();
+
+    armAbsoluteEncoder = armLeft.getAbsoluteEncoder(Type.kDutyCycle);
+
     armAbsoluteEncoder.setPositionConversionFactor(360.0);
     armPIDController.setFeedbackDevice(armAbsoluteEncoder);
     this.drivetrain = drivetrain;
 
     armPIDController.setPositionPIDWrappingEnabled(false);
-    // armPIDController.setOutputRange(NOMINAL_OUTPUT_FORWARD, PEAK_OUTPUT_FORWARD);
 
-    arm.enableSoftLimit(SoftLimitDirection.kForward, true);
-    arm.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    arm.setSoftLimit(SoftLimitDirection.kForward, ARM_SOFT_LIMIT_FWD);
-    arm.setSoftLimit(SoftLimitDirection.kReverse, ARM_SOFT_LIMIT_BKW);
+    armLeft.enableSoftLimit(SoftLimitDirection.kForward, true);
+    armLeft.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    armLeft.setSoftLimit(SoftLimitDirection.kForward, ARM_SOFT_LIMIT_FWD);
+    armLeft.setSoftLimit(SoftLimitDirection.kReverse, ARM_SOFT_LIMIT_BKW);
 
     armPIDController.setP(ARM_NORMAL_P_VAL);
     armPIDController.setI(ARM_NORMAL_I_VAL);
@@ -88,7 +95,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void setSpeed(Supplier<Double> speedSupplier) {
-    arm.set((speedSupplier.get() * 0.5));
+    armLeft.set((speedSupplier.get() * 0.5));
   }
 
   public void setPosition(ArmPosition pos) {
@@ -149,7 +156,7 @@ public class Arm extends SubsystemBase {
   public enum ArmPosition {
     AMP(ARM_SOFT_LIMIT_FWD),
     HOME(ARM_SOFT_LIMIT_BKW),
-    PICKUP_FLOOR(ARM_SOFT_LIMIT_BKW),;
+    PICKUP_FLOOR(ARM_SOFT_LIMIT_BKW);
   
     
     public final double degreePos;

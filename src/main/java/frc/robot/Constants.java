@@ -149,8 +149,8 @@ public final class Constants {
     // public static final int WRIST_SPARKMAX = 10;
     public static final int SHOOTER = 11;
     // public static final int SHOOTER_BACK_SPARKMAX = 12;
-    public static final int ARM = 13;
-    // public static final int FEEDER_SPARKMAX = 14;
+    public static final int ARM_LEFT = 13;
+    public static final int ARM_RIGHT = 14;
     public static final int INTAKE= 15;
     
     
