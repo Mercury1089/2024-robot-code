@@ -223,9 +223,9 @@ public class Autons {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-                new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)),
+                new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
                 AutoBuilder.followPath(path)
-            .until(() -> arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
+            ).until(() -> arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
             new ParallelCommandGroup(
                 drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
