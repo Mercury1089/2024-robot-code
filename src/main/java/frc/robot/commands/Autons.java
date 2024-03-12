@@ -12,6 +12,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -191,7 +192,21 @@ public class Autons {
                     pickUpNote(path),
                     shootNote()
                 );
-                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_MIDDLE);
+                // autonCommand.addCommands(
+                //     new ParallelCommandGroup(
+                //         AutoBuilder.followPath(path),
+                //         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+                //     ).until(() -> intake.hasNote()),
+                //     shootNote()
+                // );
+                path = PathUtils.generatePath(knownLocations.WING_NOTE_TOP, knownLocations.INTERMEDIARY_NOTE_MIDDLE, knownLocations.WING_NOTE_MIDDLE);
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                pathIndex++;
+                autonCommand.addCommands(
+                    pickUpNote(path),
+                    shootNote()
+                );
+                path = PathUtils.generatePath(knownLocations.WING_NOTE_MIDDLE, knownLocations.INTERMEDIARY_NOTE_BOTTOM, knownLocations.WING_NOTE_BOTTOM);
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(
@@ -222,10 +237,11 @@ public class Autons {
     public Command pickUpNote(PathPlannerPath path) {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
+                // also can try making intake be on
+                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
                 new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
                 AutoBuilder.followPath(path)
-            ).until(() -> arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1),
+            ).until(() -> (arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1)),
             new ParallelCommandGroup(
                 drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)

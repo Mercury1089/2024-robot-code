@@ -373,7 +373,7 @@ public class Drivetrain extends SubsystemBase {
     }
     smartdashField.setRobotPose(getPose());
   
-    Pose2d notePose = new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget()), TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()));
+    Pose2d notePose = new Pose2d(TargetUtils.getNoteTranslation(objectDetectionCam, getPose(), objectDetectionCam.getDistanceToTarget() + Units.inchesToMeters(4.0)), TargetUtils.getTargetHeadingToClosestNote(getObjCam(), getPose()));
 
     setPoseSmartdash(notePose, "notepose");
     pathToNote = PathUtils.generatePath(getPose(), notePose);

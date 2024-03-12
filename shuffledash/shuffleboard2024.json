@@ -25,7 +25,6 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
-              "Colors/pathToAmp": "#FFFFFFFF",
               "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
@@ -279,7 +278,6 @@
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false,
-              "Colors/pathToAmp": "#FFFFFFFF",
               "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
@@ -291,9 +289,9 @@
     }
   ],
   "windowGeometry": {
-    "x": -8.0,
-    "y": -8.0,
-    "width": 1936.0,
-    "height": 1056.0
+    "x": -7.0,
+    "y": 2.0,
+    "width": 1932.0,
+    "height": 1045.0
   }
 }
