@@ -59,6 +59,8 @@ public class KnownLocations {
             LEAVE,
             CENTER_LINE_SHOOT,
             AMP;
+    public final Rotation2d
+            WING_NOTE_ROTATION;
 
     public final double WING_NOTE_OFFSET = 7.0, CENTER_LINE_OFFSET = 30.0;
 
@@ -112,6 +114,9 @@ public class KnownLocations {
             WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
             WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
 
+            // Rotation that should be used moving from one WING_NOTE to the next.
+            WING_NOTE_ROTATION = Rotation2d.fromDegrees(-60);
+
             LEAVE = PathPointInch(114.261, 30, 0);
 
             AMP = PathPointInch(72.5, 303.0, 90.0);
@@ -143,6 +148,9 @@ public class KnownLocations {
             WING_NOTE_TOP = PathPointInch(537.464, 276, 180);
             WING_NOTE_MIDDLE = PathPointInch(537.464, 219, 180);
             WING_NOTE_BOTTOM = PathPointInch(537.464, 162, 180);
+
+            // Rotation that should be used moving from one WING_NOTE to the next.
+            WING_NOTE_ROTATION = Rotation2d.fromDegrees(-120);
 
             LEAVE = PathPointInch(537.464, 30, 180);
 

@@ -188,11 +188,7 @@ public class Autons {
                     shootNote()
                 );
 
-                if (knownLocations.alliance == Alliance.Blue) {
-                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-60.0), startingPose, knownLocations.WING_NOTE_MIDDLE);
-                } else {
-                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-120.0), startingPose, knownLocations.WING_NOTE_MIDDLE);
-                }
+                path = PathUtils.generatePath(knownLocations.WING_NOTE_ROTATION, startingPose, knownLocations.WING_NOTE_MIDDLE);
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(
@@ -201,11 +197,7 @@ public class Autons {
                     shootNote()
                 );
 
-                if (knownLocations.alliance == Alliance.Blue) {
-                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-60.0), startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-                } else {
-                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-120.0), startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-                }
+                path = PathUtils.generatePath(knownLocations.WING_NOTE_ROTATION, startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(
