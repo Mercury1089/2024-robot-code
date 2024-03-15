@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.ADXL345_I2C.AllAxes;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.APRILTAGS;
 import frc.robot.sensors.ObjectDetectionCamera;
@@ -79,7 +80,16 @@ public class TargetUtils {
    public static Translation2d getNoteTranslation(ObjectDetectionCamera objCam, Pose2d robotPose, double distance) {
         return new Translation2d(distance + Units.inchesToMeters(5.0), getTargetHeadingToClosestNote(objCam, robotPose)).plus(robotPose.getTranslation());
    }
-   
+
+   public static boolean isInWing(Pose2d pose) {
+        KnownLocations knownLocations = KnownLocations.getKnownLocations();
+        Alliance alliance = knownLocations.alliance;
+
+        return alliance == Alliance.Blue ?
+            pose.getX() > knownLocations.WING_NOTE_TOP.getX() :
+            pose.getX() < knownLocations.WING_NOTE_TOP.getX();
+   }
+
    // TODO: Create KnownLocations for the X values in this method
    public static boolean isInShootingZone(Pose2d pose) {
        boolean inShootingZone = false;

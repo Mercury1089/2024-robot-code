@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.lang.annotation.Target;
 import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -281,13 +282,7 @@ public class Autons {
     }
 
     public Command pickUpCenterNote(PathPlannerPath path, KnownLocations knownLocations) {
-        double passX = alliance == Alliance.Blue ?
-            knownLocations.WING_NOTE_BOTTOM.getX() :
-            knownLocations.WING_NOTE_BOTTOM.getX();
-
-        BooleanSupplier pickUpNoteCheck = alliance == Alliance.Blue ?
-            () -> arm.isAtPosition(ArmPosition.HOME) && noteInRange() && drivetrain.getPose().getY() > passX :
-            () -> arm.isAtPosition(ArmPosition.HOME) && noteInRange() && drivetrain.getPose().getY() < passX;
+        BooleanSupplier pickUpNoteCheck = () -> arm.isAtPosition(ArmPosition.HOME) && noteInRange() && !TargetUtils.isInWing(drivetrain.getPose());
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
