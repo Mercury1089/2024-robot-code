@@ -49,6 +49,13 @@ public class ObjectDetectionCamera extends PhotonCamera {
             0.0;
     }
 
+    public int getTargetCount() {
+        var result = getLatestResult();
+        return result.hasTargets() ? 
+            result.getTargets().size() :
+            0;
+    }
+
     public double getDistanceToTarget() {
         PhotonPipelineResult result = getLatestResult();
         if (result.hasTargets()) {

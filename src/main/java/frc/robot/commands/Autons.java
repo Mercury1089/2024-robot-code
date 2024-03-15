@@ -1,10 +1,6 @@
 package frc.robot.commands;
 
-import java.nio.file.Path;
 import java.util.function.BooleanSupplier;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.swing.text.html.ParagraphView;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -13,28 +9,26 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Robot;
 import frc.robot.Constants.SWERVE;
+import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.subsystems.RobotModeLEDs;
 import frc.robot.subsystems.arm.*;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.Intake.IntakeSpeed;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
 import frc.robot.util.KnownLocations;
 import frc.robot.util.MercMath;
 import frc.robot.util.PathUtils;
@@ -54,6 +48,7 @@ public class Autons {
 
     private final double ROTATION_P = 3.0;
     private final double TRANSLATION_P = 5.0;
+    private static final double MIN_NOTE_DISTANCE = Units.inchesToMeters(30.0);
 
     private final Command DO_NOTHING = new PrintCommand("Do Nothing Auton");
     private Drivetrain drivetrain;
@@ -259,6 +254,13 @@ public class Autons {
         LEDs.isAutoShootEnabled();
     }
 
+    public boolean noteInRange() {
+        ObjectDetectionCamera objectDetectionCam = drivetrain.getObjCam();
+        return
+            objectDetectionCam.getTargetCount() == 1 &&
+            objectDetectionCam.getDistanceToTarget() > MIN_NOTE_DISTANCE;
+    }
+    
     public Command setUpToShoot() {
         return DriveCommands.prepareToShoot(MercMath.zeroSupplier, MercMath.zeroSupplier, shooter, arm, drivetrain);
     }
@@ -270,7 +272,7 @@ public class Autons {
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
                 new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
                 AutoBuilder.followPath(path)
-            ).until(() -> (arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1)),
+            ).until(() -> arm.isAtPosition(ArmPosition.HOME) && noteInRange()),
             new ParallelCommandGroup(
                 drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
@@ -284,8 +286,8 @@ public class Autons {
             knownLocations.WING_NOTE_BOTTOM.getX();
 
         BooleanSupplier pickUpNoteCheck = alliance == Alliance.Blue ?
-            () -> arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && drivetrain.getPose().getY() > passX :
-            () -> arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && drivetrain.getPose().getY() < passX;
+            () -> arm.isAtPosition(ArmPosition.HOME) && noteInRange() && drivetrain.getPose().getY() > passX :
+            () -> arm.isAtPosition(ArmPosition.HOME) && noteInRange() && drivetrain.getPose().getY() < passX;
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
