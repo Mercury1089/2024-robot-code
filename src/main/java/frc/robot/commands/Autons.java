@@ -42,7 +42,7 @@ public class Autons {
     private SendableChooser<AutonTypes> multiNoteChooser;
     private SendableChooser<AutonTypes> autonTypeChooser;
     private Pose2d startingPose;
-    private AutonTypes autonType, multiNoteType;
+    private AutonTypes autonType; // multiNoteType;
     private Command autonCommand;
 
     private Alliance alliance;
@@ -72,7 +72,7 @@ public class Autons {
         // Starting config for Auton Choosers
         this.startingPose = knownLocations.DO_NOTHING;
         this.autonType = AutonTypes.DO_NOT_MOVE;
-        this.multiNoteType = AutonTypes.DO_NOT_MOVE;
+        // this.multiNoteType = AutonTypes.DO_NOT_MOVE;
 
         setChoosers(knownLocations);    
         
@@ -113,15 +113,15 @@ public class Autons {
         autonTypeChooser.setDefaultOption("LEAVE STARTING ZONE", AutonTypes.LEAVE_STARTING_ZONE);
         autonTypeChooser.addOption("2ND NOTE SCORE", AutonTypes.SCORE_2ND_NOTE);
         autonTypeChooser.addOption("MULTI NOTE SCORE", AutonTypes.MULTI_NOTE_SCORE);
-        autonTypeChooser.addOption("MULTI NOTE SCORE", AutonTypes.CENTER_LINE_NOTES);
+        autonTypeChooser.addOption("CENTER LINE NOTE AUTO", AutonTypes.CENTER_LINE_NOTES);
         SmartDashboard.putData("Auton Type", autonTypeChooser);
 
         // select the ELEMENT to visit during auton (or DO NOTHING)
-        multiNoteChooser = new SendableChooser<AutonTypes>();
-        multiNoteChooser.setDefaultOption("DO NOTHING", AutonTypes.MULTI_NOTE_SCORE);
-        multiNoteChooser.addOption("WING NOTES", AutonTypes.WING_NOTES);
-        multiNoteChooser.addOption("CENTER LINE NOTES", AutonTypes.CENTER_LINE_NOTES);
-        SmartDashboard.putData("Auton Element Chooser", multiNoteChooser);
+        // multiNoteChooser = new SendableChooser<AutonTypes>();
+        // multiNoteChooser.setDefaultOption("DO NOTHING", AutonTypes.MULTI_NOTE_SCORE);
+        // multiNoteChooser.addOption("WING NOTES", AutonTypes.WING_NOTES);
+        // multiNoteChooser.addOption("CENTER LINE NOTES", AutonTypes.CENTER_LINE_NOTES);
+        // SmartDashboard.putData("Auton Element Chooser", multiNoteChooser);
     }
     
     public Command getAutonCommand() {
@@ -323,7 +323,7 @@ public class Autons {
 
         Pose2d startingPose = startingPoseChooser.getSelected();
         AutonTypes autonType = autonTypeChooser.getSelected();
-        AutonTypes multiNoteType = multiNoteChooser.getSelected();
+        // AutonTypes multiNoteType = multiNoteChooser.getSelected();
 
         if (startingPose != this.startingPose) {
             this.startingPose = startingPose;
@@ -335,10 +335,10 @@ public class Autons {
             rebuildAutonCommand = true;
         }
 
-        if (multiNoteType != this.multiNoteType) {
-            this.multiNoteType = multiNoteType;
-            rebuildAutonCommand = true;
-        }
+        // if (multiNoteType != this.multiNoteType) {
+        //     this.multiNoteType = multiNoteType;
+        //     rebuildAutonCommand = true;
+        // }
 
         if (rebuildAutonCommand) {
             this.autonCommand = buildAutonCommand(knownLocations);
