@@ -46,13 +46,21 @@ public class KnownLocations {
             INTERMEDIARY_NOTE_TOP,
             INTERMEDIARY_NOTE_MIDDLE,
             INTERMEDIARY_NOTE_BOTTOM,
-            CENTER_NOTE_1,
-            CENTER_NOTE_2,
-            CENTER_NOTE_3,
-            CENTER_NOTE_4,
-            CENTER_NOTE_5,
+            CENTER_NOTE_BOTTOM,
+            CENTER_NOTE_SECOND_BOTTOM,
+            CENTER_NOTE_MIDDLE,
+            CENTER_NOTE_SECOND_TOP,
+            CENTER_NOTE_TOP,
+            INTERMEDIARY_CENTER_NOTE_BOTTOM,
+            INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM,
+            INTERMEDIARY_CENTER_NOTE_MIDDLE,
+            INTERMEDIARY_CENTER_NOTE_SECOND_TOP,
+            INTERMEDIARY_CENTER_NOTE_TOP,
             LEAVE,
+            CENTER_LINE_SHOOT,
             AMP;
+
+    public final double WING_NOTE_OFFSET = 7.0, CENTER_LINE_OFFSET = 30.0;
 
     /**
      * Load the field layout for the current year (currently CRESCENDO).
@@ -104,19 +112,27 @@ public class KnownLocations {
             WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
             WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
 
-            LEAVE = PathPointInch(114.261, 162 - 50, 0);
+            LEAVE = PathPointInch(114.261, 30, 0);
 
             AMP = PathPointInch(72.5, 303.0, 90.0);
 
-            INTERMEDIARY_NOTE_TOP = PathPointInch(84.261 - 14, 276, 0);
-            INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261 - 14, 219, 0);
-            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261 - 14, 162, 0);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(84.261 + WING_NOTE_OFFSET, 276, 0);
+            INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261 + WING_NOTE_OFFSET, 219, 0);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261 + WING_NOTE_OFFSET, 162, 0);
 
-            CENTER_NOTE_1 = PathPointInch(325.862, 30, 0);
-            CENTER_NOTE_2 = PathPointInch(325.862, 96, 0);
-            CENTER_NOTE_3 = PathPointInch(325.862, 162, 0);
-            CENTER_NOTE_4 = PathPointInch(325.862, 228, 0);
-            CENTER_NOTE_5 = PathPointInch(325.862, 294, 0);
+            CENTER_NOTE_BOTTOM = PathPointInch(325.862, 30, 0);
+            CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862, 96, 0);
+            CENTER_NOTE_MIDDLE = PathPointInch(325.862, 162, 0);
+            CENTER_NOTE_SECOND_TOP = PathPointInch(325.862, 228, 0);
+            CENTER_NOTE_TOP = PathPointInch(325.862, 294, 0);
+
+            INTERMEDIARY_CENTER_NOTE_BOTTOM = PathPointInch(325.862 - CENTER_LINE_OFFSET, 30, 0);
+            INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862 - CENTER_LINE_OFFSET, 96, 0);
+            INTERMEDIARY_CENTER_NOTE_MIDDLE = PathPointInch(325.862 - CENTER_LINE_OFFSET, 162, 0);
+            INTERMEDIARY_CENTER_NOTE_SECOND_TOP = PathPointInch(325.862 - CENTER_LINE_OFFSET, 228, 0);
+            INTERMEDIARY_CENTER_NOTE_TOP = PathPointInch(325.862 - CENTER_LINE_OFFSET, 294, 0);
+
+            CENTER_LINE_SHOOT = PathPointInch(64.66, 154.05, 0);
 
             START_TOPMOST = PathPointInch(24.741, 268.182, 60);
             START_MIDDLE = PathPointInch(55.43, 218.777885, 0);
@@ -128,19 +144,27 @@ public class KnownLocations {
             WING_NOTE_MIDDLE = PathPointInch(537.464, 219, 180);
             WING_NOTE_BOTTOM = PathPointInch(537.464, 162, 180);
 
-            LEAVE = PathPointInch(537.464, 162 - 50, 180);
+            LEAVE = PathPointInch(537.464, 30, 180);
 
             AMP = PathPointInch(578.77, 303.0, 90.0);
 
-            INTERMEDIARY_NOTE_TOP = PathPointInch(567.464 + 14, 276, 180);
-            INTERMEDIARY_NOTE_MIDDLE = PathPointInch(567.464 + 14, 219, 180);
-            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(567.464 + 14, 162, 180);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(567.464 - WING_NOTE_OFFSET, 276, 180);
+            INTERMEDIARY_NOTE_MIDDLE = PathPointInch(567.464 - WING_NOTE_OFFSET, 219, 180);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(567.464 - WING_NOTE_OFFSET, 162, 180);
 
-            CENTER_NOTE_1 = PathPointInch(325.862, 30, 180);
-            CENTER_NOTE_2 = PathPointInch(325.862, 96, 180);
-            CENTER_NOTE_3 = PathPointInch(325.862, 162, 180);
-            CENTER_NOTE_4 = PathPointInch(325.862, 228, 180);
-            CENTER_NOTE_5 = PathPointInch(325.862, 294, 180);
+            CENTER_NOTE_BOTTOM = PathPointInch(325.862, 30, 180);
+            CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862, 96, 180);
+            CENTER_NOTE_MIDDLE = PathPointInch(325.862, 162, 180);
+            CENTER_NOTE_SECOND_TOP = PathPointInch(325.862, 228, 180);
+            CENTER_NOTE_TOP = PathPointInch(325.862, 294, 180);
+
+            INTERMEDIARY_CENTER_NOTE_BOTTOM = PathPointInch(325.862 + CENTER_LINE_OFFSET, 30, 180);
+            INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862 + CENTER_LINE_OFFSET, 96, 180);
+            INTERMEDIARY_CENTER_NOTE_MIDDLE = PathPointInch(325.862 + CENTER_LINE_OFFSET, 162, 180);
+            INTERMEDIARY_CENTER_NOTE_SECOND_TOP = PathPointInch(325.862 + CENTER_LINE_OFFSET, 228, 180);
+            INTERMEDIARY_CENTER_NOTE_TOP = PathPointInch(325.862 + CENTER_LINE_OFFSET, 294, 180);
+
+            CENTER_LINE_SHOOT = PathPointInch(594.44, 154.05, 180);
 
             START_TOPMOST = PathPointInch(626.983, 266.305, 120);
             START_MIDDLE = PathPointInch(596.295, 218.777, 0);

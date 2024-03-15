@@ -103,13 +103,13 @@ public class RobotContainer {
 
     Trigger noNotePresent = new Trigger(() -> !intake.hasNote() && !shooter.hasNote() && DriverStation.isTeleop());
     
-    noNotePresent.onTrue(
-      new ParallelCommandGroup(
-        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
-      )
-    );
+    // noNotePresent.onTrue(
+    //   new ParallelCommandGroup(
+    //     new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+    //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
+    //     new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
+    //   )
+    // );
 
     Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && DriverStation.isTeleop());
     
@@ -136,7 +136,11 @@ public class RobotContainer {
 
     shootTrigger.onTrue(new SequentialCommandGroup(
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
-      new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+      new ParallelCommandGroup(
+        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
+        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
+      )
     ));
 
     gamepadLB.onTrue(new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs));

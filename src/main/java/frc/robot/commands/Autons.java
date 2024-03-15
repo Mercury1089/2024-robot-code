@@ -1,5 +1,8 @@
 package frc.robot.commands;
 
+import java.nio.file.Path;
+import java.util.function.BooleanSupplier;
+
 import javax.management.InstanceAlreadyExistsException;
 import javax.swing.text.html.ParagraphView;
 
@@ -114,6 +117,7 @@ public class Autons {
         autonTypeChooser.setDefaultOption("LEAVE STARTING ZONE", AutonTypes.LEAVE_STARTING_ZONE);
         autonTypeChooser.addOption("2ND NOTE SCORE", AutonTypes.SCORE_2ND_NOTE);
         autonTypeChooser.addOption("MULTI NOTE SCORE", AutonTypes.MULTI_NOTE_SCORE);
+        autonTypeChooser.addOption("MULTI NOTE SCORE", AutonTypes.CENTER_LINE_NOTES);
         SmartDashboard.putData("Auton Type", autonTypeChooser);
 
         // select the ELEMENT to visit during auton (or DO NOTHING)
@@ -142,24 +146,7 @@ public class Autons {
 
         PathPlannerPath path;
         int pathIndex = 1;
-        
 
-        // if (autonType == autonType.SCORE_2ND_NOTE) {
-        //     path = PathUtils.generatePath(startingPose, knownLocations.WING_NOTE_TOP);
-        //     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
-        //     pathIndex++;
-        //     autonCommand.addCommands(
-        //         new ParallelCommandGroup(
-        //             setUpToShoot(),
-        //             new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
-        //         ).until(() -> isReadyToShoot()),
-        //         new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
-        //         new ParallelCommandGroup(
-        //             new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-        //             new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)).until(() -> arm.isAtPosition(ArmPosition.HOME))
-        //     );
-        //     return autonCommand;
-        // }
         // First, always score the preloaded NOTE
         autonCommand.addCommands(
             new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs),
@@ -176,7 +163,14 @@ public class Autons {
                 autonCommand.addCommands(AutoBuilder.followPath(path));
                 break;
             case SCORE_2ND_NOTE:
-                path = PathUtils.generatePath(startingPose, knownLocations.WING_NOTE_TOP);
+                if (startingPose == knownLocations.START_TOPMOST) {
+                    path = PathUtils.generatePath(startingPose, knownLocations.WING_NOTE_TOP);
+                } else if (startingPose == knownLocations.START_MIDDLE) {
+                    path = PathUtils.generatePath(startingPose, knownLocations.WING_NOTE_MIDDLE);            
+                } else {
+                    path = PathUtils.generatePath(startingPose, knownLocations.WING_NOTE_BOTTOM);                 
+                }
+
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(
@@ -185,37 +179,72 @@ public class Autons {
                 );
                 break;
             case MULTI_NOTE_SCORE:
-                path = PathUtils.generatePath(startingPose, knownLocations.WING_NOTE_TOP);
+                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP, knownLocations.WING_NOTE_TOP);
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(
                     pickUpNote(path),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                    new ParallelCommandGroup(
+                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
+                        new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                    ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                     shootNote()
                 );
-                // autonCommand.addCommands(
-                //     new ParallelCommandGroup(
-                //         AutoBuilder.followPath(path),
-                //         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
-                //     ).until(() -> intake.hasNote()),
-                //     shootNote()
-                // );
-                path = PathUtils.generatePath(knownLocations.WING_NOTE_TOP, knownLocations.INTERMEDIARY_NOTE_MIDDLE, knownLocations.WING_NOTE_MIDDLE);
+
+                if (knownLocations.alliance == Alliance.Blue) {
+                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-60.0), startingPose, knownLocations.WING_NOTE_MIDDLE);
+                } else {
+                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-120.0), startingPose, knownLocations.WING_NOTE_MIDDLE);
+                }
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(
                     pickUpNote(path),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                     shootNote()
                 );
-                path = PathUtils.generatePath(knownLocations.WING_NOTE_MIDDLE, knownLocations.INTERMEDIARY_NOTE_BOTTOM, knownLocations.WING_NOTE_BOTTOM);
+
+                if (knownLocations.alliance == Alliance.Blue) {
+                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-60.0), startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+                } else {
+                    path = PathUtils.generatePath(Rotation2d.fromDegrees(-120.0), startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+                }
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
                 autonCommand.addCommands(
                     pickUpNote(path),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                    new ParallelCommandGroup(
+                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
+                        new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                    ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                     shootNote()
                 );
                 break;
-            // WING_NOTES, 
-            // CENTER_LINE_NOTES
+            case CENTER_LINE_NOTES:
+                path = PathUtils.generatePath(startingPose, knownLocations.CENTER_LINE_SHOOT, knownLocations.LEAVE, 
+                    knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM, knownLocations.INTERMEDIARY_CENTER_NOTE_MIDDLE, knownLocations.INTERMEDIARY_CENTER_NOTE_SECOND_TOP, knownLocations.INTERMEDIARY_CENTER_NOTE_TOP);
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                pathIndex++;
+                
+                autonCommand.addCommands(
+                    pickUpCenterNote(path, knownLocations),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                    new ParallelCommandGroup(
+                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.LEAVE, knownLocations.CENTER_LINE_SHOOT)),
+                        new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                    ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
+                    shootNote(),
+
+                    pickUpCenterNote(path, knownLocations),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                    new ParallelCommandGroup(
+                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.LEAVE, knownLocations.CENTER_LINE_SHOOT)),
+                        new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                    ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
+                    shootNote()
+                );
         }
         return autonCommand;
     }
@@ -225,7 +254,7 @@ public class Autons {
         drivetrain.isPointedAtTarget() && 
         drivetrain.isNotMoving() &&
         shooter.isAtTargetVelocity() &&
-        arm.isFinishedMoving() &&
+        arm.isFinishedMovingSpeaker() &&
         drivetrain.inShootingRange() &&
         LEDs.isAutoShootEnabled();
     }
@@ -246,7 +275,29 @@ public class Autons {
                 drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
             ).until(() -> intake.hasNote())
-            
+        );
+    }
+
+    public Command pickUpCenterNote(PathPlannerPath path, KnownLocations knownLocations) {
+        double passX = alliance == Alliance.Blue ?
+            knownLocations.WING_NOTE_BOTTOM.getX() :
+            knownLocations.WING_NOTE_BOTTOM.getX();
+
+        BooleanSupplier pickUpNoteCheck = alliance == Alliance.Blue ?
+            () -> arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && drivetrain.getPose().getY() > passX :
+            () -> arm.isAtPosition(ArmPosition.HOME) && drivetrain.getObjCam().getLatestResult().getTargets().size() == 1 && drivetrain.getPose().getY() < passX;
+
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                // also can try making intake be on
+                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
+                new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+                AutoBuilder.followPath(path)
+            ).until(pickUpNoteCheck),
+            new ParallelCommandGroup(
+                drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
+                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+            ).until(() -> intake.hasNote())
         );
     }
 

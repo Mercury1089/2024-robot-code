@@ -37,7 +37,7 @@ public class Arm extends SubsystemBase {
 
   private static final float ARM_SOFT_LIMIT_BKW = (float) 45.3;
 
-  private static final double ANGLE_OFFSET = -4.0;
+  private static final double ANGLE_OFFSET = -2.0;
 
   private final double 
     NOMINAL_OUTPUT_FORWARD = 0.01, //0.02,
@@ -129,12 +129,12 @@ public class Arm extends SubsystemBase {
     return Units.metersToInches(TargetUtils.getDistanceToSpeaker(drivetrain.getPose()));
   }
   
-  public double getError() {
-    return Math.abs(getArmPosition() - setPosition);
+  public double getSpeakerError() {
+    return Math.abs(getArmPosition() - getPosToTarget(getDistanceToSpeaker()));
   }
 
-  public boolean isFinishedMoving() {
-    return getError() < THRESHOLD_DEGREES;
+  public boolean isFinishedMovingSpeaker() {
+    return getSpeakerError() < THRESHOLD_DEGREES;
   }
 
   public boolean isAtPosition(double pos) {
@@ -154,7 +154,7 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm/Encoder", getArmPosition());
     SmartDashboard.putNumber("Arm/PosToTarget", getPosToTarget(getDistanceToSpeaker()));
-    SmartDashboard.putBoolean("Arm/isFinishedMoving", isFinishedMoving());
+    SmartDashboard.putBoolean("Arm/isFinishedMoving", isFinishedMovingSpeaker());
   }
   
 
