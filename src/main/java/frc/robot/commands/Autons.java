@@ -49,7 +49,7 @@ public class Autons {
 
     private final double ROTATION_P = 3.0;
     private final double TRANSLATION_P = 5.0;
-    private static final double MIN_NOTE_DISTANCE = Units.inchesToMeters(30.0);
+    private static final double MAX_NOTE_DISTANCE = 2.0;
 
     private final Command DO_NOTHING = new PrintCommand("Do Nothing Auton");
     private Drivetrain drivetrain;
@@ -211,7 +211,7 @@ public class Autons {
                 );
                 break;
             case CENTER_LINE_NOTES:
-                path = PathUtils.generatePath(startingPose, knownLocations.CENTER_LINE_SHOOT, knownLocations.LEAVE, 
+                path = PathUtils.generatePath(drivetrain.getPose(), /*knownLocations.CENTER_LINE_SHOOT, */ knownLocations.LEAVE, 
                     knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM, knownLocations.INTERMEDIARY_CENTER_NOTE_MIDDLE, knownLocations.INTERMEDIARY_CENTER_NOTE_SECOND_TOP, knownLocations.INTERMEDIARY_CENTER_NOTE_TOP);
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
@@ -251,7 +251,7 @@ public class Autons {
         ObjectDetectionCamera objectDetectionCam = drivetrain.getObjCam();
         return
             objectDetectionCam.getTargetCount() == 1 &&
-            objectDetectionCam.getDistanceToTarget() > MIN_NOTE_DISTANCE;
+            objectDetectionCam.getDistanceToTarget() < MAX_NOTE_DISTANCE;
     }
     
     public Command setUpToShoot() {
