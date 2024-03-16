@@ -86,8 +86,8 @@ public class TargetUtils {
         Alliance alliance = knownLocations.alliance;
 
         return alliance == Alliance.Blue ?
-            pose.getX() > knownLocations.WING_NOTE_TOP.getX() :
-            pose.getX() < knownLocations.WING_NOTE_TOP.getX();
+            pose.getX() > knownLocations.WING_NOTE_TOP.getX() + 50.0:
+            pose.getX() < knownLocations.WING_NOTE_TOP.getX() - 50.0;
    }
 
    // TODO: Create KnownLocations for the X values in this method

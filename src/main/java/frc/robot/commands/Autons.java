@@ -250,8 +250,9 @@ public class Autons {
     public boolean noteInRange() {
         ObjectDetectionCamera objectDetectionCam = drivetrain.getObjCam();
         return
-            objectDetectionCam.getTargetCount() == 1 &&
-            objectDetectionCam.getDistanceToTarget() < MAX_NOTE_DISTANCE;
+            (objectDetectionCam.getTargetCount() == 1 &&
+            objectDetectionCam.getDistanceToTarget() < MAX_NOTE_DISTANCE) 
+            || (intake.hasNote());
     }
     
     public Command setUpToShoot() {

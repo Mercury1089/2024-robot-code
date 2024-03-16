@@ -27,7 +27,6 @@
               "Visuals/Show Outside Circles": false,
               "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
-              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
@@ -294,7 +293,6 @@
               "Visuals/Show Outside Circles": false,
               "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
-              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
