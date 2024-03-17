@@ -175,40 +175,78 @@ public class Autons {
                 );
                 break;
             case MULTI_NOTE_SCORE:
-                path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP, knownLocations.WING_NOTE_TOP);
-                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
-                pathIndex++;
-                autonCommand.addCommands(
-                    pickUpNote(path),
-                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
-                    new ParallelCommandGroup(
-                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
-                        new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
-                    ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
-                    shootNote()
-                );
+                if (startingPose == knownLocations.START_TOPMOST) {
+                    path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP, knownLocations.WING_NOTE_TOP);
+                    drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                    pathIndex++;
+                    autonCommand.addCommands(
+                        pickUpNote(path),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                        new ParallelCommandGroup(
+                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
+                            new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                        ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
+                        shootNote()
+                    );
 
-                path = PathUtils.generatePath(knownLocations.WING_NOTE_ROTATION, startingPose, knownLocations.WING_NOTE_MIDDLE);
-                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
-                pathIndex++;
-                autonCommand.addCommands(
-                    pickUpNote(path),
-                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
-                    shootNote()
-                );
+                    path = PathUtils.generatePath(knownLocations.TOPMOST_WING_NOTE_ROTATION, startingPose, knownLocations.WING_NOTE_MIDDLE);
+                    drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                    pathIndex++;
+                    autonCommand.addCommands(
+                        pickUpNote(path),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                        shootNote()
+                    );
 
-                path = PathUtils.generatePath(knownLocations.WING_NOTE_ROTATION, startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
-                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
-                pathIndex++;
-                autonCommand.addCommands(
-                    pickUpNote(path),
-                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
-                    new ParallelCommandGroup(
-                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
-                        new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
-                    ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
-                    shootNote()
-                );
+                    path = PathUtils.generatePath(knownLocations.TOPMOST_WING_NOTE_ROTATION, startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+                    drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                    pathIndex++;
+                    autonCommand.addCommands(
+                        pickUpNote(path),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                        new ParallelCommandGroup(
+                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
+                            new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                        ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
+                        shootNote()
+                    );
+                } else if (startingPose == knownLocations.START_BOTTOMMOST) {
+                    path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM, knownLocations.WING_NOTE_BOTTOM);
+                    drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                    pathIndex++;
+                    autonCommand.addCommands(
+                        pickUpNote(path),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                        new ParallelCommandGroup(
+                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
+                            new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                        ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
+                        shootNote()
+                    );
+
+                    path = PathUtils.generatePath(knownLocations.BOTTOM_WING_NOTE_ROTATION, startingPose, knownLocations.WING_NOTE_MIDDLE);
+                    drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                    pathIndex++;
+                    autonCommand.addCommands(
+                        pickUpNote(path),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                        shootNote()
+                    );
+
+                    path = PathUtils.generatePath(knownLocations.BOTTOM_WING_NOTE_ROTATION, startingPose, knownLocations.INTERMEDIARY_NOTE_TOP);
+                    drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                    pathIndex++;
+                    autonCommand.addCommands(
+                        pickUpNote(path),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
+                        new ParallelCommandGroup(
+                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
+                            new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
+                        ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
+                        shootNote()
+                    );
+                }
+                
                 break;
             case CENTER_LINE_NOTES:
                 path = PathUtils.generatePath(drivetrain.getPose(), /*knownLocations.CENTER_LINE_SHOOT, */ knownLocations.LEAVE, 
