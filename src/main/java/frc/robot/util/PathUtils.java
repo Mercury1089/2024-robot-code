@@ -21,7 +21,7 @@ public class PathUtils {
      * 
      */
     public static final PathConstraints pathConstraints = new PathConstraints(
-        SWERVE.MAX_SPEED_METERS_PER_SECOND * 0.75,
+        SWERVE.MAX_SPEED_METERS_PER_SECOND * 0.85,
         SWERVE.MAX_ACCELERATION * 0.50,
         SWERVE.MAX_ROTATIONAL_SPEED,
         SWERVE.MAX_ANGULAR_SPEED

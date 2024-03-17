@@ -103,13 +103,13 @@ public class RobotContainer {
 
     Trigger noNotePresent = new Trigger(() -> !intake.hasNote() && !shooter.hasNote() && DriverStation.isTeleop());
     
-    // noNotePresent.onTrue(
-    //   new ParallelCommandGroup(
-    //     new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
-    //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-    //     new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
-    //   )
-    // );
+    noNotePresent.onTrue(
+      new ParallelCommandGroup(
+        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
+        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
+      )
+    );
 
     Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && DriverStation.isTeleop());
     
