@@ -87,7 +87,7 @@ public class Autons {
         // Configure AutoBuilder last
         AutoBuilder.configureHolonomic(
                 () -> drivetrain.getPose(), // Robot pose supplier
-                (pose) -> drivetrain.setManualPose(pose), // Method to reset odometry (will be called if your auto has a starting pose)
+                (pose) -> drivetrain.resetPose(pose), // Method to reset odometry (will be called if your auto has a starting pose)
                 () -> drivetrain.getFieldRelativSpeeds(), // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (chassisSpeeds) -> drivetrain.drive(chassisSpeeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 pathFollowerConfig,
@@ -130,7 +130,7 @@ public class Autons {
 
     public Command buildAutonCommand(KnownLocations knownLocations) {        
         // SET OUR INITIAL POSE
-        drivetrain.setManualPose(startingPose);
+        drivetrain.resetPose(startingPose);
         
         if (startingPose == knownLocations.DO_NOTHING) {
             SmartDashboard.putBoolean("isDoNothing", true);

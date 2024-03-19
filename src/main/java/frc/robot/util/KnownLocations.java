@@ -60,6 +60,7 @@ public class KnownLocations {
             CENTER_LINE_SHOOT,
             AMP;
     public final Rotation2d
+            ZERO_GYRO_ROTAION,  // Field-relative rotation facing away from Driver Station
             TOPMOST_WING_NOTE_ROTATION,
             BOTTOM_WING_NOTE_ROTATION;
 
@@ -110,7 +111,7 @@ public class KnownLocations {
         this.alliance = alliance;
 
         if (alliance == Alliance.Blue) {
-
+            
             WING_NOTE_TOP = PathPointInch(114.261, 276, 0);
             WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
             WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
@@ -140,6 +141,8 @@ public class KnownLocations {
             INTERMEDIARY_CENTER_NOTE_TOP = PathPointInch(325.862 - CENTER_LINE_OFFSET, 294, 0);
 
             CENTER_LINE_SHOOT = PathPointInch(64.66, 154.05, 0);
+
+            ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(0);
 
             START_TOPMOST = PathPointInch(24.741, 268.182, 60);
             START_MIDDLE = PathPointInch(55.43, 218.777885, 0);
@@ -176,6 +179,8 @@ public class KnownLocations {
             INTERMEDIARY_CENTER_NOTE_TOP = PathPointInch(325.862 + CENTER_LINE_OFFSET, 294, 180);
 
             CENTER_LINE_SHOOT = PathPointInch(594.44, 154.05, 180);
+
+            ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(180);
 
             START_TOPMOST = PathPointInch(626.983, 266.305, 120);
             START_MIDDLE = PathPointInch(596.295, 218.777, 0);

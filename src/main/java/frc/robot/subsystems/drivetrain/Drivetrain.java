@@ -6,6 +6,7 @@ package frc.robot.subsystems.drivetrain;
 
 import java.util.Optional;
 
+import org.opencv.core.RotatedRect;
 import org.photonvision.EstimatedRobotPose;
 
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -34,6 +35,7 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.AprilTagCamera;
 import frc.robot.sensors.ObjectDetectionCamera;
+import frc.robot.util.KnownLocations;
 import frc.robot.util.PathUtils;
 import frc.robot.util.SwerveUtils;
 import frc.robot.util.TargetUtils;
@@ -129,10 +131,6 @@ public class Drivetrain extends SubsystemBase {
 
   public PIDController getRotationalController() {
     return rotationPIDController;
-  }
-
-  public void resetYaw() {
-    pigeon.setYaw(0);
   }
 
   /**
@@ -261,13 +259,19 @@ public class Drivetrain extends SubsystemBase {
   public void setPoseSmartdash(Pose2d pose, String type) {
     smartdashField.getObject(type).setPose(pose);
   }
+  
   /**
    * Set the odometry object to a predetermined pose
    * No need to reset gyro as it auto-applies offset
    * 
    * Used to set initial pose from an auton trajectory
    */
-  public void setManualPose(Pose2d pose) {
+  public void resetPose(Pose2d pose) {
+
+    // Set gyro rotation so zero faces directly away from alliance station wall
+    Rotation2d zeroGyro = KnownLocations.getKnownLocations().ZERO_GYRO_ROTAION;
+    setRotation(zeroGyro.plus(pose.getRotation()));
+
     odometry.resetPosition(
     getRotation(), 
     new SwerveModulePosition[] {
@@ -300,11 +304,24 @@ public class Drivetrain extends SubsystemBase {
     return getFieldRelativSpeeds().vyMetersPerSecond;
   }
 
-  public Rotation2d getRotation() {
-    /* return the pigeon's yaw as Rotation2d object */
+  /**
+   * Set the robot gyro to the rotation (zero is facing directly away from the alliance station wall).
+   * Remember that this should be CCW positive.
+   * @param rotation The rotation to apply to the gyro.
+   */
+  public void setRotation(Rotation2d rotation) {
+    // Set the yaw value to the provided rotation.
+    // Because piegeon yaw clockwise positive, we must negate the value from the rotation.
+    pigeon.setYaw(-rotation.getDegrees());
+  }
 
-    // Yaw is negated for field-centric in order to ensure 'true' forward of robot
-    return Rotation2d.fromDegrees(-(pigeon.getAngle()));
+  /**
+   * Get the robot relative rotation reported by the gyro (pigeon). Remember that this should be CCW positive.
+   * @return The rotation as read from the gyro.
+   */
+  public Rotation2d getRotation() {
+    // Note: Unlike getAngle(), getRotation2d is CCW positive.
+    return pigeon.getRotation2d();
   }
 
   public AprilTagCamera getAprilTagCamera() {
