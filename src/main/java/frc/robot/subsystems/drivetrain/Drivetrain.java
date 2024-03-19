@@ -270,7 +270,7 @@ public class Drivetrain extends SubsystemBase {
 
     // Set gyro rotation so zero faces directly away from alliance station wall
     Rotation2d zeroGyro = KnownLocations.getKnownLocations().ZERO_GYRO_ROTAION;
-    setRotation(zeroGyro.plus(pose.getRotation()));
+    setRotation(zeroGyro.minus(pose.getRotation()));
 
     odometry.resetPosition(
     getRotation(), 
@@ -312,6 +312,7 @@ public class Drivetrain extends SubsystemBase {
   public void setRotation(Rotation2d rotation) {
     // Set the yaw value to the provided rotation.
     // Because piegeon yaw clockwise positive, we must negate the value from the rotation.
+    System.out.println(rotation.getDegrees());
     pigeon.setYaw(-rotation.getDegrees());
   }
 
@@ -401,6 +402,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drivetrain/CurrentPose Y", getPose().getY());
     SmartDashboard.putBoolean("Drivetrain/inShootingRange", inShootingRange());
     SmartDashboard.putBoolean("Drivetrain/inStageArea", TargetUtils.isInStageArea(getPose()));
+    SmartDashboard.putNumber("Drivetrain/getRotation", getRotation().getDegrees());
     SmartDashboard.putBoolean("Drivetrain/pointedAtTarget", isPointedAtTarget());
     SmartDashboard.putBoolean("Drivetrain/isNotMoving", isNotMoving());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());

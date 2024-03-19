@@ -183,7 +183,7 @@ public class KnownLocations {
             ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(180);
 
             START_TOPMOST = PathPointInch(626.983, 266.305, 120);
-            START_MIDDLE = PathPointInch(596.295, 218.777, 0);
+            START_MIDDLE = PathPointInch(596.295, 218.777, 180);
             START_BOTTOMMOST = PathPointInch(623.735, 169.372, -120);
 
         }
