@@ -10,7 +10,6 @@ import org.photonvision.EstimatedRobotPose;
 
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -28,7 +27,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.APRILTAGS;
@@ -36,7 +34,6 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.AprilTagCamera;
 import frc.robot.sensors.ObjectDetectionCamera;
-import frc.robot.util.KnownLocations;
 import frc.robot.util.PathUtils;
 import frc.robot.util.SwerveUtils;
 import frc.robot.util.TargetUtils;
@@ -57,11 +54,11 @@ public class Drivetrain extends SubsystemBase {
   private final double THRESHOLD_DEGREES = 5.0;
   private final double THRESHOLD_SPEED = 0.5;
     
-  // 2024 robot
+  // 2024 - Autotune
   private final double WHEEL_WIDTH = 23.5; // distance between front/back wheels (in inches)
   private final double WHEEL_LENGTH = 28.5; // distance between left/right wheels (in inches)
 
-  // // bolt
+  // // 2023 - Bolt
   // private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
   // private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
 
