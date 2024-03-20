@@ -183,7 +183,7 @@ public class Autons {
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                         new ParallelCommandGroup(
-                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
+                            // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
                             new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
                         ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                         shootNote()
@@ -205,7 +205,7 @@ public class Autons {
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                         new ParallelCommandGroup(
-                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
+                            // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
                             new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
                         ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                         shootNote()
@@ -218,7 +218,7 @@ public class Autons {
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                         new ParallelCommandGroup(
-                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
+                            // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
                             new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
                         ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                         shootNote()
@@ -240,7 +240,7 @@ public class Autons {
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                         new ParallelCommandGroup(
-                            AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
+                            // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
                             new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
                         ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                         shootNote()

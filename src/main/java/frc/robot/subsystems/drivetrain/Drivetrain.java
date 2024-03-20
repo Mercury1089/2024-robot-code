@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -267,10 +268,10 @@ public class Drivetrain extends SubsystemBase {
    * Used to set initial pose from an auton trajectory
    */
   public void resetPose(Pose2d pose) {
-
+    // DriverStation.reportWarning("Reset pose", true);
     // Set gyro rotation so zero faces directly away from alliance station wall
-    Rotation2d zeroGyro = KnownLocations.getKnownLocations().ZERO_GYRO_ROTAION;
-    setRotation(zeroGyro.minus(pose.getRotation()));
+    //Rotation2d zeroGyro = KnownLocations.getKnownLocations().ZERO_GYRO_ROTAION;
+    //setRotation(zeroGyro.minus(pose.getRotation()));
 
     odometry.resetPosition(
     getRotation(), 
