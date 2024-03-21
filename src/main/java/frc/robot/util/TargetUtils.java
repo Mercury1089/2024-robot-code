@@ -71,7 +71,7 @@ public class TargetUtils {
     }
 
     public static Rotation2d getTargetHeadingToClosestNote(ObjectDetectionCamera objCam, Pose2d robotPose) {
-        Rotation2d targetRotation = Rotation2d.fromDegrees(-objCam.getYaw() + 2.0);
+        Rotation2d targetRotation = Rotation2d.fromDegrees(-objCam.getYaw());
         return objCam.getYaw() != 0.0 ?
             robotPose.rotateBy(targetRotation).getRotation() :
             robotPose.getRotation();

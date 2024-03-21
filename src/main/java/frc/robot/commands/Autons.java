@@ -200,8 +200,6 @@ public class Autons {
                         shootNote()
                     );
 
-                    Pose2d lastNote = new Pose2d(knownLocations.WING_NOTE_BOTTOM.getTranslation(), knownLocations.TOPMOST_WING_NOTE_ROTATION);
-
                     path = PathUtils.generatePath(middleNote, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
@@ -230,7 +228,9 @@ public class Autons {
 
                     Pose2d middleNote = new Pose2d(knownLocations.WING_NOTE_MIDDLE.getTranslation(), Rotation2d.fromDegrees(90.0));
 
-                    path = PathUtils.generatePath(knownLocations.WING_NOTE_BOTTOM, middleNote);
+                    Pose2d startWingNoteBottom = new Pose2d(knownLocations.WING_NOTE_BOTTOM.getTranslation(), Rotation2d.fromDegrees(180.0));
+
+                    path = PathUtils.generatePath(startWingNoteBottom, middleNote);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
                     autonCommand.addCommands(
@@ -239,9 +239,9 @@ public class Autons {
                         shootNote()
                     );
 
-                    Pose2d topNote = new Pose2d(knownLocations.WING_NOTE_TOP.getTranslation(), knownLocations.BOTTOM_WING_NOTE_ROTATION);
+                    Pose2d topNote = new Pose2d(knownLocations.WING_NOTE_TOP.getTranslation(), Rotation2d.fromDegrees(90.0));
 
-                    path = PathUtils.generatePath(knownLocations.WING_NOTE_MIDDLE, topNote);
+                    path = PathUtils.generatePath(middleNote, topNote);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
                     autonCommand.addCommands(
