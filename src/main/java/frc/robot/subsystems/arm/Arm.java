@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
     ARM_PID_SLOT = 0;
 
   private static final double 
-    ARM_NORMAL_P_VAL = 1.0 / 15.0,
+    ARM_NORMAL_P_VAL = 1.0 / 10.0,
     ARM_NORMAL_I_VAL = 0.0,
     ARM_NORMAL_D_VAL = 0.0;
 

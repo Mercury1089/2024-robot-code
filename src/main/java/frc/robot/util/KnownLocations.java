@@ -124,9 +124,9 @@ public class KnownLocations {
 
             AMP = PathPointInch(72.5, 303.0, 90.0);
 
-            INTERMEDIARY_NOTE_TOP = PathPointInch(84.261 + WING_NOTE_OFFSET, 276, 0);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(84.261, 276, 0);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261 + WING_NOTE_OFFSET, 219, 0);
-            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261 + WING_NOTE_OFFSET, 162, 0);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261, 162, 0);
 
             CENTER_NOTE_BOTTOM = PathPointInch(325.862, 30, 0);
             CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862, 96, 0);
@@ -144,9 +144,9 @@ public class KnownLocations {
 
             ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(0);
 
-            START_TOPMOST = PathPointInch(24.741, 268.182, 60);
+            START_TOPMOST = PathPointInch(24.741 + 20.0, 276 - 4, 0);
             START_MIDDLE = PathPointInch(55.43, 218.777885, 0);
-            START_BOTTOMMOST = PathPointInch(24.741, 169.374, -60);
+            START_BOTTOMMOST = PathPointInch(24.741 + 20.0, 162, 0);
 
         } else {
 
@@ -182,9 +182,9 @@ public class KnownLocations {
 
             ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(180);
 
-            START_TOPMOST = PathPointInch(626.983, 266.305, 120);
+            START_TOPMOST = PathPointInch(626.983 - 20.0, 276, 180);
             START_MIDDLE = PathPointInch(596.295, 218.777, 180);
-            START_BOTTOMMOST = PathPointInch(623.735, 169.372, -120);
+            START_BOTTOMMOST = PathPointInch(623.735 - 20.0, 162, 180);
 
         }
     }
