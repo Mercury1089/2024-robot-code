@@ -176,16 +176,15 @@ public class Autons {
                 break;
             case MULTI_NOTE_SCORE:
                 if (startingPose == knownLocations.START_TOPMOST) {
-                    path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_TOP, knownLocations.WING_NOTE_TOP);
+
+                    Pose2d startPathPose = new Pose2d(startingPose.getTranslation(), knownLocations.FORWARD);
+
+                    path = PathUtils.generatePath(startPathPose, knownLocations.INTERMEDIARY_NOTE_TOP, knownLocations.WING_NOTE_TOP);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
                     autonCommand.addCommands(
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
-                        // new ParallelCommandGroup(
-                        //     // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
-                        //     new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
-                        // ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                         shootNote()
                     );
 
@@ -206,31 +205,27 @@ public class Autons {
                     autonCommand.addCommands(
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
-                        // new ParallelCommandGroup(
-                        //     // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
-                        //     new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
-                        // ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                         shootNote()
                     );
                 } else if (startingPose == knownLocations.START_BOTTOMMOST) {
-                    path = PathUtils.generatePath(startingPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM, knownLocations.WING_NOTE_BOTTOM);
+
+
+                    Pose2d startPathPose = new Pose2d(startingPose.getTranslation(), knownLocations.FORWARD);
+                    Pose2d startWingNoteBottom = new Pose2d(knownLocations.WING_NOTE_BOTTOM.getTranslation(), knownLocations.BACKWARD);
+
+                    path = PathUtils.generatePath(startPathPose, knownLocations.INTERMEDIARY_NOTE_BOTTOM, knownLocations.WING_NOTE_BOTTOM);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
                     autonCommand.addCommands(
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
-                        // new ParallelCommandGroup(
-                        //     // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
-                        //     new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
-                        // ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
+                        AutoBuilder.followPath(PathUtils.generatePath(startWingNoteBottom, knownLocations.INTERMEDIARY_NOTE_BOTTOM)),
                         shootNote()
                     );
 
                     Pose2d middleNote = new Pose2d(knownLocations.WING_NOTE_MIDDLE.getTranslation(), Rotation2d.fromDegrees(90.0));
 
-                    Pose2d startWingNoteBottom = new Pose2d(knownLocations.WING_NOTE_BOTTOM.getTranslation(), Rotation2d.fromDegrees(180.0));
-
-                    path = PathUtils.generatePath(startWingNoteBottom, middleNote);
+                    path = PathUtils.generatePath(knownLocations.INTERMEDIARY_NOTE_BOTTOM, middleNote);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
                     autonCommand.addCommands(
@@ -247,10 +242,6 @@ public class Autons {
                     autonCommand.addCommands(
                         pickUpNote(path),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
-                        // new ParallelCommandGroup(
-                        //     // AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_NOTE_TOP)),
-                        //     new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
-                        // ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                         shootNote()
                     );
                 }

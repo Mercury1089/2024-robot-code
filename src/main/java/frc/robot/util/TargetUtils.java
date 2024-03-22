@@ -97,9 +97,9 @@ public class TargetUtils {
 
        if (!isInStageArea(pose)) {
            if (alliance == Alliance.Blue) {
-               inShootingZone = Units.metersToInches(pose.getX()) < 230.0;
+               inShootingZone = Units.metersToInches(pose.getX()) < 200.0;
            } else if (alliance == Alliance.Red) {
-               inShootingZone = Units.metersToInches(pose.getX()) > 420.0;
+               inShootingZone = Units.metersToInches(pose.getX()) > 450.0;
            }
        }
        return inShootingZone;

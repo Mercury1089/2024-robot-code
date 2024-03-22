@@ -153,7 +153,10 @@ public class RobotContainer {
 
     // for endgame
     gamepadPOVUp.onTrue(
-      new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm)
+      new ParallelCommandGroup(
+        new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm),
+        new RunCommand(() -> shooter.stopShooter(), shooter)
+      )
     );
 
     gamepadPOVDown.onTrue(
@@ -167,6 +170,10 @@ public class RobotContainer {
     gamepadA.onTrue(new SequentialCommandGroup(
       new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter).until(() -> shooter.isAtAmpVelocity()),
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.AMP), intake)
+    ));
+
+    gamepadY.onTrue(new SequentialCommandGroup(
+      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
     ));
   }
 

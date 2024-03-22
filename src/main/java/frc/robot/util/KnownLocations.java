@@ -62,7 +62,9 @@ public class KnownLocations {
     public final Rotation2d
             ZERO_GYRO_ROTAION,  // Field-relative rotation facing away from Driver Station
             TOPMOST_WING_NOTE_ROTATION,
-            BOTTOM_WING_NOTE_ROTATION;
+            BOTTOM_WING_NOTE_ROTATION,
+            FORWARD,
+            BACKWARD;
 
     public final double WING_NOTE_OFFSET = 7.0, CENTER_LINE_OFFSET = 30.0;
 
@@ -144,9 +146,13 @@ public class KnownLocations {
 
             ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(0);
 
-            START_TOPMOST = PathPointInch(24.741 + 20.0, 276 - 4, 0);
+            START_TOPMOST = PathPointInch(24.741 + 20.0, 276 - 4, 60);
             START_MIDDLE = PathPointInch(55.43, 218.777885, 0);
-            START_BOTTOMMOST = PathPointInch(24.741 + 20.0, 162 + 4, 0);
+            START_BOTTOMMOST = PathPointInch(24.741 + 20.0, 162 - 4, -60);
+
+            FORWARD = Rotation2d.fromDegrees(0.0);
+            BACKWARD = Rotation2d.fromDegrees(180.0);
+
 
         } else {
 
@@ -182,9 +188,12 @@ public class KnownLocations {
 
             ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(180);
 
-            START_TOPMOST = PathPointInch(626.983 - 20.0, 276 - 4, 180);
+            START_TOPMOST = PathPointInch(626.983 - 20.0, 276 - 4, 120);
             START_MIDDLE = PathPointInch(596.295, 218.777, 180);
-            START_BOTTOMMOST = PathPointInch(623.735 - 20.0, 162 + 4, 180);
+            START_BOTTOMMOST = PathPointInch(623.735 - 20.0, 162 - 4, -120);
+
+            FORWARD = Rotation2d.fromDegrees(180.0);
+            BACKWARD = Rotation2d.fromDegrees(0.0);
 
         }
     }

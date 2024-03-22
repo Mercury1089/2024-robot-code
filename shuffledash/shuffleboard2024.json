@@ -27,6 +27,7 @@
               "Visuals/Show Outside Circles": false,
               "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
+              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
@@ -153,19 +154,6 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "11,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Shooter/Velocity",
-              "_title": "/SmartDashboard/Shooter/Velocity",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "12,0": {
             "size": [
               1,
@@ -262,6 +250,21 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "11,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Intake/hasNote",
+              "_title": "/SmartDashboard/Intake/hasNote",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
           }
         }
       }
@@ -293,6 +296,7 @@
               "Visuals/Show Outside Circles": false,
               "Colors/notepose": "#FFFFFFFF",
               "Colors/pathToNote": "#FFFFFFFF",
+              "Colors/traj3": "#FFFFFFFF",
               "Colors/traj2": "#FFFFFFFF",
               "Colors/traj1": "#FFFFFFFF"
             }
@@ -302,9 +306,9 @@
     }
   ],
   "windowGeometry": {
-    "x": -8.0,
-    "y": -8.0,
-    "width": 1936.0,
-    "height": 1056.0
+    "x": -7.0,
+    "y": 2.0,
+    "width": 1932.0,
+    "height": 1045.0
   }
 }

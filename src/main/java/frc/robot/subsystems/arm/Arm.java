@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
     ARM_NORMAL_I_VAL = 0.0,
     ARM_NORMAL_D_VAL = 0.0;
 
-  private static final float ARM_SOFT_LIMIT_FWD = (float) 146;
+  private static final float ARM_SOFT_LIMIT_FWD = (float) 147;
 
   private static final float ARM_SOFT_LIMIT_BKW = (float) 45.3;
 
@@ -110,11 +110,11 @@ public class Arm extends SubsystemBase {
   }
 
   public void setPosition(double pos) {
-    if (pos > ARM_SOFT_LIMIT_FWD) {
-      pos = ARM_SOFT_LIMIT_FWD;
-    } else if (pos < ARM_SOFT_LIMIT_BKW) {
-      pos = ARM_SOFT_LIMIT_BKW;
-    }
+    // if (pos > ARM_SOFT_LIMIT_FWD) {
+    //   pos = ARM_SOFT_LIMIT_FWD;
+    // } else if (pos < ARM_SOFT_LIMIT_BKW) {
+    //   pos = ARM_SOFT_LIMIT_BKW;
+    // }
 
     setPosition = pos;
 
@@ -159,7 +159,7 @@ public class Arm extends SubsystemBase {
   
 
   public enum ArmPosition {
-    AMP(ARM_SOFT_LIMIT_FWD),
+    AMP(150.0),
     HOME(ARM_SOFT_LIMIT_BKW),
     PICKUP_FLOOR(ARM_SOFT_LIMIT_BKW);
   
