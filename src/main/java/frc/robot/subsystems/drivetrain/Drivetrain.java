@@ -49,11 +49,11 @@ public class Drivetrain extends SubsystemBase {
   private SwerveDriveKinematics swerveKinematics;
   private AprilTagCamera photonCam;
   private Field2d smartdashField;
-  private PIDController rotationPIDController;
+  private PIDController rotationPIDController, directionalPidController;
   private PathPlannerPath pathToNote, pathToAmp;
 
   private ObjectDetectionCamera objectDetectionCam;
-  private static final double P = 1.0 / 90.0, I = 0.0, D = 0.0;
+  private static final double ROTATION_P = 1.0 / 90.0, DIRECTION_P = 1 / 2.0, I = 0.0, D = 0.0;
   private final double THRESHOLD_DEGREES = 5.0;
   private final double THRESHOLD_SPEED = 0.5;
     
@@ -89,9 +89,12 @@ public class Drivetrain extends SubsystemBase {
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getYaw().setUpdateFrequency(10);
 
-    rotationPIDController = new PIDController(P, I, D);
+    rotationPIDController = new PIDController(ROTATION_P, I, D);
     rotationPIDController.enableContinuousInput(-180, 180);
     rotationPIDController.setTolerance(1.0);
+
+    directionalPidController = new PIDController(DIRECTION_P, I, D);
+    directionalPidController.setTolerance(0.1);
 
     // photonvision wrapper
     photonCam = new AprilTagCamera();
@@ -132,6 +135,10 @@ public class Drivetrain extends SubsystemBase {
 
   public PIDController getRotationalController() {
     return rotationPIDController;
+  }
+
+  public PIDController getDirectionalController() {
+    return directionalPidController;
   }
 
   /**

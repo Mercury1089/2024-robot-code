@@ -17,6 +17,7 @@ import frc.robot.subsystems.arm.Arm.ArmPosition;
 import frc.robot.subsystems.arm.Intake.IntakeSpeed;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.FieldPosition;
+import frc.robot.util.KnownLocations;
 import frc.robot.util.MercMath;
 import frc.robot.util.TargetUtils;
 
@@ -26,6 +27,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -122,6 +124,10 @@ public class RobotContainer {
 
     right1.and(noNotePresent).whileTrue(
         new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+    );
+
+    left1.and(intakeHasNote).whileTrue(
+      DriveCommands.ampTargetDrive(leftJoystickX, drivetrain)
     );
 
     Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote() && LEDs.isAutoShootEnabled() && DriverStation.isTeleop());
