@@ -128,7 +128,7 @@ public class KnownLocations {
 
             INTERMEDIARY_NOTE_TOP = PathPointInch(84.261, 276, 0);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261 + WING_NOTE_OFFSET, 219, 0);
-            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261, 162, 0);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261 - 24, 162, 0);
 
             CENTER_NOTE_BOTTOM = PathPointInch(325.862, 30, 0);
             CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862, 96, 0);
@@ -168,9 +168,9 @@ public class KnownLocations {
 
             AMP = PathPointInch(578.77, 303.0, 90.0);
 
-            INTERMEDIARY_NOTE_TOP = PathPointInch(567.464 - WING_NOTE_OFFSET, 276, 180);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(567.464, 276, 180);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(567.464 - WING_NOTE_OFFSET, 219, 180);
-            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(567.464 - WING_NOTE_OFFSET, 162, 180);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(567.464 + 24, 162, 180);
 
             CENTER_NOTE_BOTTOM = PathPointInch(325.862, 30, 180);
             CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862, 96, 180);

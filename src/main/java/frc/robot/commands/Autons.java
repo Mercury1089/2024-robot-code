@@ -200,7 +200,9 @@ public class Autons {
                         shootNote()
                     );
 
-                    path = PathUtils.generatePath(middleNote, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+                    Pose2d startMiddleNote = new Pose2d(knownLocations.WING_NOTE_MIDDLE.getTranslation(), knownLocations.BACKWARD);
+
+                    path = PathUtils.generatePath(startMiddleNote, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
                     autonCommand.addCommands(

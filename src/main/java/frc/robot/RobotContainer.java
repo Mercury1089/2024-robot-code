@@ -86,6 +86,8 @@ public class RobotContainer {
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
 
+    // arm.setDefaultCommand(new RunCommand(() -> arm.changePos(), arm));
+
     intake = new Intake();
     intake.setDefaultCommand(new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake));
     
@@ -178,9 +180,9 @@ public class RobotContainer {
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.AMP), intake)
     ));
 
-    gamepadY.onTrue(new SequentialCommandGroup(
-      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
-    ));
+    // gamepadY.onTrue(new SequentialCommandGroup(
+    //   new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
+    // ));
   }
 
   /**

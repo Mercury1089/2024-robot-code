@@ -122,7 +122,7 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosToTarget(double distance) {
-    return (37.1 + (0.633 * distance) - (0.00207 * (distance * distance))) + ANGLE_OFFSET;
+    return (54.1 + (0.397 * distance) - 0.00132 * (distance * distance)) + ANGLE_OFFSET;
   }
 
   public double getDistanceToSpeaker() {

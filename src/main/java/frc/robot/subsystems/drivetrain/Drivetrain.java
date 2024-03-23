@@ -54,7 +54,7 @@ public class Drivetrain extends SubsystemBase {
 
   private ObjectDetectionCamera objectDetectionCam;
   private static final double ROTATION_P = 1.0 / 90.0, DIRECTION_P = 1 / 2.0, I = 0.0, D = 0.0;
-  private final double THRESHOLD_DEGREES = 5.0;
+  private final double THRESHOLD_DEGREES = 3.0;
   private final double THRESHOLD_SPEED = 0.5;
     
   // 2024 - Autotune
