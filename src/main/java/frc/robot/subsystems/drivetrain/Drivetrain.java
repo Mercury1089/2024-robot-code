@@ -65,7 +65,7 @@ public class Drivetrain extends SubsystemBase {
   // private final double WHEEL_WIDTH = 27; // distance between front/back wheels (in inches)
   // private final double WHEEL_LENGTH = 27; // distance between left/right wheels (in inches)
 
-  public final double ROLL_WHEN_LEVEL = -1.75;
+  private Rotation2d gyroOffset = Rotation2d.fromDegrees(0); // Offset to apply to gyro for field oriented
 
   // Slew rate filter variables for controlling lateral acceleration
   private double currentAngularSpeed = 0.0;
@@ -220,7 +220,7 @@ public class Drivetrain extends SubsystemBase {
     ChassisSpeeds fieldRelativeSpeeds;
 
     if (fieldRelative) {
-      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered, getRotation());
+      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered, getRotation(gyroOffset));
     } else {
       fieldRelativeSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered);
     }
@@ -268,10 +268,8 @@ public class Drivetrain extends SubsystemBase {
    * Used to set initial pose from an auton trajectory
    */
   public void resetPose(Pose2d pose) {
-    // DriverStation.reportWarning("Reset pose", true);
-    // Set gyro rotation so zero faces directly away from alliance station wall
-    //Rotation2d zeroGyro = KnownLocations.getKnownLocations().ZERO_GYRO_ROTAION;
-    //setRotation(zeroGyro.minus(pose.getRotation()));
+    // Set gyro offset for field orieneted rotatioon (zero faces away from alliance station wall)
+    gyroOffset = KnownLocations.getKnownLocations().ZERO_GYRO_ROTAION.plus(pose.getRotation());
 
     odometry.resetPosition(
     getRotation(), 
@@ -306,24 +304,20 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Set the robot gyro to the rotation (zero is facing directly away from the alliance station wall).
-   * Remember that this should be CCW positive.
-   * @param rotation The rotation to apply to the gyro.
-   */
-  public void setRotation(Rotation2d rotation) {
-    // Set the yaw value to the provided rotation.
-    // Because piegeon yaw clockwise positive, we must negate the value from the rotation.
-    System.out.println(rotation.getDegrees());
-    pigeon.setYaw(-rotation.getDegrees());
-  }
-
-  /**
    * Get the robot relative rotation reported by the gyro (pigeon). Remember that this should be CCW positive.
    * @return The rotation as read from the gyro.
    */
   public Rotation2d getRotation() {
     // Note: Unlike getAngle(), getRotation2d is CCW positive.
     return pigeon.getRotation2d();
+  }
+
+  /**
+   * Get the robot relative rotation reported by the gyro with an applied offset.
+   * @param offset Offset to add to the gyro-supplied rotation.
+   */
+  public Rotation2d getRotation(Rotation2d offset) {
+    return getRotation().plus(offset);
   }
 
   public AprilTagCamera getAprilTagCamera() {
