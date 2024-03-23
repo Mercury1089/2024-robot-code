@@ -114,9 +114,9 @@ public class KnownLocations {
 
         if (alliance == Alliance.Blue) {
             
-            WING_NOTE_TOP = PathPointInch(114.261, 276, 0);
-            WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
-            WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
+            WING_NOTE_TOP = PathPointInch(114.261 - 16, 276, 0);
+            WING_NOTE_MIDDLE = PathPointInch(114.261 - 16, 219, 0);
+            WING_NOTE_BOTTOM = PathPointInch(114.261 - 16, 162, 0);
 
             // Rotation that should be used moving from one WING_NOTE to the next.
             TOPMOST_WING_NOTE_ROTATION = Rotation2d.fromDegrees(-60);
@@ -156,9 +156,9 @@ public class KnownLocations {
 
         } else {
 
-            WING_NOTE_TOP = PathPointInch(537.464, 276, 180);
-            WING_NOTE_MIDDLE = PathPointInch(537.464, 219, 180);
-            WING_NOTE_BOTTOM = PathPointInch(537.464, 162, 180);
+            WING_NOTE_TOP = PathPointInch(537.464 + 16, 276, 180);
+            WING_NOTE_MIDDLE = PathPointInch(537.464 + 16, 219, 180);
+            WING_NOTE_BOTTOM = PathPointInch(537.464 + 16, 162, 180);
 
             // Rotation that should be used moving from one WING_NOTE to the next.
             TOPMOST_WING_NOTE_ROTATION = Rotation2d.fromDegrees(-120);

@@ -32,19 +32,6 @@
               "Colors/traj1": "#FFFFFFFF"
             }
           },
-          "4,0": {
-            "size": [
-              2,
-              1
-            ],
-            "content": {
-              "_type": "ComboBox Chooser",
-              "_source0": "network_table:///SmartDashboard/Auton Element Chooser",
-              "_title": "/SmartDashboard/Auton Element Chooser",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "2,0": {
             "size": [
               2,
@@ -186,7 +173,7 @@
           },
           "11,4": {
             "size": [
-              1,
+              2,
               1
             ],
             "content": {
@@ -225,28 +212,15 @@
               "_showGlyph": false
             }
           },
-          "12,4": {
+          "11,5": {
             "size": [
-              1,
+              2,
               1
             ],
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Drivetrain/Distance to closest note",
               "_title": "SmartDashboard/Drivetrain/Distance to closest note",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "11,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Drivetrain/Distance to closest note",
-              "_title": "/SmartDashboard/Drivetrain/Distance to closest note",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -264,6 +238,32 @@
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "5,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Drivetrain/distanceToSpeaker",
+              "_title": "SmartDashboard/Drivetrain/distanceToSpeaker",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "4,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Arm/Position",
+              "_title": "SmartDashboard/Arm/Position",
+              "_glyph": 148,
+              "_showGlyph": false
             }
           }
         }

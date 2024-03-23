@@ -50,7 +50,7 @@ public class Autons {
 
     private final double ROTATION_P = 3.0;
     private final double TRANSLATION_P = 5.0;
-    private static final double MAX_NOTE_DISTANCE = 2.0;
+    private static final double MAX_NOTE_DISTANCE = 1.0;
 
     private final Command DO_NOTHING = new PrintCommand("Do Nothing Auton");
     private Drivetrain drivetrain;
@@ -302,7 +302,7 @@ public class Autons {
     public boolean noteInRange() {
         ObjectDetectionCamera objectDetectionCam = drivetrain.getObjCam();
         return
-            (objectDetectionCam.getTargetCount() == 1 &&
+            (objectDetectionCam.getLatestResult().hasTargets() &&
             objectDetectionCam.getDistanceToTarget() < MAX_NOTE_DISTANCE) 
             || (intake.hasNote());
     }
