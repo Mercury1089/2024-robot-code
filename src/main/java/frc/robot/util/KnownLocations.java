@@ -66,7 +66,7 @@ public class KnownLocations {
             FORWARD,
             BACKWARD;
 
-    public final double WING_NOTE_OFFSET = 7.0, CENTER_LINE_OFFSET = 30.0;
+    public final double WING_NOTE_OFFSET = 7.0, CENTER_LINE_OFFSET = 35.0;
 
     /**
      * Load the field layout for the current year (currently CRESCENDO).
@@ -122,7 +122,7 @@ public class KnownLocations {
             TOPMOST_WING_NOTE_ROTATION = Rotation2d.fromDegrees(-60);
             BOTTOM_WING_NOTE_ROTATION = Rotation2d.fromDegrees(60);
 
-            LEAVE = PathPointInch(114.261, 30, 0);
+            LEAVE = PathPointInch(114.261 + 50, 96, 0);
 
             AMP = PathPointInch(72.5, 303.0, 90.0);
 
@@ -136,13 +136,13 @@ public class KnownLocations {
             CENTER_NOTE_SECOND_TOP = PathPointInch(325.862, 228, 0);
             CENTER_NOTE_TOP = PathPointInch(325.862, 294, 0);
 
-            INTERMEDIARY_CENTER_NOTE_BOTTOM = PathPointInch(325.862 - CENTER_LINE_OFFSET, 30, 0);
+            INTERMEDIARY_CENTER_NOTE_BOTTOM = PathPointInch(325.862 - CENTER_LINE_OFFSET, 30 + 12, 0);
             INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862 - CENTER_LINE_OFFSET, 96, 0);
             INTERMEDIARY_CENTER_NOTE_MIDDLE = PathPointInch(325.862 - CENTER_LINE_OFFSET, 162, 0);
             INTERMEDIARY_CENTER_NOTE_SECOND_TOP = PathPointInch(325.862 - CENTER_LINE_OFFSET, 228, 0);
             INTERMEDIARY_CENTER_NOTE_TOP = PathPointInch(325.862 - CENTER_LINE_OFFSET, 294, 0);
 
-            CENTER_LINE_SHOOT = PathPointInch(64.66, 154.05, 0);
+            CENTER_LINE_SHOOT = PathPointInch(64.66 + 15, 154.05 - 24, 0);
 
             ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(0);
 
@@ -164,7 +164,7 @@ public class KnownLocations {
             TOPMOST_WING_NOTE_ROTATION = Rotation2d.fromDegrees(-120);
             BOTTOM_WING_NOTE_ROTATION = Rotation2d.fromDegrees(120);
 
-            LEAVE = PathPointInch(537.464, 30, 180);
+            LEAVE = PathPointInch(537.464 -  50, 96, 180);
 
             AMP = PathPointInch(578.77, 303.0, 90.0);
 
@@ -184,7 +184,7 @@ public class KnownLocations {
             INTERMEDIARY_CENTER_NOTE_SECOND_TOP = PathPointInch(325.862 + CENTER_LINE_OFFSET, 228, 180);
             INTERMEDIARY_CENTER_NOTE_TOP = PathPointInch(325.862 + CENTER_LINE_OFFSET, 294, 180);
 
-            CENTER_LINE_SHOOT = PathPointInch(594.44, 154.05, 180);
+            CENTER_LINE_SHOOT = PathPointInch(594.44 - 15, 154.05 - 24, 180);
 
             ZERO_GYRO_ROTAION = Rotation2d.fromDegrees(180);
 

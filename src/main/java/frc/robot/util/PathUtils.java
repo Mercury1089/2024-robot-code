@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,13 @@ public class PathUtils {
     public static final PathConstraints pathConstraints = new PathConstraints(
         SWERVE.MAX_SPEED_METERS_PER_SECOND * 0.85,
         SWERVE.MAX_ACCELERATION * 0.50,
+        SWERVE.MAX_ROTATIONAL_SPEED,
+        SWERVE.MAX_ANGULAR_SPEED
+    );
+
+    public static final PathConstraints fastPathConstraints = new PathConstraints(
+        SWERVE.MAX_SPEED_METERS_PER_SECOND,
+        SWERVE.MAX_ACCELERATION * 0.60,
         SWERVE.MAX_ROTATIONAL_SPEED,
         SWERVE.MAX_ANGULAR_SPEED
     );
@@ -55,6 +63,18 @@ public class PathUtils {
         return new PathPlannerPath(
             bezierPoints,
             PathUtils.pathConstraints,
+            new GoalEndState(0.0, endStateRotation, true));
+    }
+
+    public static PathPlannerPath generatePath(PathConstraints constraints, Pose2d... poses) {
+        return PathUtils.generatePath(poses[poses.length-1].getRotation(), constraints, poses);
+    }
+
+    public static PathPlannerPath generatePath(Rotation2d endStateRotation, PathConstraints constraints, Pose2d... poses) {   
+        List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(poses);
+        return new PathPlannerPath(
+            bezierPoints,
+            constraints,
             new GoalEndState(0.0, endStateRotation, true));
     }
 

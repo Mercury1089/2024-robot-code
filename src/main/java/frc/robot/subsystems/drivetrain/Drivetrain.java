@@ -159,6 +159,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void resetGyro() {
     pigeon.reset();
+    gyroOffset = Rotation2d.fromDegrees(0.0);
   }
 
   public void drive(double xSpeed, double ySpeed, double angularSpeed) {

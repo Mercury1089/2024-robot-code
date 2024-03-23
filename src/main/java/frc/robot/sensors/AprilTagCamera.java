@@ -45,7 +45,7 @@ public class AprilTagCamera extends PhotonCamera {
         super(DEFAULT_CAM_NAME);
         fieldLayout = KnownLocations.getFieldLayout();
         Transform3d robotToCam = new Transform3d(
-            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(DEFAULT_CAM_TILT, DEFAULT_CAM_ROTATION, 0)
+            new Translation3d(DEFAULT_CAM_X, DEFAULT_CAM_Y, DEFAULT_CAM_Z), new Rotation3d(0.0, DEFAULT_CAM_TILT, DEFAULT_CAM_ROTATION)
         );
         // Uncomment the following to silence missing camera errors
         // PhotonCamera.setVersionCheckEnabled(false);

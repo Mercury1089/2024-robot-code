@@ -5,6 +5,7 @@ import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -248,24 +249,36 @@ public class Autons {
                 
                 break;
             case CENTER_LINE_NOTES:
-                path = PathUtils.generatePath(drivetrain.getPose(), /* knownLocations.CENTER_LINE_SHOOT, */ knownLocations.LEAVE, 
-                    knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM, knownLocations.INTERMEDIARY_CENTER_NOTE_MIDDLE, knownLocations.INTERMEDIARY_CENTER_NOTE_SECOND_TOP, knownLocations.INTERMEDIARY_CENTER_NOTE_TOP);
+
+                Pose2d leavePose = new Pose2d(knownLocations.LEAVE.getTranslation(), startingPose.getRotation());
+
+                // Pose2d startingNoteBottom = new Pose2d(knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM.getTranslation(), Rotation2d.fromDegrees(90));
+
+                Pose2d noteSecondBottom = new Pose2d(knownLocations.INTERMEDIARY_CENTER_NOTE_SECOND_BOTTOM.getTranslation(), Rotation2d.fromDegrees(90.0));
+                Pose2d noteMiddle = new Pose2d(knownLocations.INTERMEDIARY_CENTER_NOTE_MIDDLE.getTranslation(), Rotation2d.fromDegrees(90.0));
+
+                path = PathUtils.generatePath(knownLocations.FORWARD, PathUtils.fastPathConstraints, startingPose, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, noteSecondBottom, noteMiddle);
+
+                PathPlannerPath shootPath = PathUtils.generatePath(PathUtils.fastPathConstraints, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.CENTER_LINE_SHOOT);
+
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                pathIndex++;
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(shootPath), "traj" + pathIndex);
                 pathIndex++;
                 
                 autonCommand.addCommands(
-                    pickUpCenterNote(path, knownLocations),
+                    pickUpCenterNote(path),
                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                     new ParallelCommandGroup(
-                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.LEAVE, knownLocations.CENTER_LINE_SHOOT)),
+                        AutoBuilder.followPath(shootPath),
                         new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
                     ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                     shootNote(),
 
-                    pickUpCenterNote(path, knownLocations),
+                    pickUpCenterNote(path),
                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                     new ParallelCommandGroup(
-                        AutoBuilder.followPath(PathUtils.generatePath(drivetrain.getPose(), knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.LEAVE, knownLocations.CENTER_LINE_SHOOT)),
+                        AutoBuilder.followPath(shootPath),
                         new RunCommand(() -> arm.setPosition(arm.getPosToTarget(arm.getDistanceToSpeaker())), arm)
                     ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                     shootNote()
@@ -311,7 +324,7 @@ public class Autons {
         );
     }
 
-    public Command pickUpCenterNote(PathPlannerPath path, KnownLocations knownLocations) {
+    public Command pickUpCenterNote(PathPlannerPath path) {
         BooleanSupplier pickUpNoteCheck = () -> arm.isAtPosition(ArmPosition.HOME) && noteInRange() && !TargetUtils.isInWing(drivetrain.getPose());
 
         return new SequentialCommandGroup(
