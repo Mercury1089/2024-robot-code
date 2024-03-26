@@ -89,6 +89,10 @@ public class DriveCommands {
             true
         ), drivetrain);
     }
+    
+    public static Command shuttleNotesTargetDrive(Supplier<Double> xSpeedSupplier, Supplier<Double> ySpeedSupplier, Drivetrain drivetrain) {
+        return DriveCommands.targetDrive(xSpeedSupplier, ySpeedSupplier, () -> TargetUtils.getTargetHeadingToPoint(drivetrain.getPose(), KnownLocations.getKnownLocations().WING_NOTE_MIDDLE.getTranslation()), drivetrain);
+    }
 
     /**
      * Construct a command that will follow a path provided when the command initializes.

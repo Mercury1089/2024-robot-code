@@ -51,6 +51,11 @@ public class TargetUtils {
         return heading;
     }
 
+    public static double getTargetHeadingToPoint(Pose2d robotPose, Translation2d point) {
+        Rotation2d targetRotation = point.minus(robotPose.getTranslation()).getAngle();
+        return  targetRotation.rotateBy(Rotation2d.fromDegrees(180.0)).getDegrees();
+    }
+
     public static double getTargetHeadingToFieldPosition(Pose2d robotPose, FieldPosition fieldPos) {
         double heading = 0.0;
         Alliance alliance = KnownLocations.getKnownLocations().alliance;

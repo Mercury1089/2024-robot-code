@@ -22,6 +22,7 @@ import frc.robot.util.MercMath;
 import frc.robot.util.TargetUtils;
 
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -182,6 +183,35 @@ public class RobotContainer {
       new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter).until(() -> shooter.isAtAmpVelocity()),
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.AMP), intake)
     ));
+
+
+    BooleanSupplier shuttleCheck = () -> arm.isAtPosition(ArmPosition.SHUTTLE) && shooter.isAtTargetVelocity();
+
+    left3.and(intakeHasNote).whileTrue(
+      new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter),
+          new RunCommand(() -> arm.setPosition(ArmPosition.SHUTTLE), arm),
+          DriveCommands.shuttleNotesTargetDrive(gamepadLeftY, gamepadLeftX, drivetrain)
+        ).until(shuttleCheck),
+        new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
+      )
+    ).onFalse(
+      new ParallelCommandGroup(
+        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter),
+        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+      )
+    );
+
+    right3.onTrue(
+      new RunCommand(() -> arm.setPosition(ArmPosition.SHUTTLE), arm)
+    );
+
+    // left3.and(shuttleCheck).onTrue(
+    //   new SequentialCommandGroup(
+    //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> intake.hasNote())
+    //   )
+    // );
 
     // gamepadY.onTrue(new SequentialCommandGroup(
     //   new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
