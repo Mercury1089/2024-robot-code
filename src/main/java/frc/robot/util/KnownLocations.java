@@ -114,9 +114,9 @@ public class KnownLocations {
 
         if (alliance == Alliance.Blue) {
             
-            WING_NOTE_TOP = PathPointInch(114.261 - 16, 276, 0);
-            WING_NOTE_MIDDLE = PathPointInch(114.261 - 16, 219, 0);
-            WING_NOTE_BOTTOM = PathPointInch(114.261 - 16, 162, 0);
+            WING_NOTE_TOP = PathPointInch(114.261, 276, 0);
+            WING_NOTE_MIDDLE = PathPointInch(114.261, 219, 0);
+            WING_NOTE_BOTTOM = PathPointInch(114.261, 162, 0);
 
             // Rotation that should be used moving from one WING_NOTE to the next.
             TOPMOST_WING_NOTE_ROTATION = Rotation2d.fromDegrees(-60);
@@ -126,9 +126,9 @@ public class KnownLocations {
 
             AMP = PathPointInch(72.5, 303.0, 90.0);
 
-            INTERMEDIARY_NOTE_TOP = PathPointInch(84.261, 276, 0);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(84.261 + WING_NOTE_OFFSET, 276, 0);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(84.261 + WING_NOTE_OFFSET, 219, 0);
-            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261 - 24, 162, 0);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(84.261 + WING_NOTE_OFFSET, 162, 0);
 
             CENTER_NOTE_BOTTOM = PathPointInch(325.862, 30, 0);
             CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862, 96, 0);
@@ -156,9 +156,9 @@ public class KnownLocations {
 
         } else {
 
-            WING_NOTE_TOP = PathPointInch(537.464 + 16, 276, 180);
-            WING_NOTE_MIDDLE = PathPointInch(537.464 + 16, 219, 180);
-            WING_NOTE_BOTTOM = PathPointInch(537.464 + 16, 162, 180);
+            WING_NOTE_TOP = PathPointInch(537.464, 276, 180);
+            WING_NOTE_MIDDLE = PathPointInch(537.464, 219, 180);
+            WING_NOTE_BOTTOM = PathPointInch(537.464, 162, 180);
 
             // Rotation that should be used moving from one WING_NOTE to the next.
             TOPMOST_WING_NOTE_ROTATION = Rotation2d.fromDegrees(-120);
@@ -168,9 +168,9 @@ public class KnownLocations {
 
             AMP = PathPointInch(578.77, 303.0, 90.0);
 
-            INTERMEDIARY_NOTE_TOP = PathPointInch(567.464, 276, 180);
+            INTERMEDIARY_NOTE_TOP = PathPointInch(567.464 - WING_NOTE_OFFSET, 276, 180);
             INTERMEDIARY_NOTE_MIDDLE = PathPointInch(567.464 - WING_NOTE_OFFSET, 219, 180);
-            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(567.464 + 24, 162, 180);
+            INTERMEDIARY_NOTE_BOTTOM = PathPointInch(567.464 - WING_NOTE_OFFSET, 162, 180);
 
             CENTER_NOTE_BOTTOM = PathPointInch(325.862, 30, 180);
             CENTER_NOTE_SECOND_BOTTOM = PathPointInch(325.862, 96, 180);

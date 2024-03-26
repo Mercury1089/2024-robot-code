@@ -1,11 +1,9 @@
 package frc.robot.commands;
 
-import java.lang.annotation.Target;
 import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -14,11 +12,11 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -27,9 +25,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.SWERVE;
 import frc.robot.sensors.ObjectDetectionCamera;
 import frc.robot.subsystems.RobotModeLEDs;
-import frc.robot.subsystems.arm.*;
+import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmPosition;
+import frc.robot.subsystems.arm.Intake;
 import frc.robot.subsystems.arm.Intake.IntakeSpeed;
+import frc.robot.subsystems.arm.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.KnownLocations;
 import frc.robot.util.MercMath;
@@ -50,7 +50,7 @@ public class Autons {
 
     private final double ROTATION_P = 3.0;
     private final double TRANSLATION_P = 5.0;
-    private static final double MAX_NOTE_DISTANCE = 1.0;
+    private static final double MAX_NOTE_DISTANCE = 2.0;
 
     private final Command DO_NOTHING = new PrintCommand("Do Nothing Auton");
     private Drivetrain drivetrain;
@@ -200,9 +200,7 @@ public class Autons {
                         shootNote()
                     );
 
-                    Pose2d startMiddleNote = new Pose2d(knownLocations.WING_NOTE_MIDDLE.getTranslation(), knownLocations.BACKWARD);
-
-                    path = PathUtils.generatePath(startMiddleNote, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
+                    path = PathUtils.generatePath(middleNote, knownLocations.INTERMEDIARY_NOTE_BOTTOM);
                     drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                     pathIndex++;
                     autonCommand.addCommands(
@@ -313,17 +311,17 @@ public class Autons {
 
     public Command pickUpNote(PathPlannerPath path) {
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                // also can try making intake be on
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
-                new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
-                AutoBuilder.followPath(path)
-            ).until(() -> arm.isAtPosition(ArmPosition.HOME) && noteInRange()),
-            new ParallelCommandGroup(
-                drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
-                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-            ).until(() -> intake.hasNote())
-        );
+                new ParallelCommandGroup(
+                        // also can try making intake be on
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
+                        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+                        AutoBuilder.followPath(path)).until(() -> noteInRange() /*&& arm.isAtPosition(ArmPosition.HOME) */),
+                new ConditionalCommand(
+                        new ParallelCommandGroup(
+                                drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
+                                new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake))
+                                .until(() -> intake.hasNote()),
+                        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake), () -> !intake.hasNote()));
     }
 
     public Command pickUpCenterNote(PathPlannerPath path) {

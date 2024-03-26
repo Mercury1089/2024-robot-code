@@ -37,7 +37,7 @@ public class Arm extends SubsystemBase {
 
   private static final float ARM_SOFT_LIMIT_BKW = (float) 45.3;
 
-  private static final double ANGLE_OFFSET = 0.0;
+  private static final double ANGLE_OFFSET = -3.0;
 
   private final double 
     NOMINAL_OUTPUT_FORWARD = 0.01, //0.02,
@@ -122,7 +122,8 @@ public class Arm extends SubsystemBase {
   }
 
   public double getPosToTarget(double distance) {
-    return (54.1 + (0.397 * distance) - 0.00132 * (distance * distance)) + ANGLE_OFFSET;
+    // return (54.1 + (0.397 * distance) - 0.00132 * (distance * distance)) + ANGLE_OFFSET;
+    return (37.1 + (0.633 * distance) - (0.00207 * (distance * distance))) + ANGLE_OFFSET;
   }
 
   public double getDistanceToSpeaker() {

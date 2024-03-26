@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.arm.Intake;
+import frc.robot.util.TargetUtils;
 
 public class RobotModeLEDs extends SubsystemBase {
 
@@ -42,6 +43,7 @@ public class RobotModeLEDs extends SubsystemBase {
   public enum LEDState {
     OFF(0.99),
     HASNOTE(0.77),
+    DISABLEDANDNOTE(0.15),
     AUTOSHOOTENABLED(0.65),
     AUTOSHOOTDISABLED(0.61);
 
@@ -62,7 +64,9 @@ public class RobotModeLEDs extends SubsystemBase {
     SmartDashboard.putString("LED Color", robotMode.toString());
     SmartDashboard.putBoolean("LEDs/enableAutoShoot", isAutoShootEnabled());
 
-    if (intake.hasNote()) {
+    if (intake.hasNote() && robotMode == RobotMode.AUTOSHOOTDISABLED) {
+      blinkin.set(LEDState.DISABLEDANDNOTE.colorValue);
+    } else if (intake.hasNote() && robotMode == RobotMode.AUTOSHOOTENABLED) {
       blinkin.set(LEDState.HASNOTE.colorValue);
     } else if (robotMode == RobotMode.AUTOSHOOTENABLED) {
       blinkin.set(LEDState.AUTOSHOOTENABLED.colorValue);

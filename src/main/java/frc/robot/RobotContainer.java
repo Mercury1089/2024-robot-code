@@ -125,7 +125,10 @@ public class RobotContainer {
     );
 
     right1.and(noNotePresent).whileTrue(
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+      new ParallelCommandGroup(
+        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
+        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+      ) 
     );
 
     left1.and(intakeHasNote).whileTrue(

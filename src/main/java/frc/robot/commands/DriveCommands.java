@@ -73,6 +73,14 @@ public class DriveCommands {
     public static Command ampTargetDrive(Supplier<Double> ySpeedSupplier, Drivetrain drivetrain) {
         int ampTag = KnownLocations.getKnownLocations().alliance == Alliance.Blue ? APRILTAGS.BLUE_AMP : APRILTAGS.RED_AMP;
 
+        if (ampTag == APRILTAGS.RED_AMP) {
+            return new RunCommand(() -> drivetrain.drive(
+                -drivetrain.getDirectionalController().calculate(drivetrain.getPose().getX(), KnownLocations.getFieldLayout().getTagPose(ampTag).get().getX()),
+                -MercMath.sqaureInput(MathUtil.applyDeadband(ySpeedSupplier.get(), SWERVE.JOYSTICK_DEADBAND)),
+                drivetrain.getRotationalController().calculate(drivetrain.getPose().getRotation().getDegrees(), -90.0),
+                true
+            ), drivetrain);
+        }
 
         return new RunCommand(() -> drivetrain.drive(
             drivetrain.getDirectionalController().calculate(drivetrain.getPose().getX(), KnownLocations.getFieldLayout().getTagPose(ampTag).get().getX()),
