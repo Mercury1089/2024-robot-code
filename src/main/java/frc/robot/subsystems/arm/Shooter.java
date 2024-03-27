@@ -173,7 +173,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isAtAmpVelocity() {
-    return Math.abs(getVelocity() - AMP_RPM) <= TARGET_VELOCITY_THRESHOLD;
+    return getVelocity() > 700.0;
   }
 
   public void setTargetVelocity(double velocity) {

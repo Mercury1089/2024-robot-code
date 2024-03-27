@@ -53,7 +53,7 @@ public class Drivetrain extends SubsystemBase {
   private PathPlannerPath pathToNote, pathToAmp;
 
   private ObjectDetectionCamera objectDetectionCam;
-  private static final double ROTATION_P = 1.0 / 90.0, DIRECTION_P = 1 / 2.0, I = 0.0, D = 0.0;
+  private static final double ROTATION_P = 1.0 / 90.0, DIRECTION_P = 1 / 1.5, I = 0.0, D = 0.0;
   private final double THRESHOLD_DEGREES = 3.0;
   private final double THRESHOLD_SPEED = 0.5;
     
@@ -356,6 +356,10 @@ public class Drivetrain extends SubsystemBase {
     return Math.abs(getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToFieldPosition(getPose(), FieldPosition.SPEAKER)) < THRESHOLD_DEGREES;
   }
 
+  public boolean isPointedAtShuttleTarget() {
+    return Math.abs(getPose().getRotation().getDegrees() - TargetUtils.getTargetHeadingToPoint(getPose(), KnownLocations.getKnownLocations().WING_NOTE_MIDDLE.getTranslation())) < 5.0;
+  }
+
   public boolean isNotMoving() {
     return Math.abs(getXSpeeds()) < THRESHOLD_SPEED && Math.abs(getYSpeeds()) < THRESHOLD_SPEED;
   }
@@ -367,7 +371,6 @@ public class Drivetrain extends SubsystemBase {
   public boolean objCamHasTargets() {
     return objectDetectionCam.getLatestResult().hasTargets();
   }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

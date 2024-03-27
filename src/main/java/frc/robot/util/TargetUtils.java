@@ -95,6 +95,25 @@ public class TargetUtils {
             pose.getX() < knownLocations.WING_NOTE_TOP.getX() - 50.0;
    }
 
+   public static boolean isInAmpZone(Pose2d pose) {
+    KnownLocations knownLocations = KnownLocations.getKnownLocations();
+    return knownLocations.alliance == Alliance.Blue ? 
+      pose.getY() > knownLocations.WING_NOTE_BOTTOM.getY() && pose.getX() < knownLocations.WING_LINE_BLUE + 24:
+      pose.getY() > knownLocations.WING_NOTE_BOTTOM.getY() && pose.getX() > knownLocations.WING_LINE_RED - 24;
+   }
+
+   public static boolean isInCenterZone(Pose2d pose) {
+    KnownLocations knownLocations = KnownLocations.getKnownLocations();
+    return pose.getX() > knownLocations.WING_LINE_BLUE && pose.getX() < knownLocations.WING_LINE_RED;
+   }
+
+   public static boolean ampShotCheck(Pose2d pose) {
+    int ampTag = KnownLocations.getKnownLocations().alliance == Alliance.Blue ? APRILTAGS.BLUE_AMP : APRILTAGS.RED_AMP;
+    return /*(Math.abs(KnownLocations.getFieldLayout().getTagPose(ampTag).get().getX() - pose.getX()) < 0.05) && 
+      (Math.abs(pose.getRotation().getDegrees() + 90.0) < 0.75) && */
+      (getDistanceToFieldPos(pose, ampTag) < 2.0);
+   }
+
    // TODO: Create KnownLocations for the X values in this method
    public static boolean isInShootingZone(Pose2d pose) {
        boolean inShootingZone = false;

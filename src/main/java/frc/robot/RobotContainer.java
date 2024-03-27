@@ -86,7 +86,6 @@ public class RobotContainer {
 
     arm = new Arm(drivetrain);
     arm.setDefaultCommand(new RunCommand(() -> arm.setSpeed(gamepadLeftY), arm));
-
     // arm.setDefaultCommand(new RunCommand(() -> arm.changePos(), arm));
 
     intake = new Intake();
@@ -132,10 +131,6 @@ public class RobotContainer {
       ) 
     );
 
-    left1.and(intakeHasNote).whileTrue(
-      DriveCommands.ampTargetDrive(leftJoystickX, drivetrain)
-    );
-
     Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote() && LEDs.isAutoShootEnabled() && DriverStation.isTeleop());
 
     setUpToShoot.whileTrue(
@@ -159,6 +154,7 @@ public class RobotContainer {
     gamepadRB.onTrue(new InstantCommand(() -> LEDs.disableAutoShoot(), LEDs));
 
     right11.onTrue(new InstantCommand(() -> drivetrain.drive(0.0, 0.0, 0.0), drivetrain));
+    gamepadX.onTrue(new InstantCommand(() -> drivetrain.drive(0.0, 0.0, 0.0), drivetrain));
     
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
@@ -184,8 +180,18 @@ public class RobotContainer {
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.AMP), intake)
     ));
 
+    left1.and(intakeHasNote).whileTrue(
+      new SequentialCommandGroup(
+        DriveCommands.ampTargetDrive(leftJoystickX, drivetrain).until(() -> TargetUtils.ampShotCheck(drivetrain.getPose()) && !LEDs.isAutoShootEnabled()),
+        new ParallelCommandGroup(
+          DriveCommands.ampTargetDrive(leftJoystickX, drivetrain),
+          new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter),
+          new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm)
+        )
+      )
+    );
 
-    BooleanSupplier shuttleCheck = () -> arm.isAtPosition(ArmPosition.SHUTTLE) && shooter.isAtTargetVelocity();
+    BooleanSupplier shuttleCheck = () -> arm.isAtPosition(ArmPosition.SHUTTLE) && shooter.isAtTargetVelocity() && drivetrain.isPointedAtShuttleTarget();
 
     left3.and(intakeHasNote).whileTrue(
       new SequentialCommandGroup(
@@ -202,20 +208,6 @@ public class RobotContainer {
         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
       )
     );
-
-    right3.onTrue(
-      new RunCommand(() -> arm.setPosition(ArmPosition.SHUTTLE), arm)
-    );
-
-    // left3.and(shuttleCheck).onTrue(
-    //   new SequentialCommandGroup(
-    //     new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> intake.hasNote())
-    //   )
-    // );
-
-    // gamepadY.onTrue(new SequentialCommandGroup(
-    //   new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
-    // ));
   }
 
   /**

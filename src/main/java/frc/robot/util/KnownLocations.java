@@ -66,7 +66,7 @@ public class KnownLocations {
             FORWARD,
             BACKWARD;
 
-    public final double WING_NOTE_OFFSET = 7.0, CENTER_LINE_OFFSET = 35.0;
+    public final double WING_NOTE_OFFSET = 7.0, CENTER_LINE_OFFSET = 35.0, WING_LINE_BLUE = 230.0, WING_LINE_RED = 420.0;
 
     /**
      * Load the field layout for the current year (currently CRESCENDO).
