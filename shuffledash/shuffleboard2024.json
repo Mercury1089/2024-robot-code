@@ -57,7 +57,7 @@
               "_showGlyph": false,
               "Crosshair/Show crosshair": true,
               "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": true,
+              "Controls/Show controls": false,
               "Controls/Rotation": "NONE",
               "compression": -1.0,
               "fps": -1,
@@ -263,40 +263,6 @@
               "_title": "SmartDashboard/Arm/Position",
               "_glyph": 148,
               "_showGlyph": false
-            }
-          }
-        }
-      }
-    },
-    {
-      "title": "Tab 2",
-      "autoPopulate": false,
-      "autoPopulatePrefix": "",
-      "widgetPane": {
-        "gridSize": 128.0,
-        "showGrid": true,
-        "hgap": 16.0,
-        "vgap": 16.0,
-        "titleType": 0,
-        "tiles": {
-          "4,1": {
-            "size": [
-              8,
-              5
-            ],
-            "content": {
-              "_type": "Field",
-              "_source0": "network_table:///SmartDashboard/Swerve Odometry",
-              "_title": "/SmartDashboard/Swerve Odometry",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Game/Game": "k2024Crescendo",
-              "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false,
-              "Colors/notepose": "#FFFFFFFF",
-              "Colors/pathToNote": "#FFFFFFFF",
-              "Colors/traj2": "#FFFFFFFF",
-              "Colors/traj1": "#FFFFFFFF"
             }
           }
         }

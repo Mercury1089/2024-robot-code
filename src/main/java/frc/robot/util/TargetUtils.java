@@ -75,6 +75,12 @@ public class TargetUtils {
         return heading;
     }
 
+    public static int getAmpTag() {
+        return KnownLocations.getKnownLocations().alliance == Alliance.Blue ?
+            APRILTAGS.BLUE_AMP :
+            APRILTAGS.RED_AMP;
+    }
+
     public static Rotation2d getTargetHeadingToClosestNote(ObjectDetectionCamera objCam, Pose2d robotPose) {
         Rotation2d targetRotation = Rotation2d.fromDegrees(-objCam.getYaw());
         return objCam.getYaw() != 0.0 ?

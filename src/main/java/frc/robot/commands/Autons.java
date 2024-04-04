@@ -259,9 +259,13 @@ public class Autons {
 
                 path = PathUtils.generatePath(knownLocations.FORWARD, PathUtils.fastPathConstraints, startingPose, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, noteSecondBottom, noteMiddle);
 
+                PathPlannerPath secondPath = PathUtils.generatePath(knownLocations.FORWARD, PathUtils.fastPathConstraints, knownLocations.CENTER_LINE_SHOOT, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, noteSecondBottom, noteMiddle);
+
                 PathPlannerPath shootPath = PathUtils.generatePath(PathUtils.fastPathConstraints, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.CENTER_LINE_SHOOT);
 
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
+                pathIndex++;
+                drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(secondPath), "traj" + pathIndex);
                 pathIndex++;
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(shootPath), "traj" + pathIndex);
                 pathIndex++;
@@ -275,7 +279,8 @@ public class Autons {
                     ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                     shootNote(),
 
-                    pickUpCenterNote(path),
+                    pickUpCenterNote(secondPath),
+                    // pickUpCenterNote(path),
                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                     new ParallelCommandGroup(
                         AutoBuilder.followPath(shootPath),
@@ -325,7 +330,7 @@ public class Autons {
     }
 
     public Command pickUpCenterNote(PathPlannerPath path) {
-        BooleanSupplier pickUpNoteCheck = () -> arm.isAtPosition(ArmPosition.HOME) && noteInRange() && !TargetUtils.isInWing(drivetrain.getPose());
+        BooleanSupplier pickUpNoteCheck = () -> /* arm.isAtPosition(ArmPosition.HOME) && */ noteInRange() && !TargetUtils.isInWing(drivetrain.getPose());
 
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
