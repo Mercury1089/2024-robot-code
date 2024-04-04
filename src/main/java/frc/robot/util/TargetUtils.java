@@ -91,20 +91,20 @@ public class TargetUtils {
         Alliance alliance = knownLocations.alliance;
 
         return alliance == Alliance.Blue ?
-            pose.getX() > knownLocations.WING_NOTE_TOP.getX() + 50.0:
-            pose.getX() < knownLocations.WING_NOTE_TOP.getX() - 50.0;
+            Units.metersToInches(pose.getX()) > (Units.metersToInches(knownLocations.WING_NOTE_TOP.getX()) + 50.0):
+            Units.metersToInches(pose.getX()) < (Units.metersToInches(knownLocations.WING_NOTE_TOP.getX()) - 50.0);
    }
 
    public static boolean isInAmpZone(Pose2d pose) {
     KnownLocations knownLocations = KnownLocations.getKnownLocations();
     return knownLocations.alliance == Alliance.Blue ? 
-      pose.getY() > knownLocations.WING_NOTE_BOTTOM.getY() && pose.getX() < knownLocations.WING_LINE_BLUE + 24:
-      pose.getY() > knownLocations.WING_NOTE_BOTTOM.getY() && pose.getX() > knownLocations.WING_LINE_RED - 24;
+      pose.getY() > knownLocations.WING_NOTE_BOTTOM.getY() && Units.metersToInches(pose.getX()) < (knownLocations.WING_LINE_BLUE + 24):
+      pose.getY() > knownLocations.WING_NOTE_BOTTOM.getY() && Units.metersToInches(pose.getX()) > (knownLocations.WING_LINE_RED - 24);
    }
 
    public static boolean isInCenterZone(Pose2d pose) {
     KnownLocations knownLocations = KnownLocations.getKnownLocations();
-    return pose.getX() > knownLocations.WING_LINE_BLUE && pose.getX() < knownLocations.WING_LINE_RED;
+    return Units.metersToInches(pose.getX()) > knownLocations.WING_LINE_BLUE && Units.metersToInches(pose.getX()) < knownLocations.WING_LINE_RED;
    }
 
    public static boolean ampShotCheck(Pose2d pose) {
