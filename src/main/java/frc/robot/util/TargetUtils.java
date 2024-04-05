@@ -97,8 +97,8 @@ public class TargetUtils {
         Alliance alliance = knownLocations.alliance;
 
         return alliance == Alliance.Blue ?
-            Units.metersToInches(pose.getX()) > (Units.metersToInches(knownLocations.WING_NOTE_TOP.getX()) + 50.0):
-            Units.metersToInches(pose.getX()) < (Units.metersToInches(knownLocations.WING_NOTE_TOP.getX()) - 50.0);
+            Units.metersToInches(pose.getX()) < (Units.metersToInches(knownLocations.WING_NOTE_TOP.getX()) /*+ 50.0 */):
+            Units.metersToInches(pose.getX()) > (Units.metersToInches(knownLocations.WING_NOTE_TOP.getX()) /*- 50.0 */);
    }
 
    public static boolean isInAmpZone(Pose2d pose) {
