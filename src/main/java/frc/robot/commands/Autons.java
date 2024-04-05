@@ -96,7 +96,7 @@ public class Autons {
                 drivetrain // Reference to this subsystem to set requirements
         );
 
-        PPHolonomicDriveController.setRotationTargetOverride(() -> TargetUtils.getRotationTargetOverride(drivetrain, intake, arm));
+        PPHolonomicDriveController.setRotationTargetOverride(() -> TargetUtils.getRotationTargetOverride(this, drivetrain, intake, arm));
     }
 
     public void setChoosers(KnownLocations knownLocations) {
@@ -127,6 +127,10 @@ public class Autons {
     
     public Command getAutonCommand() {
         return this.autonCommand;
+    }
+
+    public AutonTypes getAutonType() {
+        return this.autonType;
     }
 
     public Command buildAutonCommand(KnownLocations knownLocations) {        
@@ -261,7 +265,7 @@ public class Autons {
 
                 PathPlannerPath secondPath = PathUtils.generatePath(knownLocations.FORWARD, PathUtils.fastPathConstraints, knownLocations.CENTER_LINE_SHOOT, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, noteSecondBottom, noteMiddle);
 
-                PathPlannerPath shootPath = PathUtils.generatePath(PathUtils.fastPathConstraints, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.CENTER_LINE_SHOOT);
+                PathPlannerPath shootPath = PathUtils.generatePath(knownLocations.BACKWARD, PathUtils.fastPathConstraints, knownLocations.INTERMEDIARY_CENTER_NOTE_BOTTOM, knownLocations.CENTER_LINE_SHOOT, knownLocations.START_BOTTOMMOST);
 
                 drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(path), "traj" + pathIndex);
                 pathIndex++;
