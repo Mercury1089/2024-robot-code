@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.opencv.core.RotatedRect;
 import org.photonvision.EstimatedRobotPose;
@@ -171,6 +172,10 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void drive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative, boolean rateLimit) {
+    drive(xSpeed, ySpeed, angularSpeed, fieldRelative, rateLimit, () -> this.getRotation(this.gyroOffset));
+  }
+
+  public void drive(double xSpeed, double ySpeed, double angularSpeed, boolean fieldRelative, boolean rateLimit, Supplier<Rotation2d> rotationSupplier) {
     double xSpeedCommanded;
     double ySpeedCommanded;
 
@@ -228,7 +233,7 @@ public class Drivetrain extends SubsystemBase {
     ChassisSpeeds fieldRelativeSpeeds;
 
     if (fieldRelative) {
-      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered, getRotation(gyroOffset));
+      fieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered, rotationSupplier.get());
     } else {
       fieldRelativeSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, angularSpeedDelivered);
     }
@@ -412,6 +417,7 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putBoolean("Drivetrain/inShootingRange", inShootingRange());
     SmartDashboard.putBoolean("Drivetrain/inStageArea", TargetUtils.isInStageArea(getPose()));
     SmartDashboard.putNumber("Drivetrain/getRotation", getRotation().getDegrees());
+    SmartDashboard.putNumber("Drivetrain/distanceToAMP", TargetUtils.getDistanceToFieldPos(getPose(), APRILTAGS.BLUE_AMP));
     SmartDashboard.putBoolean("Drivetrain/pointedAtTarget", isPointedAtTarget());
     SmartDashboard.putBoolean("Drivetrain/isNotMoving", isNotMoving());
     SmartDashboard.putNumber("Drivetrain/CurrentPose Rotation", getPose().getRotation().getDegrees());

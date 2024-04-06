@@ -72,12 +72,13 @@ public class DriveCommands {
 
     public static Command ampTargetDrive(Supplier<Double> ySpeedSupplier, Drivetrain drivetrain) {
             return new RunCommand(() -> drivetrain.drive(
-                KnownLocations.getKnownLocations().alliance == Alliance.Blue ? 
-                    drivetrain.getDirectionalController().calculate(drivetrain.getPose().getX(), KnownLocations.getFieldLayout().getTagPose(TargetUtils.getAmpTag()).get().getX()) :
-                    -drivetrain.getDirectionalController().calculate(drivetrain.getPose().getX(), KnownLocations.getFieldLayout().getTagPose(TargetUtils.getAmpTag()).get().getX()),
-                -MercMath.sqaureInput(MathUtil.applyDeadband(ySpeedSupplier.get(), SWERVE.JOYSTICK_DEADBAND)),
+                drivetrain.getDirectionalController().calculate(drivetrain.getPose().getX(), KnownLocations.getFieldLayout().getTagPose(TargetUtils.getAmpTag()).get().getX()),
+                (KnownLocations.getKnownLocations().alliance == Alliance.Blue ? -1 : 1) *
+                MercMath.sqaureInput(MathUtil.applyDeadband(ySpeedSupplier.get(), SWERVE.JOYSTICK_DEADBAND)),
                 drivetrain.getRotationalController().calculate(drivetrain.getPose().getRotation().getDegrees(), -90.0),
-                true
+                true,
+                false,
+                () -> drivetrain.getPose().getRotation()
             ), drivetrain);
     }
     
