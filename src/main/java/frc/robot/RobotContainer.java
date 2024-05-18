@@ -95,63 +95,9 @@ public class RobotContainer {
     LEDs.disableAutoShoot();
 
     shooter = new Shooter();
-    shooter.setDefaultCommand(new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter));
-    // shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
+    shooter.setDefaultCommand(new RunCommand(() -> shooter.stopShooter(), shooter));
     
     auton = new Autons(drivetrain, intake, shooter, arm, LEDs);
-
-    Trigger intakeHasNote = new Trigger(() -> intake.hasNote() && DriverStation.isTeleop());
-    intakeHasNote.onTrue(new ParallelCommandGroup(
-      new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
-    ));
-
-    Trigger noNotePresent = new Trigger(() -> !intake.hasNote() && !shooter.hasNote() && DriverStation.isTeleop());
-    
-    noNotePresent.onTrue(
-      new ParallelCommandGroup(
-        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
-      )
-    );
-
-    Trigger noteInRange = new Trigger(() -> drivetrain.getObjCam().getLatestResult().hasTargets() && DriverStation.isTeleop());
-    
-    right1.and(noteInRange).whileTrue(
-      DriveCommands.targetDrive(
-          leftJoystickY, leftJoystickX,
-          () -> TargetUtils.getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()).getDegrees(),
-          drivetrain)
-    );
-
-    right1.and(noNotePresent).whileTrue(
-      new ParallelCommandGroup(
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
-        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
-      ) 
-    );
-
-    Trigger setUpToShoot = new Trigger(() -> drivetrain.inShootingRange() && intake.hasNote() && LEDs.isAutoShootEnabled() && DriverStation.isTeleop());
-
-    setUpToShoot.whileTrue(
-      DriveCommands.prepareToShoot(leftJoystickY, leftJoystickX, shooter, arm, drivetrain)
-    );
-    
-    Trigger shootTrigger = new Trigger(
-      () -> auton.isReadyToShoot() && 
-      DriverStation.isTeleop());
-
-    shootTrigger.onTrue(new SequentialCommandGroup(
-      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake).until(() -> !shooter.hasNote() && !intake.hasNote()),
-      new ParallelCommandGroup(
-        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake),
-        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter)
-      )
-    ));
-
-    gamepadLB.onTrue(new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs));
-    gamepadRB.onTrue(new InstantCommand(() -> LEDs.disableAutoShoot(), LEDs));
 
     right11.onTrue(new InstantCommand(() -> drivetrain.drive(0.0, 0.0, 0.0), drivetrain));
     gamepadX.onTrue(new InstantCommand(() -> drivetrain.drive(0.0, 0.0, 0.0), drivetrain));
@@ -159,54 +105,27 @@ public class RobotContainer {
     left10.onTrue(new InstantCommand(() -> drivetrain.resetGyro(), drivetrain).ignoringDisable(true));
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
 
-    // for endgame
-    gamepadPOVUp.onTrue(
-      new ParallelCommandGroup(
-        new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm),
-        new RunCommand(() -> shooter.stopShooter(), shooter)
-      )
+
+    gamepadA.whileTrue(
+      new RunCommand(() -> intake.setSpeed(IntakeSpeed.SLOW), intake)
     );
 
-    gamepadPOVDown.onTrue(
-      new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
-    );
-
-    gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake));
-    gamepadB.whileTrue(new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter));
-
-    // THIS CAN BE MANUALLY DONE
-    gamepadA.onTrue(new SequentialCommandGroup(
-      new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter).until(() -> shooter.isAtAmpVelocity()),
-      new RunCommand(() -> intake.setSpeed(IntakeSpeed.AMP), intake)
-    ));
-
-    left1.and(intakeHasNote).whileTrue(
+    gamepadB.whileTrue(
       new SequentialCommandGroup(
-        DriveCommands.ampTargetDrive(leftJoystickX, drivetrain).until(() -> TargetUtils.ampShotCheck(drivetrain.getPose()) && !LEDs.isAutoShootEnabled()),
-        new ParallelCommandGroup(
-          DriveCommands.ampTargetDrive(leftJoystickX, drivetrain),
-          new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter),
-          new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm)
-        )
-      )
-    );
-
-    BooleanSupplier shuttleCheck = () -> arm.isAtPosition(ArmPosition.SHUTTLE) && shooter.isAtTargetVelocity() && drivetrain.isPointedAtShuttleTarget();
-
-    left3.and(intakeHasNote).whileTrue(
-      new SequentialCommandGroup(
+        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter).until(() -> shooter.isAtTargetVelocity()),
         new ParallelCommandGroup(
           new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter),
-          new RunCommand(() -> arm.setPosition(ArmPosition.SHUTTLE), arm),
-          DriveCommands.shuttleNotesTargetDrive(gamepadLeftY, gamepadLeftX, drivetrain)
-        ).until(shuttleCheck),
-        new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
-      )
-    ).onFalse(
-      new ParallelCommandGroup(
-        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter),
-        new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
-      )
+          new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+        )
+      ) 
+    );
+
+    gamepadPOVUp.whileTrue(
+      new RunCommand(() -> arm.setPosition(ArmPosition.MANUAL_SHOT), arm)
+    );
+
+    gamepadPOVDown.whileTrue(
+      new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
     );
   }
 

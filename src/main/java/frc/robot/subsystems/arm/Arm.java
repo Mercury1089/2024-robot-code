@@ -163,6 +163,7 @@ public class Arm extends SubsystemBase {
     AMP(150.0),
     HOME(ARM_SOFT_LIMIT_BKW),
     SHUTTLE(78.0),
+    MANUAL_SHOT(78.0),
     PICKUP_FLOOR(ARM_SOFT_LIMIT_BKW);
   
     
