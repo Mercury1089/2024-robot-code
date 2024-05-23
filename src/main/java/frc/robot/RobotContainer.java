@@ -106,18 +106,23 @@ public class RobotContainer {
     left11.onTrue(new RunCommand(() -> drivetrain.lockSwerve(), drivetrain));
 
 
-    gamepadA.whileTrue(
+    left1.whileTrue(
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.SLOW), intake)
     );
 
-    gamepadB.whileTrue(
-      new SequentialCommandGroup(
-        new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter).until(() -> shooter.isAtTargetVelocity()),
-        new ParallelCommandGroup(
-          new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter),
-          new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
-        )
-      ) 
+    right1.whileTrue(
+      new ParallelCommandGroup(
+        new RunCommand(() -> arm.setPosition(ArmPosition.MANUAL_SHOT), arm),
+        new SequentialCommandGroup(
+          new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter).until(() -> shooter.isAtTargetVelocity()),
+          new ParallelCommandGroup(
+            new RunCommand(() -> shooter.setVelocity(Shooter.STEADY_RPM), shooter),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)
+          )
+        )       
+      )
+    ).onFalse(
+      new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
     );
 
     gamepadPOVUp.whileTrue(
