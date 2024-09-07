@@ -1,7 +1,11 @@
 package frc.robot.commands;
 
+import java.sql.Driver;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
+import com.choreo.lib.Choreo;
+import com.choreo.lib.ChoreoControlFunction;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -9,6 +13,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -58,6 +63,7 @@ public class Autons {
     private Intake intake;
     private RobotModeLEDs LEDs;
     private Shooter shooter;
+    private ChoreoControlFunction choreoController;
 
     public Autons(Drivetrain drivetrain, Intake intake, Shooter shooter, Arm arm, RobotModeLEDs leds) {
 
@@ -97,6 +103,11 @@ public class Autons {
         );
 
         PPHolonomicDriveController.setRotationTargetOverride(() -> TargetUtils.getRotationTargetOverride(this, drivetrain, intake, arm));
+
+        choreoController = Choreo.choreoSwerveController(
+                new PIDController(TRANSLATION_P, 0.0, 0.0), 
+                new PIDController(TRANSLATION_P, 0.0, 0.0), 
+                new PIDController(ROTATION_P, 0.0, 0.0));
     }
 
     public void setChoosers(KnownLocations knownLocations) {
@@ -153,7 +164,7 @@ public class Autons {
             new InstantCommand(() -> LEDs.enableAutoShoot(), LEDs),
             shootNote()
         );      
-
+        /* 
         switch(autonType) {
             case DO_NOT_MOVE:
                 break;
@@ -249,7 +260,7 @@ public class Autons {
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                         shootNote()
                     );
-                } /* else if (startingPose == knownLocations.START_MIDDLE) {
+                } else if (startingPose == knownLocations.START_MIDDLE) {
                     Pose2d startPathPose = new Pose2d(startingPose.getTranslation(), knownLocations.FORWARD);
                     Pose2d startWingNoteBottom = new Pose2d(knownLocations.WING_NOTE_BOTTOM.getTranslation(), knownLocations.BACKWARD);
 
@@ -284,7 +295,7 @@ public class Autons {
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> intake.hasNote()),
                         shootNote()
                     );
-                } */
+                }
                 
                 break;
             case CENTER_LINE_NOTES:
@@ -329,8 +340,15 @@ public class Autons {
                     ).until(() -> drivetrain.isNotMoving() && arm.isFinishedMovingSpeaker()),
                     shootNote()
                 );
-        }
-        return autonCommand;
+        } */
+
+        return Choreo.choreoSwerveCommand(
+            Choreo.getTrajectory("testPath"), 
+            () -> drivetrain.getPose(),
+            choreoController, 
+            (chassisSpeeds) -> drivetrain.drive(chassisSpeeds), 
+            () -> false, 
+            drivetrain);
     }
 
     public boolean isReadyToShoot() {
