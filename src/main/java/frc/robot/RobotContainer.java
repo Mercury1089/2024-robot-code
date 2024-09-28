@@ -167,13 +167,18 @@ public class RobotContainer {
       )
     );
 
-    gamepadPOVDown.onTrue(
-      new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+    gamepadPOVDown.onTrue( new ParallelCommandGroup(
+         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+         new RunCommand(() -> shooter.stopShooter(), shooter)
+      )
     );
 
-    gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake));
-    gamepadB.whileTrue(new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter));
-
+    gamepadY.onTrue(
+      new ParallelCommandGroup(
+        new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm),
+        new RunCommand(() -> shooter.stopShooter(), shooter)
+      )
+    );
     // THIS CAN BE MANUALLY DONE
     gamepadA.onTrue(new SequentialCommandGroup(
       new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter).until(() -> shooter.isAtAmpVelocity()),
