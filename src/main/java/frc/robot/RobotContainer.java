@@ -21,15 +21,24 @@ import frc.robot.util.KnownLocations;
 import frc.robot.util.MercMath;
 import frc.robot.util.TargetUtils;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
@@ -100,6 +109,14 @@ public class RobotContainer {
     
     auton = new Autons(drivetrain, intake, shooter, arm, LEDs);
 
+    Map<String, Command> commands = new HashMap<String, Command>();
+
+    commands.put("pickUpNote", auton.pickUpNote());
+    commands.put("pickUpCenterNote", auton.pickUpCenterNote());
+    commands.put("shootNote", auton.shootNote());
+
+    NamedCommands.registerCommands(commands);
+
     Trigger intakeHasNote = new Trigger(() -> intake.hasNote() && DriverStation.isTeleop());
     intakeHasNote.onTrue(new ParallelCommandGroup(
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
@@ -167,13 +184,19 @@ public class RobotContainer {
       )
     );
 
-    gamepadPOVDown.onTrue(
-      new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm)
+    gamepadPOVDown.onTrue( new ParallelCommandGroup(
+         new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+         new RunCommand(() -> shooter.stopShooter(), shooter)
+      )
     );
 
-    gamepadY.whileTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake));
-    gamepadB.whileTrue(new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter));
-
+    gamepadY.onTrue(
+      new ParallelCommandGroup(
+        new RunCommand(() -> arm.setPosition(ArmPosition.AMP), arm),
+        new RunCommand(() -> shooter.stopShooter(), shooter)
+      )
+    );
+    
     // THIS CAN BE MANUALLY DONE
     gamepadA.onTrue(new SequentialCommandGroup(
       new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter).until(() -> shooter.isAtAmpVelocity()),
