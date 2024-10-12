@@ -35,7 +35,7 @@ public class Arm extends SubsystemBase {
 
   private static final float ARM_SOFT_LIMIT_FWD = (float) 147;
 
-  private static final float ARM_SOFT_LIMIT_BKW = (float) 45.3;
+  private static final float ARM_SOFT_LIMIT_BKW = (float) 45.9;
 
   private static final double ANGLE_OFFSET = -3.5;
 

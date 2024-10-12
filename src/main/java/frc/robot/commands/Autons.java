@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoControlFunction;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -167,15 +168,15 @@ public class Autons {
                 break;
         }
 
-        PathPlannerPath finalizedAuton = PathPlannerPath.fromChoreoTrajectory(autonToRun);
+        PathPlannerAuto finalizedAuton = new PathPlannerAuto(autonToRun);
 
-        if (KnownLocations.getKnownLocations().alliance == Alliance.Red) {
-            finalizedAuton.flipPath();
-        }
+        // if (KnownLocations.getKnownLocations().alliance == Alliance.Red) {
+        //     finalizedAuton.flipPath();
+        // }
 
-        drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(finalizedAuton), "autoRoutine");
+        // drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(finalizedAuton), "autoRoutine");
 
-        autonCommand.addCommands(AutoBuilder.followPath(finalizedAuton));
+        autonCommand.addCommands(finalizedAuton);
 
         return autonCommand;
     }
@@ -202,11 +203,17 @@ public class Autons {
     }
 
     public Command pickUpNote() {
-        return new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake).until(() -> intake.hasNote());
+        return new SequentialCommandGroup(
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake).until(() -> intake.hasNote()),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
+        );
     }
 
     public Command pickUpCenterNote() {
-        return new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake).until(() -> intake.hasNote());
+        return new SequentialCommandGroup(
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake).until(() -> intake.hasNote()),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
+        );
     }
 
     // public Command pickUpNote() {
@@ -245,8 +252,14 @@ public class Autons {
                         setUpToShoot(),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)).until(() -> isReadyToShoot()),
                 new RunCommand(() -> intake.setSpeed(IntakeSpeed.SHOOT), intake)
-                        .until(() -> !shooter.hasNote() && !intake.hasNote()));
+                        .until(() -> !shooter.hasNote() && !intake.hasNote()),
+                new ParallelCommandGroup(
+                    new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
+                    new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
+                ).until(() -> arm.isAtPosition(ArmPosition.HOME))
+            );
     }
+
 
     /**
      * Rebuilds the autonCommand when ONE of the following conditions changes:
