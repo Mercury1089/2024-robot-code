@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.01316454885162,
-        "y": 6.720899207564182
+        "x": 0.9687188605146458,
+        "y": 4.3217209511342105
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.284461030460524,
-        "y": 7.094331880971454
+        "x": 1.6375181841272772,
+        "y": 2.2295702773223733
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.6,
-        "y": 7.0
+        "x": 7.964381313378012,
+        "y": 0.8189562532971225
       },
       "prevControl": {
-        "x": 1.8887395713252983,
-        "y": 7.0
+        "x": 7.223675325624652,
+        "y": 0.9513581132760084
+      },
+      "nextControl": {
+        "x": 8.214284064931766,
+        "y": 0.7742859122081884
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.02,
+        "y": 3.3
+      },
+      "prevControl": {
+        "x": 3.083473803311243,
+        "y": 1.6138730459279103
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,8 +46,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.35,
-      "rotationDegrees": 0,
+      "waypointRelativePos": 1,
+      "rotationDegrees": -10.885527054658722,
       "rotateFast": true
     }
   ],
@@ -39,7 +55,7 @@
   "eventMarkers": [
     {
       "name": "pickUpNote",
-      "waypointRelativePos": 0.2,
+      "waypointRelativePos": 0.8,
       "command": {
         "type": "sequential",
         "data": {
@@ -63,13 +79,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -50.63068275763529,
     "rotateFast": true
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 60.39554925399503,
+    "rotation": -60.39554925399508,
     "velocity": 0
   },
   "useDefaultConstraints": true

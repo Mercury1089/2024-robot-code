@@ -112,7 +112,6 @@ public class RobotContainer {
     Map<String, Command> commands = new HashMap<String, Command>();
 
     commands.put("pickUpNote", auton.pickUpNote());
-    commands.put("pickUpCenterNote", auton.pickUpCenterNote());
     commands.put("shootNote", auton.shootNote());
 
     NamedCommands.registerCommands(commands);
@@ -197,7 +196,8 @@ public class RobotContainer {
       )
     );
     
-    // THIS CAN BE MANUALLY DONE
+    gamepadB.whileTrue(new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake));
+
     gamepadA.onTrue(new SequentialCommandGroup(
       new RunCommand(() -> shooter.setVelocity(Shooter.AMP_RPM), shooter).until(() -> shooter.isAtAmpVelocity()),
       new RunCommand(() -> intake.setSpeed(IntakeSpeed.AMP), intake)

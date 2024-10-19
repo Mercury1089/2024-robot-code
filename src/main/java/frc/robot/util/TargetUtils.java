@@ -160,15 +160,12 @@ public class TargetUtils {
    }
 
    public static Optional<Rotation2d> getRotationTargetOverride(Autons auto, Drivetrain drivetrain, Intake intake, Arm arm){
-    // Some condition that should decide if we want to override rotation
-    var result = drivetrain.getObjCam().getLatestResult();
+    // var result = drivetrain.getObjCam().getLatestResult();   <- Don't need this anymore
     if (auto.getAutonType() == AutonTypes.CENTER_LINE_NOTES && TargetUtils.isInWing(drivetrain.getPose())) {
         return Optional.empty();
-    } else if (result.hasTargets() && !intake.hasNote()) {
-        // Return an optional containing the rotation override (this should be a field relative rotation)
+    } else if (/*result.hasTargets() && */ !intake.hasNote() && auto.noteInRange()) { // added auto.noteInRange()
         return Optional.of(getTargetHeadingToClosestNote(drivetrain.getObjCam(), drivetrain.getPose()));
     } else if (intake.hasNote()) {
-        // return an empty optional when we don't want to override the path's rotation
         return Optional.of(Rotation2d.fromDegrees(getTargetHeadingToFieldPosition(drivetrain.getPose(), FieldPosition.SPEAKER)));
     } else {
         return Optional.empty();

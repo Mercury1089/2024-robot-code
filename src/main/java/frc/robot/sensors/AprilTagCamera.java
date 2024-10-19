@@ -12,6 +12,7 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -65,7 +66,20 @@ public class AprilTagCamera extends PhotonCamera {
     }
 
     public Optional<EstimatedRobotPose> getGlobalPose() {
-        return estimator.update();
+        double THRESHOLD_AMBIGUITY = 0.45;
+
+        PhotonPipelineResult result = getLatestResult();
+
+        if (result.hasTargets()) {
+            for (int i = 0; i < result.targets.size(); i++) {
+                if (result.targets.get(i).getPoseAmbiguity() > THRESHOLD_AMBIGUITY) {
+                    result.targets.remove(i);
+                    i--;
+                }
+            }
+        }
+
+        return estimator.update(result);
     }
 
     public double getYaw() {

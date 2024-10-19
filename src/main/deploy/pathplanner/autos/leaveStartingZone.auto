@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3921973789893525,
-      "y": 5.574556013976893
+      "x": 0.8632322719190892,
+      "y": 4.2912231279008015
     },
-    "rotation": 0
+    "rotation": -58.91249467652001
   },
   "command": {
     "type": "sequential",
@@ -14,19 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Test"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shootNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Test2"
+            "pathName": "leaveStartingZone"
           }
         }
       ]

@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import java.nio.file.Path;
 import java.sql.Driver;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -56,7 +57,7 @@ public class Autons {
 
     private final double ROTATION_P = 3.0;
     private final double TRANSLATION_P = 5.0;
-    private static final double MAX_NOTE_DISTANCE = 2.0;
+    private static final double MAX_NOTE_DISTANCE = 1.25;
 
     private final Command DO_NOTHING = new PrintCommand("Do Nothing Auton");
     private Drivetrain drivetrain;
@@ -170,13 +171,20 @@ public class Autons {
 
         PathPlannerAuto finalizedAuton = new PathPlannerAuto(autonToRun);
 
-        // if (KnownLocations.getKnownLocations().alliance == Alliance.Red) {
-        //     finalizedAuton.flipPath();
-        // }
+        if (KnownLocations.getKnownLocations().alliance == Alliance.Red) {
+            List<PathPlannerPath> pathsInAuto = PathPlannerAuto.getPathGroupFromAutoFile(autonToRun);
+            for (PathPlannerPath p : pathsInAuto) {
+                PathPlannerPath redSidedPath = p.flipPath();
+                autonCommand.addCommands(
+                    AutoBuilder.followPath(redSidedPath),
+                    shootNote()
+                );
+            }
+        } else {
+            autonCommand.addCommands(finalizedAuton);
+        }
 
         // drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(finalizedAuton), "autoRoutine");
-
-        autonCommand.addCommands(finalizedAuton);
 
         return autonCommand;
     }
@@ -209,45 +217,9 @@ public class Autons {
         );
     }
 
-    public Command pickUpCenterNote() {
-        return new SequentialCommandGroup(
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake).until(() -> intake.hasNote()),
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
-        );
-    }
-
-    // public Command pickUpNote() {
-    //     return new SequentialCommandGroup(
-    //             new ParallelCommandGroup(
-    //                     // also can try making intake be on
-    //                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
-    //                     new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm))
-    //                     .until(() -> noteInRange() /* && arm.isAtPosition(ArmPosition.HOME) */),
-    //             new ConditionalCommand(
-    //                     new ParallelCommandGroup(
-    //                             drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
-    //                             new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake)).until(() -> intake.hasNote()),
-    //                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake), () -> !intake.hasNote()));
-    // }
-
-    // public Command pickUpCenterNote() {
-    //     BooleanSupplier pickUpNoteCheck = () -> /* arm.isAtPosition(ArmPosition.HOME) && */ noteInRange()
-    //             && !TargetUtils.isInWing(drivetrain.getPose());
-
-    //     return new SequentialCommandGroup(
-    //             new ParallelCommandGroup(
-    //                     // also can try making intake be on
-    //                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake),
-    //                     new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm))
-    //             .until(pickUpNoteCheck),
-    //             new ParallelCommandGroup(
-    //                     drivetrain.defer(() -> AutoBuilder.followPath(drivetrain.getPathToNote())),
-    //                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.INTAKE), intake))
-    //             .until(() -> intake.hasNote()));
-    // }
-
     public Command shootNote() {
-        return new SequentialCommandGroup(
+        return new ConditionalCommand(
+            new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         setUpToShoot(),
                         new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)).until(() -> isReadyToShoot()),
@@ -257,7 +229,10 @@ public class Autons {
                     new RunCommand(() -> arm.setPosition(ArmPosition.HOME), arm),
                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
                 ).until(() -> arm.isAtPosition(ArmPosition.HOME))
-            );
+            ),
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake), 
+            () -> intake.hasNote()
+        );
     }
 
 

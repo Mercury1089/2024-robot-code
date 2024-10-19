@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.01316454885162,
-      "y": 6.720899207564182
+      "x": 1.4416145195926755,
+      "y": 5.559932574410603
     },
-    "rotation": 57.09475707701201
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "startTMToTMNote"
+            "pathName": "startMToMiddleWN"
           }
         },
         {
@@ -26,7 +26,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "topWNToFirstCNTotopWN"
+            "pathName": "middleWNToBottomWN"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "bottomWNToTopWN"
           }
         },
         {
