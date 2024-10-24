@@ -1,0 +1,20 @@
+{
+  "Connections": {
+    "open": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "1089"
+  },
+  "transitory": {
+    "photonvision": {
+      "AprilTagCamera": {
+        "double[]##v_/photonvision/AprilTagCamera/targetPose": {
+          "open": true
+        },
+        "open": true
+      },
+      "open": true
+    }
+  }
+}

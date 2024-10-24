@@ -20,6 +20,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -100,7 +101,17 @@ public class Autons {
                 () -> drivetrain.getFieldRelativSpeeds(), // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (chassisSpeeds) -> drivetrain.drive(chassisSpeeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 pathFollowerConfig,
-                () -> { return false; }, // Never flip a path - all paths use absolute coordinates
+                () -> {
+                // Boolean supplier that controls when the path will be mirrored for the red alliance
+                // This will flip the path being followed to the red side of the field.
+                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                var alliance = DriverStation.getAlliance();
+                if (alliance.isPresent()) {
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+                }, // Never flip a path - all paths use absolute coordinates
                 drivetrain // Reference to this subsystem to set requirements
         );
 
@@ -153,9 +164,9 @@ public class Autons {
                 break;
             case MULTI_NOTE_SCORE:
                 if (startingPose == knownLocations.START_TOPMOST) {
-                    autonToRun = "wingNoteAutonTopMost";
+                    autonToRun = "leaveStartingZone";
                 } else if (startingPose == knownLocations.START_BOTTOMMOST) {
-                    autonToRun = "wingNoteAutonBottomMost";
+                    autonToRun = "leaveStartingZone";
                 } else if (startingPose == knownLocations.START_MIDDLE) {
                     autonToRun = "wingNoteAutonMiddle";
                 }
@@ -171,18 +182,20 @@ public class Autons {
 
         PathPlannerAuto finalizedAuton = new PathPlannerAuto(autonToRun);
 
-        if (KnownLocations.getKnownLocations().alliance == Alliance.Red) {
-            List<PathPlannerPath> pathsInAuto = PathPlannerAuto.getPathGroupFromAutoFile(autonToRun);
-            for (PathPlannerPath p : pathsInAuto) {
-                PathPlannerPath redSidedPath = p.flipPath();
-                autonCommand.addCommands(
-                    AutoBuilder.followPath(redSidedPath),
-                    shootNote()
-                );
-            }
-        } else {
-            autonCommand.addCommands(finalizedAuton);
-        }
+        // if (KnownLocations.getKnownLocations().alliance == Alliance.Red) {
+        //     List<PathPlannerPath> pathsInAuto = PathPlannerAuto.getPathGroupFromAutoFile(autonToRun);
+        //     for (PathPlannerPath p : pathsInAuto) {
+        //         PathPlannerPath redSidedPath = p.flipPath();
+        //         autonCommand.addCommands(
+        //             AutoBuilder.followPath(redSidedPath),
+        //             shootNote()
+        //         );
+        //     }
+        // } else {
+            
+        // }
+
+        autonCommand.addCommands(finalizedAuton);
 
         // drivetrain.setTrajectorySmartdash(PathUtils.TrajectoryFromPath(finalizedAuton), "autoRoutine");
 
@@ -230,7 +243,7 @@ public class Autons {
                     new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake)
                 ).until(() -> arm.isAtPosition(ArmPosition.HOME))
             ),
-            new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake), 
+            new RunCommand(() -> intake.setSpeed(IntakeSpeed.STOP), intake).until(() -> !intake.hasNote()), 
             () -> intake.hasNote()
         );
     }

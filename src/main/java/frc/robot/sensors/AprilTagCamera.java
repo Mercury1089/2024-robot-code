@@ -66,20 +66,7 @@ public class AprilTagCamera extends PhotonCamera {
     }
 
     public Optional<EstimatedRobotPose> getGlobalPose() {
-        double THRESHOLD_AMBIGUITY = 0.45;
-
-        PhotonPipelineResult result = getLatestResult();
-
-        if (result.hasTargets()) {
-            for (int i = 0; i < result.targets.size(); i++) {
-                if (result.targets.get(i).getPoseAmbiguity() > THRESHOLD_AMBIGUITY) {
-                    result.targets.remove(i);
-                    i--;
-                }
-            }
-        }
-
-        return estimator.update(result);
+        return estimator.update();
     }
 
     public double getYaw() {
